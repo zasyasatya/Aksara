@@ -82,27 +82,74 @@ Aksara/
 └── docker-compose.yml
 ```
 
-## 🚀 Quick Start
+## 🚀 Quick Start (tanpa Docker)
 
-### Backend
+Cara paling mudah untuk menjalankan Aksara adalah launcher satu-perintah. Ia
+membuat virtual environment lokal (`.venv`), memasang dependensi backend, lalu
+membangun UI dan menjalankan aplikasi pada satu alamat.
+
+**Syarat wajib:** Python 3.10 atau lebih baru. Tidak ada dependensi Python yang
+akan dipasang secara global.
 
 ```bash
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-# Docs: http://localhost:8000/docs
+# Linux / macOS
+./run.sh
+
+# Windows (double-click atau dari Command Prompt / PowerShell)
+run.bat
+
+# Alternatif di semua platform
+python run.py
+# Windows jika perintah `python` tidak ada di PATH:
+py -3 run.py
 ```
 
-### Frontend
+Pada first run, buka **http://localhost:8000** setelah launcher selesai.
+Dokumentasi API tersedia di **http://localhost:8000/docs**.
+
+> **Catatan Windows:** `run.bat` mencoba `py -3`, `python3`, `python`, lalu
+> interpreter `.venv` secara otomatis. Jadi Python yang sudah terpasang lewat
+> Python Launcher tidak akan keliru dilaporkan sebagai “Python tidak ditemukan”.
+
+Node.js 18+ diperlukan hanya untuk membangun UI dari source. Jika Node.js belum
+ada, API tetap berjalan dan launcher dapat melayani UI yang telah dibuild
+sebelumnya. Instal Node.js dari https://nodejs.org jika ingin menjalankan UI
+pada clone baru atau mengubah frontend.
+
+### Perintah launcher
 
 ```bash
+python run.py --check          # periksa Python, Node, .venv, dan UI
+python run.py --build          # paksa build ulang UI statis, lalu jalankan
+python run.py --backend-only   # hanya FastAPI / API (Node tidak dibutuhkan)
+python run.py --dev            # FastAPI + Next.js dev server dengan hot reload
+python run.py --port 9000      # jalankan aplikasi pada port lain
+python run.py --reinstall      # pasang ulang dependensi Python di .venv
+./install.sh                   # siapkan semuanya tanpa menjalankan server
+# Windows: install.bat
+```
+
+Mode biasa menyajikan UI dan API dari port yang sama (`8000`), sehingga browser
+selalu memanggil API melalui `/api` pada origin yang sama. Pada mode `--dev`,
+UI Next.js berada di `http://localhost:3000` dan API berada di
+`http://localhost:8000`; proxy Next.js tetap meneruskan `/api` ke backend.
+
+### Menjalankan manual (opsional)
+
+```bash
+# Backend
+cd backend
+python -m venv ../.venv
+../.venv/bin/python -m pip install -r requirements.txt
+../.venv/bin/python -m uvicorn app.main:app --reload --port 8000
+
+# Frontend (terminal lain)
 cd frontend
 npm install
 npm run dev
-# App: http://localhost:3000
 ```
 
-### Docker
+### Docker (opsional)
 
 ```bash
 docker-compose up --build

@@ -1,4 +1,6 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"
+// Same-origin by default. In dev, next.config.js proxies /api to FastAPI; in
+// the production export, FastAPI serves both this UI and /api on one port.
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api"
 
 type TranslateDirection = "latin-to-bali" | "bali-to-latin"
 

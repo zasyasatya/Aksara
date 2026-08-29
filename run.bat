@@ -1,106 +1,38 @@
 @echo off
-REM Aksara Platform - Auto Setup & Run (Windows)
-REM Menyiapkan instalasi dan menjalankan backend + frontend sekaligus
-REM Usage: run.bat  atau  run.bat --install
+REM Aksara launcher for Windows.
+REM Python may be installed through the Python Launcher (py) without a
+REM usable `python` PATH alias. Probe real interpreters before reporting an
+REM error so a preinstalled Python is never mistaken for a missing one.
 
-setlocal enabledelayedexpansion
+setlocal EnableExtensions
+cd /d "%~dp0"
 
-echo.
-echo    ___   _  __ _____   ___   ____   ___
-echo   / _ ^| / ^|/ // ___/  / _ ^| / __ \ / _ \
-echo  / __ ^|/    / \__ \  / __ ^|/ /_/ // , _/
-echo /_/ ^|_/_/^|_/ /____/ /_/ ^|_\____//_/^|_^|
-echo.
-echo Platform Belajar Aksara Bali - Auto Setup
-echo Aksara - Melestarikan Warisan, Menulis Masa Depan
-echo.
-
-REM Check if we're in correct dir
-if not exist "run.py" (
-    echo [ERROR] run.py not found! Run this script from repository root
-    pause
-    exit /b 1
-)
-
-echo [CHECK] Checking requirements...
-
-REM Python
-python --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [ERROR] Python not found! Install from https://python.org
-    pause
-    exit /b 1
-) else (
-    for /f "tokens=*" %%i in ('python --version 2^>^&1') do echo [OK] %%i
-)
-
-REM Node
-node --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [ERROR] Node.js not found! Install from https://nodejs.org
-    pause
-    exit /b 1
-) else (
-    for /f "tokens=*" %%i in ('node --version 2^>^&1') do echo [OK] Node %%i
-)
-
-REM npm
-npm --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [ERROR] npm not found!
-    pause
-    exit /b 1
-) else (
-    for /f "tokens=*" %%i in ('npm --version 2^>^&1') do echo [OK] npm %%i
-)
+call :try_python py -3
+if not errorlevel 1 goto :python_found
+call :try_python python3
+if not errorlevel 1 goto :python_found
+call :try_python python
+if not errorlevel 1 goto :python_found
+call :try_python "%~dp0.venv\Scripts\python.exe"
+if not errorlevel 1 goto :python_found
 
 echo.
-echo [SETUP] Installing dependencies...
-
-REM Backend
-echo [BACKEND] pip install -r backend\requirements.txt
-if exist "backend\requirements.txt" (
-    python -m pip install -r backend\requirements.txt -q
-    if %errorlevel% equ 0 (
-        echo [OK] Backend installed
-    ) else (
-        echo [WARN] Backend install failed, trying with --break-system-packages
-        python -m pip install -r backend\requirements.txt -q --break-system-packages
-    )
-) else (
-    echo [ERROR] backend\requirements.txt not found!
-)
-
-REM Frontend
-echo [FRONTEND] npm install
-if exist "frontend" (
-    cd frontend
-    if not exist "node_modules" (
-        call npm install --silent
-        echo [OK] Frontend installed
-    ) else (
-        echo [SKIP] node_modules exists, skipping (use --force-install to reinstall)
-        echo %* | findstr /C:"--force-install" >nul
-        if %errorlevel% equ 0 (
-            echo [FORCE] Reinstalling...
-            rmdir /s /q node_modules 2>nul
-            call npm install --silent
-        )
-    )
-    cd ..
-) else (
-    echo [ERROR] frontend\ not found!
-)
-
+echo [ERROR] Aksara needs a runnable Python 3.10+ interpreter.
+echo         Python may already be installed but not exposed as `python` in PATH.
+echo         Try: py -3 --version
+echo         Or install/repair Python from https://python.org/downloads
 echo.
-echo [OK] Setup complete! Starting servers...
-echo Backend: http://localhost:8000/docs
-echo Frontend: http://localhost:3000
-echo.
-echo Press Ctrl+C to stop both servers
-echo.
+exit /b 1
 
-REM Run the Python unified runner
-python run.py --no-install %*
+:python_found
+"%PYTHON_EXE%" %PYTHON_ARGS% "%~dp0run.py" %*
+exit /b %errorlevel%
 
-pause
+:try_python
+set "CANDIDATE=%~1"
+set "CANDIDATE_ARGS=%~2"
+"%CANDIDATE%" %CANDIDATE_ARGS% -c "import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)" >nul 2>&1
+if errorlevel 1 exit /b 1
+set "PYTHON_EXE=%CANDIDATE%"
+set "PYTHON_ARGS=%CANDIDATE_ARGS%"
+exit /b 0
