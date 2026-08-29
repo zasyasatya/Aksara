@@ -1,0 +1,260 @@
+[
+  {
+    "id": "quiz-wres-01-1",
+    "lesson_id": "wresastra-01",
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "question": {"text": "Pilih aksara yang berbunyi 'Ha'", "latin": "ha"},
+    "options": [
+      {"id": "a", "bali": "ᬳ", "latin": "ha", "is_correct": true},
+      {"id": "b", "bali": "ᬦ", "latin": "na"},
+      {"id": "c", "bali": "ᬘ", "latin": "ca"},
+      {"id": "d", "bali": "ᬭ", "latin": "ra"}
+    ],
+    "correct_answer": "a",
+    "explanation": "ᬳ adalah Ha, aksara pertama dalam Hanacaraka. Dalam beberapa kata seperti hujan (ᬳᬸᬚᬦ᭄) dibaca ujan tanpa h.",
+    "xp": 10
+  },
+  {
+    "id": "quiz-wres-01-2",
+    "lesson_id": "wresastra-01",
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "question": {"text": "Aksara ᬦ berbunyi?", "bali": "ᬦ"},
+    "options": [
+      {"id": "a", "bali": "ᬳ", "latin": "ha"},
+      {"id": "b", "bali": "ᬦ", "latin": "na", "is_correct": true},
+      {"id": "c", "bali": "ᬘ", "latin": "ca"},
+      {"id": "d", "bali": "ᬓ", "latin": "ka"}
+    ],
+    "correct_answer": "b",
+    "explanation": "ᬦ adalah Na.",
+    "xp": 10
+  },
+  {
+    "id": "quiz-wres-01-3",
+    "lesson_id": "wresastra-01",
+    "type": "true_false",
+    "difficulty": "easy",
+    "question": {"text": "Apakah ᬩᬮᬶ benar untuk kata 'bali'?", "latin": "bali", "bali": "ᬩᬮᬶ", "pair": {"latin": "bali", "bali": "ᬩᬮᬶ"}},
+    "options": [
+      {"id": "true", "label": "Benar", "is_correct": true},
+      {"id": "false", "label": "Salah"}
+    ],
+    "correct_answer": "true",
+    "explanation": "Benar! Ba (ᬩ) + La (ᬮ) + Ulu (ᬶ) = Li, jadi Bali = ᬩᬮᬶ",
+    "xp": 15
+  },
+  {
+    "id": "quiz-wres-02-1",
+    "lesson_id": "wresastra-02",
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "question": {"text": "Pilih aksara Sa", "latin": "sa"},
+    "options": [
+      {"id": "a", "bali": "ᬤ", "latin": "da"},
+      {"id": "b", "bali": "ᬲ", "latin": "sa", "is_correct": true},
+      {"id": "c", "bali": "ᬯ", "latin": "wa"},
+      {"id": "d", "bali": "ᬮ", "latin": "la"}
+    ],
+    "correct_answer": "b",
+    "explanation": "ᬲ adalah Sa.",
+    "xp": 10
+  },
+  {
+    "id": "quiz-wres-02-2",
+    "lesson_id": "wresastra-02",
+    "type": "true_false",
+    "difficulty": "medium",
+    "question": {"text": "Apakah ᬲᬯ benar untuk 'sawa'?", "latin": "sawa", "bali": "ᬲᬯ"},
+    "options": [
+      {"id": "true", "label": "Benar", "is_correct": true},
+      {"id": "false", "label": "Salah"}
+    ],
+    "correct_answer": "true",
+    "explanation": "Benar, Sa + Wa = Sawa",
+    "xp": 15
+  },
+  {
+    "id": "quiz-wres-03-1",
+    "lesson_id": "wresastra-03",
+    "type": "multiple_choice",
+    "difficulty": "easy",
+    "question": {"text": "Aksara untuk 'nya' adalah?", "latin": "nya"},
+    "options": [
+      {"id": "a", "bali": "ᬜ", "latin": "nya", "is_correct": true},
+      {"id": "b", "bali": "ᬬ", "latin": "ya"},
+      {"id": "c", "bali": "ᬚ", "latin": "ja"},
+      {"id": "d", "bali": "ᬧ", "latin": "pa"}
+    ],
+    "correct_answer": "a",
+    "explanation": "ᬜ adalah Nya.",
+    "xp": 10
+  },
+  {
+    "id": "quiz-wres-04-1",
+    "lesson_id": "wresastra-04",
+    "type": "true_false",
+    "difficulty": "easy",
+    "question": {"text": "Apakah ᬫᬕ benar untuk 'maga'?", "latin": "maga", "bali": "ᬫᬕ"},
+    "options": [
+      {"id": "true", "label": "Benar", "is_correct": true},
+      {"id": "false", "label": "Salah"}
+    ],
+    "correct_answer": "true",
+    "explanation": "Benar, Ma + Ga = Maga",
+    "xp": 10
+  },
+  {
+    "id": "quiz-pangangge-01-1",
+    "lesson_id": "pangangge-suara-01",
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "question": {"text": "Pangangge untuk vokal I adalah?", "latin": "i"},
+    "options": [
+      {"id": "a", "bali": "ᬶ", "latin": "ulu", "label": "Ulu ◌ᬶ", "is_correct": true},
+      {"id": "b", "bali": "ᬸ", "latin": "suku", "label": "Suku ◌ᬸ"},
+      {"id": "c", "bali": "ᬾ", "latin": "taleng", "label": "Taleng ᬾ"},
+      {"id": "d", "bali": "ᭂ", "latin": "pepet", "label": "Pepet ◌ᭂ"}
+    ],
+    "correct_answer": "a",
+    "explanation": "Ulu (◌ᬶ) memberi vokal i. Contoh: ᬩ + ᬶ = ᬩᬶ (bi)",
+    "xp": 15
+  },
+  {
+    "id": "quiz-pangangge-01-2",
+    "lesson_id": "pangangge-suara-01",
+    "type": "true_false",
+    "difficulty": "medium",
+    "question": {"text": "Apakah ᬩᬸ benar untuk 'bu'?", "latin": "bu", "bali": "ᬩᬸ"},
+    "options": [
+      {"id": "true", "label": "Benar", "is_correct": true},
+      {"id": "false", "label": "Salah"}
+    ],
+    "correct_answer": "true",
+    "explanation": "Benar! Ba + Suku = Bu",
+    "xp": 15
+  },
+  {
+    "id": "quiz-pangangge-02-1",
+    "lesson_id": "pangangge-suara-02",
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "question": {"text": "Pangangge pepet berbunyi?", "latin": "pepet"},
+    "options": [
+      {"id": "a", "label": "e seperti pada bleganjur", "is_correct": true},
+      {"id": "b", "label": "i seperti pada bali"},
+      {"id": "c", "label": "u seperti pada buku"},
+      {"id": "d", "label": "o seperti pada soto"}
+    ],
+    "correct_answer": "a",
+    "explanation": "Pepet ◌ᭂ berbunyi ě seperti e pada 'bleganjur' ᬩᬼᬕᬜ᭄ᬚᬸᬃ. Ingat, pepet tidak boleh kombinasi dengan cakra!",
+    "xp": 15
+  },
+  {
+    "id": "quiz-tengenan-01-1",
+    "lesson_id": "pangangge-tengenan-01",
+    "type": "multiple_choice",
+    "difficulty": "medium",
+    "question": {"text": "Akhiran 'ng' menggunakan?", "latin": "ng"},
+    "options": [
+      {"id": "a", "bali": "ᬂ", "label": "Cecek ◌ᬂ", "is_correct": true},
+      {"id": "b", "bali": "ᬄ", "label": "Bisah ◌ᬄ"},
+      {"id": "c", "bali": "ᬃ", "label": "Surang ◌ᬃ"},
+      {"id": "d", "bali": "᭄", "label": "Adeg-adeg ◌᭄"}
+    ],
+    "correct_answer": "a",
+    "explanation": "Cecek ◌ᬂ untuk akhiran ng. Contoh: ᬓᬭᬗ᭄ᬓᬸᬂ karangkung dengan cecek di akhir.",
+    "xp": 15
+  },
+  {
+    "id": "quiz-gantungan-01",
+    "lesson_id": "gantungan-01",
+    "type": "gantungan_choice",
+    "difficulty": "hard",
+    "question": {"text": "Pilih penulisan benar untuk 'dharma'", "latin": "dharma", "hint": "Perhatikan surang dan gantungan"},
+    "options": [
+      {"id": "a", "bali": "ᬤᬃᬫ", "is_correct": true, "label": "ᬤᬃᬫ"},
+      {"id": "b", "bali": "ᬤᬭ᭄ᬫ", "label": "ᬤᬭ᭄ᬫ"},
+      {"id": "c", "bali": "ᬤᬄᬫ", "label": "ᬤᬄᬫ"}
+    ],
+    "correct_answer": "a",
+    "explanation": "Dharma = Da + Surang (r) + Ma gantungan. Jadi ᬤᬃᬫ. Surang untuk r di tengah, gantungan untuk ma.",
+    "xp": 20
+  },
+  {
+    "id": "quiz-gantungan-02",
+    "lesson_id": "gantungan-01",
+    "type": "true_false",
+    "difficulty": "hard",
+    "question": {"text": "Apakah tumpuk telu (2 gantungan pada 1 aksara) diperbolehkan?", "latin": "tumpuk telu"},
+    "options": [
+      {"id": "true", "label": "Ya, boleh"},
+      {"id": "false", "label": "Tidak boleh", "is_correct": true}
+    ],
+    "correct_answer": "false",
+    "explanation": "Tidak boleh! Tumpuk telu (tiga lapis) dilarang. Maksimal 1 gantungan per aksara dasar. Jika ada 3 konsonan berurutan, harus pisah suku kata.",
+    "xp": 20
+  },
+  {
+    "id": "quiz-gantungan-03",
+    "lesson_id": "gantungan-02",
+    "type": "multiple_choice",
+    "difficulty": "hard",
+    "question": {"text": "Cakra adalah gantungan untuk?", "latin": "cakra"},
+    "options": [
+      {"id": "a", "label": "Ra", "is_correct": true},
+      {"id": "b", "label": "Ya"},
+      {"id": "c", "label": "Wa"},
+      {"id": "d", "label": "La"}
+    ],
+    "correct_answer": "a",
+    "explanation": "Cakra / Guwung adalah gantungan Ra. Contoh: Kra = Ka + Cakra = ᬓ᭄ᬭ. Nania untuk Ya, Suku Kembung untuk Wa.",
+    "xp": 20
+  },
+  {
+    "id": "quiz-swalalita-01",
+    "lesson_id": "swalalita-01",
+    "type": "multiple_choice",
+    "difficulty": "hard",
+    "question": {"text": "Sa sapa digunakan untuk?", "latin": "sa sapa"},
+    "options": [
+      {"id": "a", "label": "Kata Sanskerta seperti aksara", "is_correct": true},
+      {"id": "b", "label": "Kata Bali sehari-hari"},
+      {"id": "c", "label": "Angka"},
+      {"id": "d", "label": "Tanda baca"}
+    ],
+    "correct_answer": "a",
+    "explanation": "Sa sapa (ᬱ) dan Sa saga (ᬰ) untuk kata Sanskerta. Contoh: Aksara = ᬅᬓ᭄ᬱᬭ dengan sa sapa.",
+    "xp": 25
+  },
+  {
+    "id": "quiz-kalimat-01",
+    "lesson_id": "kalimat-01",
+    "type": "true_false",
+    "difficulty": "medium",
+    "question": {"text": "Apakah ᬑᬁ ᬲ᭄ᬯᬲ᭄ᬢ᭄ᬬᬲ᭄ᬢᬸ benar untuk Om Swastyastu?", "latin": "om swastyastu", "bali": "ᬑᬁ ᬲ᭄ᬯᬲ᭄ᬢ᭄ᬬᬲ᭄ᬢᬸ"},
+    "options": [
+      {"id": "true", "label": "Benar", "is_correct": true},
+      {"id": "false", "label": "Salah"}
+    ],
+    "correct_answer": "true",
+    "explanation": "Benar! Om Swastyastu adalah salam Bali. Ditulis dengan Okara + Ulu Candra + Sa + Wa gantungan + ... kompleks dengan banyak gantungan.",
+    "xp": 30
+  },
+  {
+    "id": "quiz-kalimat-02",
+    "lesson_id": "kalimat-01",
+    "type": "gantungan_choice",
+    "difficulty": "hard",
+    "question": {"text": "Pilih yang benar untuk 'bleganjur' (contoh pepet + gantungan La yang diperbolehkan)", "latin": "bleganjur"},
+    "options": [
+      {"id": "a", "bali": "ᬩᬼᬕᬜ᭄ᬚᬸᬃ", "is_correct": true, "label": "ᬩᬼᬕᬜ᭄ᬚᬸᬃ"},
+      {"id": "b", "bali": "ᬩᭂᬕᬜ᭄ᬚᬸᬃ", "label": "Salah penempatan"},
+      {"id": "c", "bali": "ᬩ᭄ᬮᬕᬜ᭄ᬚᬸᬃ", "label": "Tanpa pepet"}
+    ],
+    "correct_answer": "a",
+    "explanation": "Bleganjur = Ba + La gantungan + Pepet + Ga + Nya gantungan + Ja + Suku + Surang. Kombinasi La gantungan + Pepet DIPERBOLEHKAN, tapi Cakra + Pepet DILARANG!",
+    "xp": 30
+  }
+]
