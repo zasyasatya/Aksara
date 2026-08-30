@@ -22,6 +22,7 @@ Platform edukasi interaktif untuk mempelajari Aksara Bali (Hanacaraka) dengan pe
 
 ### ✅ Quiz Validasi
 - Murid menulis aksara, sistem validasi apakah benar sesuai soal
+<<<<<<< HEAD
 - Tipe: pilihan ganda, benar/salah, gantungan choice, **menulis aksara** (murid menulis kata dari soal, divalidasi otomatis + skor kemiripan), susun kalimat
 - Filter tipe soal di halaman kuis + **keyboard virtual** untuk menulis aksara
 - Feedback detail: jelaskan kesalahan (misal: "Seharusnya pakai gantungan, bukan adeg-adeg")
@@ -40,6 +41,12 @@ Platform edukasi interaktif untuk mempelajari Aksara Bali (Hanacaraka) dengan pe
 - **Mode DEV** (`AKSARA_MODE=dev`): semua halaman dokumentasi selalu tampil, akses admin & guru otomatis
 - **Mode PROD** (`AKSARA_MODE=prod`): hanya halaman publik yang tampil; admin login via token (`AKSARA_ADMIN_TOKEN`), guru via token (`AKSARA_GURU_TOKEN`)
 
+=======
+- Tipe: pilihan ganda, benar/salah, gantungan choice, susun kalimat
+- Feedback detail: jelaskan kesalahan (misal: "Seharusnya pakai gantungan, bukan adeg-adeg")
+- Endpoint `/api/quiz/validate-pair` untuk validasi custom
+
+>>>>>>> origin/main
 ### 🎨 Design System
 - Branding kuat: Saffron (#FF6B35), Deep Brown (#2C1810), Cream (#FFF8E7), Terracotta
 - Font: Plus Jakarta Sans + Noto Sans Balinese
@@ -74,10 +81,16 @@ Aksara/
 │   │   ├── services/
 │   │   │   ├── transliterator.py - CORE advanced engine (800+ lines)
 │   │   │   ├── classifier.py
+<<<<<<< HEAD
 │   │   │   ├── quiz_engine.py - check_answer + validate_pair (termasuk tipe write_aksara)
 │   │   │   └── data_store.py - store JSON terpusat (mampu ditulis ulang, reload per-request)
 │   │   ├── routers/ - translate, classify, lessons, quiz, docs, manage
 │   │   ├── schemas/ - Pydantic models (termasuk manage.py)
+=======
+│   │   │   └── quiz_engine.py
+│   │   ├── routers/ - translate, classify, lessons, quiz
+│   │   ├── schemas/ - Pydantic models
+>>>>>>> origin/main
 │   │   └── tests/ - pytest
 │   └── requirements.txt
 ├── frontend/
@@ -85,6 +98,7 @@ Aksara/
 │   │   ├── page.tsx - Landing
 │   │   ├── dashboard/ - Dashboard progress
 │   │   ├── learn/ - Belajar bertahap
+<<<<<<< HEAD
 │   │   ├── translate/ - Translate dua arah + keyboard aksara
 │   │   ├── quiz/ - Kuis validasi (filter tipe + menulis aksara)
 │   │   ├── playground/ - Keyboard virtual
@@ -99,31 +113,89 @@ Aksara/
 │   ├── lib/api.ts - Typed fetch (termasuk manage.* + token guru)
 │   ├── lib/store.ts - Zustand
 │   └── public/screenshots/ - Screenshot halaman (untuk dokumentasi)
+=======
+│   │   ├── translate/ - Translate live
+│   │   ├── quiz/ - Kuis validasi
+│   │   └── playground/ - Keyboard virtual
+│   ├── components/ui/ - Button, Card, Badge
+│   ├── components/layout/ - Header, BottomNav
+│   ├── components/aksara/ - AksaraCard, etc
+│   ├── lib/api.ts - Typed fetch
+│   └── lib/store.ts - Zustand
+>>>>>>> origin/main
 ├── branding/ - Logo, colors, etc
 └── docker-compose.yml
 ```
 
-## 🚀 Quick Start
+<<<<<<< HEAD
+## 🚀 Quick Start (tanpa Docker)
 
-### Backend
+Cara paling mudah untuk menjalankan Aksara adalah launcher satu-perintah. Ia
+membuat virtual environment lokal (`.venv`), memasang dependensi backend, lalu
+membangun UI dan menjalankan aplikasi pada satu alamat.
+
+**Syarat wajib:** Python 3.10 atau lebih baru. Tidak ada dependensi Python yang
+akan dipasang secara global.
 
 ```bash
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-# Docs: http://localhost:8000/docs
+# Linux / macOS
+./run.sh
+
+# Windows (double-click atau dari Command Prompt / PowerShell)
+run.bat
+
+# Alternatif di semua platform
+python run.py
+# Windows jika perintah `python` tidak ada di PATH:
+py -3 run.py
 ```
 
-### Frontend
+Pada first run, buka **http://localhost:8000** setelah launcher selesai.
+Dokumentasi API tersedia di **http://localhost:8000/docs**.
+
+> **Catatan Windows:** `run.bat` mencoba `py -3`, `python3`, `python`, lalu
+> interpreter `.venv` secara otomatis. Jadi Python yang sudah terpasang lewat
+> Python Launcher tidak akan keliru dilaporkan sebagai “Python tidak ditemukan”.
+
+Node.js 18+ diperlukan hanya untuk membangun UI dari source. Jika Node.js belum
+ada, API tetap berjalan dan launcher dapat melayani UI yang telah dibuild
+sebelumnya. Instal Node.js dari https://nodejs.org jika ingin menjalankan UI
+pada clone baru atau mengubah frontend.
+
+### Perintah launcher
 
 ```bash
+python run.py --check          # periksa Python, Node, .venv, dan UI
+python run.py --build          # paksa build ulang UI statis, lalu jalankan
+python run.py --backend-only   # hanya FastAPI / API (Node tidak dibutuhkan)
+python run.py --dev            # FastAPI + Next.js dev server dengan hot reload
+python run.py --port 9000      # jalankan aplikasi pada port lain
+python run.py --reinstall      # pasang ulang dependensi Python di .venv
+./install.sh                   # siapkan semuanya tanpa menjalankan server
+# Windows: install.bat
+```
+
+Mode biasa menyajikan UI dan API dari port yang sama (`8000`), sehingga browser
+selalu memanggil API melalui `/api` pada origin yang sama. Pada mode `--dev`,
+UI Next.js berada di `http://localhost:3000` dan API berada di
+`http://localhost:8000`; proxy Next.js tetap meneruskan `/api` ke backend.
+
+### Menjalankan manual (opsional)
+
+```bash
+# Backend
+cd backend
+python -m venv ../.venv
+../.venv/bin/python -m pip install -r requirements.txt
+../.venv/bin/python -m uvicorn app.main:app --reload --port 8000
+
+# Frontend (terminal lain)
 cd frontend
 npm install
 npm run dev
-# App: http://localhost:3000
 ```
 
-### Docker
+### Docker (opsional)
 
 ```bash
 docker-compose up --build
@@ -193,6 +265,7 @@ curl -X POST http://localhost:8000/api/quiz/check \
   -d '{"quiz_id": "quiz-wres-01-1", "answer": "a"}'
 ```
 
+<<<<<<< HEAD
 ## 📚 Dokumentasi, Admin & Mode Dev/Prod
 
 Buka **`/docs`** (menu Dokumentasi) untuk panduan penggunaan per peran
@@ -253,6 +326,8 @@ Endpoint lengkap: `GET/POST /api/manage/lessons`, `GET/PUT/DELETE /api/manage/le
 `GET/POST /api/manage/dictionary`, `DELETE /api/manage/dictionary/{latin}`,
 `GET /api/manage/aksara`.
 
+=======
+>>>>>>> origin/main
 ## 🎨 Branding
 
 - **Name:** Aksara
