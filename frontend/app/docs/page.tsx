@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import { api, DocsPageMeta, DocsPagesResponse, getAdminToken } from "@/lib/api"
+import { api, DocsPageMeta, DocsPagesResponse } from "@/lib/api"
 import { Header } from "@/components/layout/header"
 import { BottomNav } from "@/components/layout/bottom-nav"
 import { Badge } from "@/components/ui/badge"
@@ -14,7 +14,7 @@ export default function DocsHubPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    api.getDocsPages(getAdminToken()).then(setData).catch((e) => setError((e as Error).message))
+    api.getDocsPages().then(setData).catch((e) => setError((e as Error).message))
   }, [])
 
   const visiblePages = useMemo(() => {
@@ -40,7 +40,7 @@ export default function DocsHubPage() {
                 Dokumentasi
               </h1>
               <p className="text-charcoal/60 mt-1">
-                Tata cara penggunaan & metodologi ilmiah platform Aksara
+                Tata cara penggunaan & metodologi ilmiah platform AKSA
               </p>
             </div>
           </div>

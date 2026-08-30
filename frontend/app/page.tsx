@@ -20,13 +20,13 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-cream pb-20 lg:pb-0">
       <Header />
       
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-sand via-cream to-cream" />
-        <div className="absolute top-20 right-10 text-[200px] font-bali text-sand/30 select-none hidden lg:block">
+        <div className="pointer-events-none absolute top-24 right-8 text-[160px] leading-none font-bali text-sand/25 select-none hidden lg:block">
           ᬅᬓ᭄ᬱᬭ
         </div>
         
@@ -73,7 +73,7 @@ export default function LandingPage() {
                 <div className="flex items-center gap-2 rounded-full bg-white border border-sand px-4 py-2 shadow-soft">
                   <Zap className="h-4 w-4 text-saffron" />
                   <span className="text-sm font-semibold text-deep-brown">
-                    {visits != null ? `${visits.toLocaleString("id-ID")} orang telah belajar di Aksara` : "Bergabunglah dengan para penjaga aksara"}
+                    {visits != null ? `${visits.toLocaleString("id-ID")} orang telah belajar di AKSA` : "Bergabunglah dengan para penjaga aksara"}
                   </span>
                 </div>
                 <span className="text-xs text-charcoal/50">
@@ -273,7 +273,7 @@ export default function LandingPage() {
               <p className="text-charcoal/70 leading-relaxed">
                 Pemerintah Provinsi Bali mewajibkan Bahasa Bali (termasuk <strong>aksara</strong>)
                 dan Kearifan Lokal Bali sebagai muatan lokal minimal 2 jam per minggu di seluruh
-                satuan pendidikan formal. Aksara menyediakan media belajar digital yang
+                satuan pendidikan formal. AKSA menyediakan media belajar digital yang
                 selaras: materi terstruktur, kuis tervalidasi, dan panel guru untuk
                 menyesuaikan konten dengan kelas Anda — <strong>gratis untuk murid</strong>.
               </p>
@@ -340,11 +340,11 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-deep-brown text-cream font-bali flex items-center justify-center text-xl">ᬅ</div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.svg" alt="AKSA" className="h-9 w-auto" />
               <div>
-                <div className="font-bold">AKSARA</div>
                 <div className="text-xs text-charcoal/60">
-                  © 2026 Aksara Platform. Ngajegang Bali. — dibuat oleh{" "}
+                  © 2026 AKSA — Aksara Nusantara. Ngajegang Bali. — dibuat oleh{" "}
                   <a
                     href="https://zasya.id"
                     target="_blank"

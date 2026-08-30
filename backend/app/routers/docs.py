@@ -7,8 +7,8 @@ Menyediakan:
 Aturan visibilitas:
 - Mode DEV : semua halaman selalu dikembalikan, is_admin selalu True.
 - Mode PROD: hanya halaman `is_public: true` yang dikembalikan untuk pengguna
-  biasa. Admin (header X-Admin-Token valid) tetap melihat semua halaman agar
-  bisa mengatur mana yang "go public".
+  biasa. Admin (sesi login valid, header ``Authorization: Bearer <token>``)
+  tetap melihat semua halaman agar bisa mengatur mana yang "go public".
 """
 
 import json
@@ -20,6 +20,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Header, HTTPException
 
 from ..core.config import settings
+from ..core import security
 from ..schemas.docs import DocsPage, DocsPagesResponse, VisibilityResponse, VisibilityUpdate
 
 router = APIRouter(prefix="/docs", tags=["docs"])
@@ -47,21 +48,26 @@ def _save_pages(pages: List[dict]) -> None:
         os.replace(tmp, DOCS_DATA_PATH)
 
 
-def is_admin(token: Optional[str]) -> bool:
-    """Mode dev: admin otomatis. Mode prod: cocokkan token."""
+def _role(authorization: Optional[str]) -> Optional[str]:
+    """Role sesi aktif: 'admin'/'guru', atau None bila tidak login."""
     if not settings.is_prod:
-        return True
-    return bool(settings.admin_token) and token == settings.admin_token
+        return "admin"
+    return security.get_session_role(security.bearer_token(authorization))
+
+
+def is_admin(authorization: Optional[str]) -> bool:
+    """Mode dev: admin otomatis. Mode prod: sesi login admin valid."""
+    return _role(authorization) == "admin"
 
 
 @router.get("/pages", response_model=DocsPagesResponse)
-async def list_docs_pages(x_admin_token: Optional[str] = Header(default=None)):
+async def list_docs_pages(authorization: Optional[str] = Header(default=None)):
     """Daftar halaman dokumentasi.
 
     Di mode prod, non-admin hanya menerima halaman publik.
     """
     pages_raw = _load_pages()
-    admin = is_admin(x_admin_token)
+    admin = is_admin(authorization)
     if settings.is_prod and not admin:
         pages_raw = [p for p in pages_raw if p.get("is_public", True)]
     pages = sorted(
@@ -75,11 +81,11 @@ async def list_docs_pages(x_admin_token: Optional[str] = Header(default=None)):
 async def set_docs_visibility(
     slug: str,
     body: VisibilityUpdate,
-    x_admin_token: Optional[str] = Header(default=None),
+    authorization: Optional[str] = Header(default=None),
 ):
     """Ubah status publik/privat sebuah halaman dokumentasi (admin only)."""
-    if not is_admin(x_admin_token):
-        raise HTTPException(status_code=403, detail="Akses ditolak. Token admin diperlukan pada mode prod.")
+    if not is_admin(authorization):
+        raise HTTPException(status_code=403, detail="Akses ditolak. Login sebagai Admin diperlukan pada mode prod.")
 
     with _file_lock:
         pages = _load_pages()

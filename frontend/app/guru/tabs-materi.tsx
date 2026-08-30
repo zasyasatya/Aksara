@@ -40,7 +40,7 @@ const EMPTY: LessonIn = {
   is_published: true,
 }
 
-export function TabsMateri({ token }: { token: string | null }) {
+export function TabsMateri() {
   const [lessons, setLessons] = useState<any[]>([])
   const [aksara, setAksara] = useState<AksaraRefGroup[]>([])
   const [quizList, setQuizList] = useState<any[]>([])
@@ -52,9 +52,9 @@ export function TabsMateri({ token }: { token: string | null }) {
 
   const load = () => {
     Promise.all([
-      api.manage.listLessons(token),
+      api.manage.listLessons(),
       api.manage.aksaraReference(),
-      api.manage.listQuizzes(token),
+      api.manage.listQuizzes(),
     ])
       .then(([l, a, q]) => {
         setLessons(l.lessons)
@@ -65,7 +65,7 @@ export function TabsMateri({ token }: { token: string | null }) {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { load() }, [token])
+  useEffect(() => { load() }, [])
 
   const startCreate = () => {
     setEditId(null)
@@ -108,10 +108,10 @@ export function TabsMateri({ token }: { token: string | null }) {
     setSaving(true)
     try {
       if (editId) {
-        await api.manage.updateLesson(editId, editing, token)
+        await api.manage.updateLesson(editId, editing)
         setFlash({ kind: "ok", text: `Materi “${editing.title}” diperbarui.` })
       } else {
-        await api.manage.createLesson(editing, token)
+        await api.manage.createLesson(editing)
         setFlash({ kind: "ok", text: `Materi “${editing.title}” ditambahkan.` })
       }
       setEditing(null)
@@ -126,7 +126,7 @@ export function TabsMateri({ token }: { token: string | null }) {
 
   const remove = async (id: string) => {
     try {
-      const r = await api.manage.deleteLesson(id, token)
+      const r = await api.manage.deleteLesson(id)
       setFlash({ kind: "ok", text: r.message })
       load()
     } catch (e) {

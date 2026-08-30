@@ -38,11 +38,11 @@ export function ContentAdmin() {
               title: "Mode prod → halaman login",
               body: (
                 <>
-                  Saat backend dalam mode <Code>prod</Code> dan token belum tersimpan, Anda
+                  Saat backend dalam mode <Code>prod</Code> dan belum login, Anda
                   diarahkan ke halaman <Link href="/login" className="text-saffron-dark font-semibold hover:underline">/login</Link>.
-                  Pilih peran <strong>Admin</strong>, masukkan <strong>token admin</strong> yang
-                  diset operator (env <Code>AKSARA_ADMIN_TOKEN</Code>), lalu klik “Simpan &amp; Lanjut”.
-                  Token tersimpan di localStorage peramban — klik “Keluar” untuk menghapusnya.
+                  Pilih peran <strong>Admin</strong>, masukkan <strong>username &amp; password</strong> yang
+                  diset operator (env <Code>AKSARA_ADMIN_USERNAME</Code> / <Code>AKSARA_ADMIN_PASSWORD</Code>),
+                  lalu klik “Masuk”. Sesi tersimpan di peramban — klik “Keluar” untuk menghapusnya.
                 </>
               ),
             },
@@ -50,13 +50,13 @@ export function ContentAdmin() {
         />
         <Screenshot
           src="/screenshots/login.png"
-          alt="Halaman login Aksara dengan pilihan peran Guru dan Admin"
-          caption="Halaman login: pilih peran (Guru/Admin) lalu masukkan token sesuai env backend."
+          alt="Halaman login AKSA dengan pilihan peran Guru dan Admin"
+          caption="Halaman login: pilih peran (Guru/Admin) lalu masukkan username & password sesuai env backend."
           url="aksara.local/login"
         />
         <Screenshot
           src="/screenshots/admin.png"
-          alt="Panel admin Aksara dengan pengaturan publikasi dokumentasi"
+          alt="Panel admin AKSA dengan pengaturan publikasi dokumentasi"
           caption="Panel admin: status mode, pengatur publikasi halaman dokumentasi, dan informasi sistem."
           url="aksara.local/admin"
         />
@@ -67,7 +67,7 @@ export function ContentAdmin() {
           head={["Aspek", "Mode DEV", "Mode PROD"]}
           rows={[
             ["Halaman dokumentasi", "Semua halaman tampil (termasuk yang privat, dengan badge “Privat”)", "Hanya halaman yang dipublikasikan admin"],
-            ["Akses panel admin", "Otomatik, tanpa login", "Wajib token admin (AKSARA_ADMIN_TOKEN)"],
+            ["Akses panel admin", "Otomatik, tanpa login", "Wajib login username & password admin"],
             ["Ubah status publikasi", "Boleh (untuk persiapan konten)", "Boleh — langsung berdampak pada apa yang terlihat pengunjung"],
             ["Pengguna biasa", "Melihat semua halaman dokumentasi", "Melihat halaman publik saja; halaman privat tidak bisa dibuka"],
           ]}
@@ -130,13 +130,15 @@ export function ContentAdmin() {
 
       <DocSection id="api" number="4." title="API & variabel lingkungan (ringkasan)">
         <CodeBlock>{`# Variabel lingkungan backend
-AKSARA_MODE=prod              # dev | prod
-AKSARA_ADMIN_TOKEN=ganti-ini  # token admin (wajib di prod)
+AKSARA_MODE=prod                          # dev | prod
+AKSARA_ADMIN_USERNAME=admin               # username admin
+AKSARA_ADMIN_PASSWORD=ganti-password      # password admin (wajib diganti di prod)
 
 # Contoh API
-GET  /api/docs/pages                          # daftar halaman + mode + is_admin
-PATCH /api/docs/pages/:slug/visibility        # body: {"is_public": true|false}
-       Header: X-Admin-Token: <token>         # diperlukan di prod`}</CodeBlock>
+POST /auth/login                           # body: {"role":"admin","username":"...","password":"..."}
+GET  /api/docs/pages                       # daftar halaman + mode + is_admin
+PATCH /api/docs/pages/:slug/visibility     # body: {"is_public": true|false}
+       Header: Authorization: Bearer <session>   # sesi dari /auth/login`}</CodeBlock>
         <p>
           Endpoint <Code>GET /api/docs/pages</Code> membalas field <Code>mode</Code> (
           <Code>dev|prod</Code>) dan <Code>is_admin</Code> — frontend memakai keduanya untuk

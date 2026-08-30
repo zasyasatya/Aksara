@@ -9,7 +9,7 @@ export function ContentGuru() {
     <>
       <p className="text-lg leading-relaxed">
         Panduan ini untuk <strong>guru Bahasa Bali</strong> (atau fasilitator) yang ingin
-        memanfaatkan platform Aksara di kelas. Semua fitur bisa langsung dipakai sebagai alat
+        memanfaatkan platform AKSA di kelas. Semua fitur bisa langsung dipakai sebagai alat
         bantu mengajar, menyiapkan materi, dan menilai — dan kini guru juga dapat{" "}
         <strong>memperbarui konten langsung dari Panel Guru</strong> (materi, kuis, kamus)
         tanpa menyentuh kode.
@@ -69,10 +69,10 @@ export function ContentGuru() {
         <Callout title="Akses & keamanan">
           Di <strong>mode dev</strong> panel langsung terbuka untuk semua orang. Di <strong>mode
           prod</strong>, guru diarahkan ke halaman <Link href="/login" className="text-saffron-dark font-semibold hover:underline">/login</Link>{" "}
-          dan memilih peran <strong>Guru</strong> lalu memasukkan <strong>token</strong> — nilai
-          environment <Code>AKSARA_GURU_TOKEN</Code> (token admin juga diterima). Token disimpan
-          lokal di peramban guru, bukan di server. Halaman murid tidak terpengaruh — tetap bisa
-          diakses tanpa login.
+          dan memilih peran <strong>Guru</strong> lalu memasukkan <strong>username &amp; password</strong> — nilai
+          environment <Code>AKSARA_GURU_USERNAME</Code> / <Code>AKSARA_GURU_PASSWORD</Code> (akun admin
+          juga diterima). Sesi login tersimpan lokal di peramban guru, bukan di server. Halaman murid
+          tidak terpengaruh — tetap bisa diakses tanpa login.
         </Callout>
         <Screenshot
           src="/screenshots/guru.png"
@@ -227,7 +227,7 @@ export function ContentGuru() {
         <p>
           Sejak <strong>Pergub Bali Nomor 7 Tahun 2026</strong>, Bahasa Bali (termasuk{" "}
           <strong>aksara</strong>) dan Kearifan Lokal Bali wajib diajarkan minimal 2 jam per
-          minggu di seluruh satuan pendidikan formal di Bali. Program kemitraan Aksara ada
+          minggu di seluruh satuan pendidikan formal di Bali. Program kemitraan AKSA ada
           untuk memastikan sekolah Anda tidak memulai dari nol:
         </p>
         <Steps items={[
@@ -238,7 +238,7 @@ export function ContentGuru() {
             </>
           ) },
           { title: "Isi formulir (±1 menit)", body: "Nama sekolah/sanggar, wilayah, perkiraan jumlah siswa, dan kontak. Gratis, tanpa komitmen." },
-          { title: "Onboarding 30 menit", body: "Tim Aksara menghubungi via kontak yang diberikan: sesi pengenalan Panel Guru, penyusunan kuis awal, dan pertanyaan teknis." },
+          { title: "Onboarding 30 menit", body: "Tim AKSA menghubungi via kontak yang diberikan: sesi pengenalan Panel Guru, penyusunan kuis awal, dan pertanyaan teknis." },
           { title: "Sekolah masuk daftar mitra", body: "Nama sekolah tampil di halaman /sekolah (status “Verifikasi berjalan” → “Terverifikasi” setelah onboarding)." },
         ]} />
         <Screenshot

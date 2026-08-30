@@ -27,7 +27,7 @@ function nextOptionId(existing: QuizOptionIn[]): string {
   return `opt-${existing.length + 1}`
 }
 
-export function TabsKuis({ token }: { token: string | null }) {
+export function TabsKuis() {
   const [quizzes, setQuizzes] = useState<any[]>([])
   const [lessons, setLessons] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -37,13 +37,13 @@ export function TabsKuis({ token }: { token: string | null }) {
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; text: string } | null>(null)
 
   const load = () => {
-    Promise.all([api.manage.listQuizzes(token), api.manage.listLessons(token)])
+    Promise.all([api.manage.listQuizzes(), api.manage.listLessons()])
       .then(([q, l]) => { setQuizzes(q.quizzes); setLessons(l.lessons) })
       .catch((e) => setFlash({ kind: "err", text: (e as Error).message }))
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { load() }, [token])
+  useEffect(() => { load() }, [])
 
   const startCreate = () => {
     setEditId(null)
@@ -91,10 +91,10 @@ export function TabsKuis({ token }: { token: string | null }) {
     setSaving(true)
     try {
       if (editId) {
-        await api.manage.updateQuiz(editId, editing, token)
+        await api.manage.updateQuiz(editId, editing)
         setFlash({ kind: "ok", text: `Kuis ${editId} diperbarui.` })
       } else {
-        const r = await api.manage.createQuiz(editing, token)
+        const r = await api.manage.createQuiz(editing)
         setFlash({ kind: "ok", text: `Kuis ${r.id} ditambahkan.` })
       }
       setEditing(null)
@@ -109,7 +109,7 @@ export function TabsKuis({ token }: { token: string | null }) {
 
   const remove = async (id: string) => {
     try {
-      const r = await api.manage.deleteQuiz(id, token)
+      const r = await api.manage.deleteQuiz(id)
       setFlash({ kind: "ok", text: r.message })
       load()
     } catch (e) {

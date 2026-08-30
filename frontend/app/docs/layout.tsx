@@ -4,10 +4,10 @@ import type { ReactNode } from "react";
 export const metadata: Metadata = {
   title: "Dokumentasi — Panduan Murid, Guru, Admin & Metode",
   description:
-    "Panduan lengkap platform Aksara Bali: cara penggunaan untuk murid, guru, dan admin, serta metode ilmiah di balik mesin transliterasi aksara Bali.",
+    "Panduan lengkap platform AKSA: cara penggunaan untuk murid, guru, dan admin, serta metode ilmiah di balik mesin transliterasi aksara Bali.",
   alternates: { canonical: "/docs" },
   openGraph: {
-    title: "Dokumentasi Platform Aksara Bali",
+    title: "Dokumentasi Platform AKSA",
     description:
       "Panduan penggunaan (murid/guru/admin) dan dokumentasi metode ilmiah transliterasi.",
     url: "/docs",

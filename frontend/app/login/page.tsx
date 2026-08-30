@@ -3,27 +3,20 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import {
-  api,
-  getAdminToken,
-  getGuruToken,
-  setAdminToken,
-  setGuruToken,
-} from "@/lib/api"
+import { api, AuthRole, getSession, setSession } from "@/lib/api"
 import { Header } from "@/components/layout/header"
-import { ArrowLeft, GraduationCap, Loader2, ShieldCheck } from "lucide-react"
+import { ArrowLeft, GraduationCap, Loader2, Lock, ShieldCheck, User } from "lucide-react"
 
-type Role = "guru" | "admin"
-
-const ROLES: { key: Role; label: string; desc: string; icon: any }[] = [
+const ROLES: { key: AuthRole; label: string; desc: string; icon: any }[] = [
   { key: "guru", label: "Guru", desc: "kelola materi, kuis & kamus", icon: GraduationCap },
   { key: "admin", label: "Admin", desc: "kelola dokumen & mode prod", icon: ShieldCheck },
 ]
 
 export default function LoginPage() {
   const router = useRouter()
-  const [role, setRole] = useState<Role>("guru")
-  const [token, setToken] = useState("")
+  const [role, setRole] = useState<AuthRole>("guru")
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
   const [mode, setMode] = useState<"dev" | "prod">("dev")
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -40,18 +33,17 @@ export default function LoginPage() {
     }
   }, [])
 
-  const targetPath = (r: Role) => (r === "admin" ? "/admin" : "/guru")
-  const storedToken = role === "admin" ? getAdminToken() : getGuruToken()
+  const targetPath = (r: AuthRole) => (r === "admin" ? "/admin" : "/guru")
+  const stored = getSession()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setBusy(true)
     setError(null)
     try {
-      const res = await api.auth.login(role, token.trim())
-      if (res.ok) {
-        if (role === "admin") setAdminToken(token.trim() || null)
-        else setGuruToken(token.trim() || null)
+      const res = await api.auth.login(role, username.trim(), password)
+      if (res.ok && res.session_token) {
+        setSession(res.session_token, res.role ?? role)
         router.push(next.startsWith("/guru") || next.startsWith("/admin") ? next : targetPath(role))
       } else {
         setError(res.message)
@@ -79,7 +71,7 @@ export default function LoginPage() {
         <div className="mt-4 rounded-3xl border border-sand bg-white p-6 lg:p-8 shadow-soft">
           <h1 className="font-display text-2xl font-bold text-deep-brown">Masuk</h1>
           <p className="mt-1 text-sm text-charcoal/60">
-            Pilih peran lalu masukkan token. Halaman murid tetap bisa diakses tanpa login.
+            Pilih peran lalu masukkan username & password. Halaman murid tetap bisa diakses tanpa login.
           </p>
 
           {/* Pilihan role */}
@@ -108,25 +100,48 @@ export default function LoginPage() {
             })}
           </div>
 
-          {/* Token */}
+          {/* Username & password */}
           <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-3">
-            <label className="text-xs font-semibold uppercase tracking-wide text-charcoal/50">
-              {role === "admin" ? (
-                <>Token Admin <code className="rounded bg-sand px-1">AKSARA_ADMIN_TOKEN</code></>
-              ) : (
-                <>Token Guru <code className="rounded bg-sand px-1">AKSARA_GURU_TOKEN</code></>
-              )}
-            </label>
-            <input
-              type="password"
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              placeholder={mode === "dev" ? "kosongkan saja (mode dev)" : "Masukkan token…"}
-              className="rounded-xl border border-sand bg-cream px-4 py-2.5 text-sm outline-none focus:border-saffron"
-            />
-            {storedToken && (
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="username" className="text-xs font-semibold uppercase tracking-wide text-charcoal/50">
+                Username
+              </label>
+              <div className="relative">
+                <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-charcoal/40" />
+                <input
+                  id="username"
+                  type="text"
+                  autoComplete="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder={mode === "dev" ? "username (boleh kosong)" : "Masukkan username…"}
+                  className="w-full rounded-xl border border-sand bg-cream py-2.5 pl-9 pr-4 text-sm outline-none focus:border-saffron"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="password" className="text-xs font-semibold uppercase tracking-wide text-charcoal/50">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-charcoal/40" />
+                <input
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={mode === "dev" ? "password (boleh kosong)" : "Masukkan password…"}
+                  className="w-full rounded-xl border border-sand bg-cream py-2.5 pl-9 pr-4 text-sm outline-none focus:border-saffron"
+                />
+              </div>
+            </div>
+
+            {stored && (
               <p className="text-xs text-charcoal/50">
-                Token tersimpan di perangkat ini — klik <b>Simpan & Lanjut</b> untuk masuk kembali.
+                Anda masih masuk sebagai <b>{stored.role === "admin" ? "Admin" : "Guru"}</b> — klik{" "}
+                <b>Masuk</b> untuk memperbarui sesi.
               </p>
             )}
             {error && (
@@ -136,18 +151,18 @@ export default function LoginPage() {
             )}
             <button
               type="submit"
-              disabled={busy || (mode === "prod" && !token.trim())}
+              disabled={busy || (mode === "prod" && (!username.trim() || !password))}
               className="flex items-center justify-center gap-2 rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white shadow-soft transition-colors hover:bg-ocean disabled:cursor-not-allowed disabled:opacity-50"
             >
               {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-              {busy ? "Memeriksa…" : "Simpan & Lanjut"}
+              {busy ? "Memeriksa…" : "Masuk"}
             </button>
           </form>
 
           {mode === "dev" && (
             <p className="mt-4 rounded-xl bg-sage/10 px-4 py-2.5 text-xs text-sage">
-              Mode <b>dev</b> aktif — akses otomatis tanpa token. Pada mode <b>prod</b>,
-              token dibaca dari env backend.
+              Mode <b>dev</b> aktif — login otomatis tanpa username/password. Pada mode{" "}
+              <b>prod</b>, akun dibaca dari env backend (lihat dokumentasi admin).
             </p>
           )}
         </div>

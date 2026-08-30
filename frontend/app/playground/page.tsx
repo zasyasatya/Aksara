@@ -109,7 +109,7 @@ export default function PlaygroundPage() {
 
       <div className="container mx-auto px-4 lg:px-8 py-6 max-w-5xl">
         <div className="text-center mb-8">
-          <h1 className="font-display text-3xl font-bold">Playground Aksara</h1>
+          <h1 className="font-display text-3xl font-bold">Playground AKSA</h1>
           <p className="text-charcoal/60 mt-1">
             Latihan tulis bebas — ketik lewat keyboard, atau tulis tangan telusuri siluetnya
           </p>

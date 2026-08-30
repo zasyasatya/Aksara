@@ -152,33 +152,58 @@ export interface AksaraRefGroup {
   items: { id: string; bali: string; latin: string; name: string }[]
 }
 
-const ADMIN_TOKEN_KEY = "aksara_admin_token"
-const GURU_TOKEN_KEY = "aksara_guru_token"
+// ── Otentikasi (login username + password → sesi) ───────────────────────
 
-/** Ambil token admin tersimpan (null bila belum login). Hanya jalan di browser. */
-export function getAdminToken(): string | null {
+export type AuthRole = "admin" | "guru"
+
+export interface LoginResponse {
+  ok: boolean
+  message: string
+  mode: string
+  role?: AuthRole
+  session_token?: string | null
+}
+
+export interface SessionInfo {
+  role: AuthRole | null
+  is_admin: boolean
+  is_guru: boolean
+  mode: string
+}
+
+export interface Session {
+  token: string
+  role: AuthRole
+}
+
+const SESSION_KEY = "aksara_session_token"
+const SESSION_ROLE_KEY = "aksara_session_role"
+
+/** Ambil sesi login tersimpan (null bila belum login). Hanya jalan di browser. */
+export function getSession(): Session | null {
   if (typeof window === "undefined") return null
-  return window.localStorage.getItem(ADMIN_TOKEN_KEY)
+  const token = window.localStorage.getItem(SESSION_KEY)
+  const role = window.localStorage.getItem(SESSION_ROLE_KEY)
+  if (!token || (role !== "admin" && role !== "guru")) return null
+  return { token, role: role as AuthRole }
 }
 
-/** Simpan atau hapus token admin. */
-export function setAdminToken(token: string | null): void {
+/** Simpan (atau hapus) sesi login. */
+export function setSession(token: string | null, role: AuthRole | null): void {
   if (typeof window === "undefined") return
-  if (token) window.localStorage.setItem(ADMIN_TOKEN_KEY, token)
-  else window.localStorage.removeItem(ADMIN_TOKEN_KEY)
+  if (token && role) {
+    window.localStorage.setItem(SESSION_KEY, token)
+    window.localStorage.setItem(SESSION_ROLE_KEY, role)
+  } else {
+    window.localStorage.removeItem(SESSION_KEY)
+    window.localStorage.removeItem(SESSION_ROLE_KEY)
+  }
 }
 
-/** Ambil token guru tersimpan (null bila belum login). */
-export function getGuruToken(): string | null {
-  if (typeof window === "undefined") return null
-  return window.localStorage.getItem(GURU_TOKEN_KEY)
-}
-
-/** Simpan atau hapus token guru. */
-export function setGuruToken(token: string | null): void {
-  if (typeof window === "undefined") return
-  if (token) window.localStorage.setItem(GURU_TOKEN_KEY, token)
-  else window.localStorage.removeItem(GURU_TOKEN_KEY)
+/** Header Authorization untuk sesi aktif (kosong bila belum login). */
+function authHeaders(): Record<string, string> {
+  const session = getSession()
+  return session ? { Authorization: `Bearer ${session.token}` } : {}
 }
 
 async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -190,18 +215,18 @@ async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise
       ...options.headers,
     },
   })
-  
+
   if (!res.ok) {
     const error = await res.text()
     throw new Error(`API Error ${res.status}: ${error}`)
   }
-  
+
   return res.json()
 }
 
 export const api = {
   health: () => fetchAPI<{status: string; version?: string; service?: string}>("/health"),
-  
+
   translate: (text: string, direction: TranslateDirection, useDictionary = true) =>
     fetchAPI<TranslateResponse>("/translate", {
       method: "POST",
@@ -211,22 +236,22 @@ export const api = {
         options: { use_dictionary: useDictionary }
       })
     }),
-  
+
   translateBatch: (items: {text: string, direction: TranslateDirection}[]) =>
     fetchAPI<{results: TranslateResponse[]}>("/translate/batch", {
       method: "POST",
       body: JSON.stringify({ items })
     }),
-  
+
   classify: (text: string) =>
     fetchAPI<ClassifyResponse>("/classify", {
       method: "POST",
       body: JSON.stringify({ text })
     }),
-  
+
   getClassifyTypes: () =>
     fetchAPI<{types: any[]}>("/classify/types"),
-  
+
   getLessons: (params?: {level?: number, category?: string, search?: string, limit?: number, offset?: number}) => {
     const searchParams = new URLSearchParams()
     if (params?.level) searchParams.set("level", params.level.toString())
@@ -237,10 +262,10 @@ export const api = {
     const query = searchParams.toString() ? `?${searchParams.toString()}` : ""
     return fetchAPI<{lessons: Lesson[], total: number, level_info: any}>(`/lessons${query}`)
   },
-  
+
   getLesson: (id: string) =>
     fetchAPI<any>(`/lessons/${id}`),
-  
+
   getQuizzes: (params?: {lesson_id?: string, type?: string, difficulty?: string, limit?: number}) => {
     const searchParams = new URLSearchParams()
     if (params?.lesson_id) searchParams.set("lesson_id", params.lesson_id)
@@ -250,22 +275,22 @@ export const api = {
     const query = searchParams.toString() ? `?${searchParams.toString()}` : ""
     return fetchAPI<{quizzes: Quiz[], total: number}>(`/quiz${query}`)
   },
-  
+
   checkQuiz: (quiz_id: string, answer: any, user_input?: string) =>
     fetchAPI<any>("/quiz/check", {
       method: "POST",
       body: JSON.stringify({ quiz_id, answer, user_input })
     }),
-  
+
   validatePair: (question_latin: string, question_bali: string, user_bali: string, mode: "exact" | "tolerant" = "exact") =>
     fetchAPI<any>("/quiz/validate-pair", {
       method: "POST",
       body: JSON.stringify({ question_latin, question_bali, user_bali, mode })
     }),
-  
+
   getGantunganRules: () =>
     fetchAPI<{rules: any[]}>("/translate/gantungan/rules"),
-  
+
   analyzeGantungan: (text: string, direction: TranslateDirection = "latin-to-bali") =>
     fetchAPI<any>("/translate/gantungan/analyze", {
       method: "POST",
@@ -273,97 +298,106 @@ export const api = {
     }),
 
   // ── Dokumentasi ──
-  getDocsPages: (adminToken: string | null = null) =>
+  getDocsPages: () =>
     fetchAPI<DocsPagesResponse>("/docs/pages", {
-      headers: adminToken ? { "X-Admin-Token": adminToken } : {},
+      headers: authHeaders(),
     }),
 
-  setDocVisibility: (slug: string, isPublic: boolean, adminToken: string | null = null) =>
+  setDocVisibility: (slug: string, isPublic: boolean) =>
     fetchAPI<VisibilityResponse>(`/docs/pages/${slug}/visibility`, {
       method: "PATCH",
       body: JSON.stringify({ is_public: isPublic }),
-      headers: adminToken ? { "X-Admin-Token": adminToken } : {},
+      headers: authHeaders(),
     }),
 
   // ── Otentikasi (Guru & Admin) ──
   auth: {
     info: () =>
       fetchAPI<{ mode: "dev" | "prod" }>("/auth/info"),
-    login: (role: "guru" | "admin", token: string) =>
-      fetchAPI<{ ok: boolean; message: string; mode: string }>("/auth/login", {
+    login: (role: AuthRole, username: string, password: string) =>
+      fetchAPI<LoginResponse>("/auth/login", {
         method: "POST",
-        body: JSON.stringify({ role, token }),
+        body: JSON.stringify({ role, username, password }),
+      }),
+    logout: () =>
+      fetchAPI<{ ok: boolean; message: string }>("/auth/logout", {
+        method: "POST",
+        headers: authHeaders(),
+      }),
+    session: () =>
+      fetchAPI<SessionInfo>("/auth/session", {
+        headers: authHeaders(),
       }),
   },
 
   // ── Manajemen konten (Guru) ──
   manage: {
-    status: (guruToken: string | null = null) =>
+    status: () =>
       fetchAPI<ManageStatus>("/manage/status", {
-        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+        headers: authHeaders(),
       }),
 
     // Materi
-    listLessons: (guruToken: string | null = null) =>
+    listLessons: () =>
       fetchAPI<{ lessons: any[]; total: number }>("/manage/lessons", {
-        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+        headers: authHeaders(),
       }),
-    createLesson: (body: LessonIn, guruToken: string | null = null) =>
+    createLesson: (body: LessonIn) =>
       fetchAPI<any>("/manage/lessons", {
         method: "POST",
         body: JSON.stringify(body),
-        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+        headers: authHeaders(),
       }),
-    updateLesson: (id: string, body: LessonIn, guruToken: string | null = null) =>
+    updateLesson: (id: string, body: LessonIn) =>
       fetchAPI<any>(`/manage/lessons/${id}`, {
         method: "PUT",
         body: JSON.stringify(body),
-        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+        headers: authHeaders(),
       }),
-    deleteLesson: (id: string, guruToken: string | null = null) =>
+    deleteLesson: (id: string) =>
       fetchAPI<{ message: string }>(`/manage/lessons/${id}`, {
         method: "DELETE",
-        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+        headers: authHeaders(),
       }),
 
     // Kuis
-    listQuizzes: (guruToken: string | null = null) =>
+    listQuizzes: () =>
       fetchAPI<{ quizzes: any[]; total: number }>("/manage/quizzes", {
-        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+        headers: authHeaders(),
       }),
-    createQuiz: (body: QuizIn, guruToken: string | null = null) =>
+    createQuiz: (body: QuizIn) =>
       fetchAPI<any>("/manage/quizzes", {
         method: "POST",
         body: JSON.stringify(body),
-        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+        headers: authHeaders(),
       }),
-    updateQuiz: (id: string, body: QuizIn, guruToken: string | null = null) =>
+    updateQuiz: (id: string, body: QuizIn) =>
       fetchAPI<any>(`/manage/quizzes/${id}`, {
         method: "PUT",
         body: JSON.stringify(body),
-        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+        headers: authHeaders(),
       }),
-    deleteQuiz: (id: string, guruToken: string | null = null) =>
+    deleteQuiz: (id: string) =>
       fetchAPI<{ message: string }>(`/manage/quizzes/${id}`, {
         method: "DELETE",
-        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+        headers: authHeaders(),
       }),
 
     // Kamus
-    listDictionary: (guruToken: string | null = null) =>
+    listDictionary: () =>
       fetchAPI<{ entries: DictEntry[]; total: number }>("/manage/dictionary", {
-        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+        headers: authHeaders(),
       }),
-    upsertDict: (body: { latin: string; bali: string; meaning?: string; note?: string }, guruToken: string | null = null) =>
+    upsertDict: (body: { latin: string; bali: string; meaning?: string; note?: string }) =>
       fetchAPI<DictEntry>("/manage/dictionary", {
         method: "POST",
         body: JSON.stringify(body),
-        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+        headers: authHeaders(),
       }),
-    deleteDict: (latin: string, guruToken: string | null = null) =>
+    deleteDict: (latin: string) =>
       fetchAPI<{ message: string }>(`/manage/dictionary/${encodeURIComponent(latin)}`, {
         method: "DELETE",
-        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+        headers: authHeaders(),
       }),
 
     // Referensi aksara untuk form
@@ -393,4 +427,4 @@ export const api = {
 
 /** URL publik aplikasi (untuk teks share & meta). Bisa di-override via env. */
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aksara.id"
-export const SITE_HASHTAGS = "#AksaraBali #MelestarikanBudaya"
+export const SITE_HASHTAGS = "#AKSA #AksaraBali #MelestarikanBudaya"

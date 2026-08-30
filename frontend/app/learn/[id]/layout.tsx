@@ -45,7 +45,7 @@ export async function generateMetadata({
   const { id: paramsId } = await params
   const fallback: Metadata = {
     title: `Pelajaran ${paramsId}`,
-    description: "Pelajaran interaktif Aksara Bali.",
+    description: "Pelajaran interaktif aksara Bali di AKSA.",
     alternates: { canonical: `/learn/${paramsId}` },
   }
   try {
@@ -60,8 +60,8 @@ export async function generateMetadata({
     const lessons: unknown = JSON.parse(readFileSync(catalogue, "utf-8"))
     const lesson = (lessons as any[]).find((l) => l?.id === paramsId)
     if (!lesson) return fallback
-    const title = `${lesson.title} — Belajar Aksara Bali`
-    const description = `${lesson.description ?? lesson.title} — pelajaran interaktif level ${lesson.level ?? "-"} platform Aksara Bali.`
+    const title = `${lesson.title} — Belajar Aksara Bali di AKSA`
+    const description = `${lesson.description ?? lesson.title} — pelajaran interaktif level ${lesson.level ?? "-"} di AKSA.`
     return {
       title,
       description,

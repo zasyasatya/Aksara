@@ -16,7 +16,7 @@ interface Draft {
 
 const EMPTY_DRAFT: Draft = { latin: "", bali: "", meaning: "", note: "" }
 
-export function TabsKamus({ token }: { token: string | null }) {
+export function TabsKamus() {
   const [entries, setEntries] = useState<DictEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState("")
@@ -26,13 +26,13 @@ export function TabsKamus({ token }: { token: string | null }) {
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; text: string } | null>(null)
 
   const load = () => {
-    api.manage.listDictionary(token)
+    api.manage.listDictionary()
       .then((r) => setEntries(r.entries))
       .catch((e) => setFlash({ kind: "err", text: (e as Error).message }))
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { load() }, [token])
+  useEffect(() => { load() }, [])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -51,7 +51,7 @@ export function TabsKamus({ token }: { token: string | null }) {
         bali: draft.bali.trim(),
         meaning: draft.meaning || undefined,
         note: draft.note || undefined,
-      }, token)
+      })
       setFlash({
         kind: "ok",
         text: draftKey ? `Kamus “${draft.latin}” diperbarui.` : `Kamus “${draft.latin}” ditambahkan.`,
@@ -68,7 +68,7 @@ export function TabsKamus({ token }: { token: string | null }) {
 
   const remove = async (latin: string) => {
     try {
-      const r = await api.manage.deleteDict(latin, token)
+      const r = await api.manage.deleteDict(latin)
       setFlash({ kind: "ok", text: r.message })
       load()
     } catch (e) {

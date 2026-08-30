@@ -8,7 +8,7 @@ export function ContentScientific() {
     <>
       <p className="text-lg leading-relaxed">
         Halaman ini adalah dedikasi khusus untuk menjelaskan <strong>metode ilmiah (scientific
-        method)</strong> yang dipakai platform Aksara dalam menyajikan materi dan melakukan
+        method)</strong> yang dipakai platform AKSA dalam menyajikan materi dan melakukan
         transliterasi Aksara Bali, serta <strong>referensi akademik</strong> yang mendasarinya.
         Tujuannya: transparansi — siapa pun bisa menelusuri <em>mengapa</em> sebuah hasil
         transliterasi muncul, dan sumber mana yang melandasi setiap aturan.

@@ -20,7 +20,7 @@ const JSONLD = {
   "@graph": [
     {
       "@type": "SoftwareApplication",
-      name: "Aksara Translate",
+      name: "AKSA Translate",
       url: "https://aksara.id/translate",
       applicationCategory: "EducationalApplication",
       operatingSystem: "Web",
@@ -33,7 +33,7 @@ const JSONLD = {
         "Analisis gantungan, gempelan & tumpuk telu",
         "Pengenalan tulisan tangan aksara (offline/on-device)",
       ],
-      provider: { "@type": "Organization", name: "Aksara", url: "https://aksara.id" },
+      provider: { "@type": "Organization", name: "AKSA", url: "https://aksara.id" },
     },
     {
       "@type": "FAQPage",

@@ -4,7 +4,17 @@ Base URL: `http://localhost:8000/api` (dev), `https://api.aksara.bali/api` (prod
 
 ## Authentication
 
-MVP: No auth (public). Future: JWT Bearer.
+Endpoint publik bebas akses. Panel Guru & Admin memakai **login username + password**
+yang menerbitkan session token opak, dikirim ulang sebagai header
+`Authorization: Bearer <session_token>`.
+
+- **POST /auth/login** — body `{ "role": "admin"|"guru", "username", "password" }`.
+  Mode `dev` login otomatis; mode `prod` mencocokkan username/password dengan env
+  (`AKSARA_ADMIN_USERNAME`/`AKSARA_ADMIN_PASSWORD`, `AKSARA_GURU_USERNAME`/`AKSARA_GURU_PASSWORD`).
+  Response: `{ "ok", "message", "mode", "role", "session_token" }`.
+- **GET /auth/info** — `{ "mode": "dev"|"prod" }`.
+- **GET /auth/session** — memeriksa sesi aktif → `{ "role", "is_admin", "is_guru", "mode" }`.
+- **POST /auth/logout** — menghapus sesi aktif.
 
 ## Endpoints
 

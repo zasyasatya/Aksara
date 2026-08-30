@@ -4,10 +4,10 @@ Guru dapat memperbarui materi (lessons), kuis, dan kamus kata khusus
 tanpa menyentuh kode — semua editan langsung tersimpan ke file JSON data
 dan langsung terlihat oleh murid (baca per-request).
 
-Otentikasi mengikuti pola dokumen:
+Otentikasi memakai sesi login (username + password, lihat routers/auth.py):
 - Mode DEV  → semua pengakses dianggap guru (mudah untuk development/demo).
-- Mode PROD → wajib header X-Admin-Token berisi AKSARA_GURU_TOKEN
-  (token admin AKSARA_ADMIN_TOKEN juga diterima).
+- Mode PROD → wajib login Guru/Admin; session token dikirim sebagai header
+  ``Authorization: Bearer <token>`` (akun admin juga dapat mengelola konten).
 """
 
 import re
@@ -17,6 +17,7 @@ from typing import Optional
 from fastapi import APIRouter, Header, HTTPException
 
 from ..core.config import settings
+from ..core import security
 from ..services import data_store
 from ..schemas.manage import (
     DictIn, LessonIn, ManageStatus, MessageResponse, QuizIn
@@ -25,21 +26,25 @@ from ..schemas.manage import (
 router = APIRouter(prefix="/manage", tags=["manage"])
 
 
-def is_guru(token: Optional[str]) -> bool:
+def _role(authorization: Optional[str]) -> Optional[str]:
+    """Role sesi aktif: 'admin'/'guru', atau None bila tidak login.
+
+    Mode dev tidak mensyaratkan sesi — dianggap guru.
+    """
     if not settings.is_prod:
-        return True
-    if not token:
-        return False
-    return token == settings.guru_token or (
-        bool(settings.admin_token) and token == settings.admin_token
-    )
+        return "guru"
+    return security.get_session_role(security.bearer_token(authorization))
 
 
-def _require_guru(token: Optional[str]) -> None:
-    if not is_guru(token):
+def is_guru(authorization: Optional[str]) -> bool:
+    return _role(authorization) in ("admin", "guru")
+
+
+def _require_guru(authorization: Optional[str]) -> None:
+    if not is_guru(authorization):
         raise HTTPException(
             status_code=403,
-            detail="Akses ditolak. Token guru diperlukan pada mode prod (env AKSARA_GURU_TOKEN).",
+            detail="Akses ditolak. Login sebagai Guru diperlukan pada mode prod.",
         )
 
 
@@ -62,13 +67,12 @@ def _unique_id(lessons, base: str) -> str:
 # ── Status ──────────────────────────────────────────────────────────────
 
 @router.get("/status", response_model=ManageStatus)
-async def manage_status(x_admin_token: Optional[str] = Header(default=None)):
+async def manage_status(authorization: Optional[str] = Header(default=None)):
+    role = _role(authorization)
     return ManageStatus(
         mode="prod" if settings.is_prod else "dev",
-        is_guru=is_guru(x_admin_token),
-        is_admin=(not settings.is_prod) or (
-            bool(x_admin_token) and x_admin_token in (settings.guru_token, settings.admin_token)
-        ),
+        is_guru=role in ("admin", "guru"),
+        is_admin=(role == "admin"),
     )
 
 
@@ -81,8 +85,8 @@ async def list_manage_lessons():
 
 
 @router.post("/lessons", status_code=201)
-async def create_lesson(body: LessonIn, x_admin_token: Optional[str] = Header(default=None)):
-    _require_guru(x_admin_token)
+async def create_lesson(body: LessonIn, authorization: Optional[str] = Header(default=None)):
+    _require_guru(authorization)
     lessons = data_store.get_lessons()
 
     if body.id:
@@ -113,8 +117,8 @@ async def create_lesson(body: LessonIn, x_admin_token: Optional[str] = Header(de
 
 
 @router.put("/lessons/{lesson_id}")
-async def update_lesson(lesson_id: str, body: LessonIn, x_admin_token: Optional[str] = Header(default=None)):
-    _require_guru(x_admin_token)
+async def update_lesson(lesson_id: str, body: LessonIn, authorization: Optional[str] = Header(default=None)):
+    _require_guru(authorization)
     lessons = data_store.get_lessons()
     idx = next((i for i, l in enumerate(lessons) if l.get("id") == lesson_id), None)
     if idx is None:
@@ -130,8 +134,8 @@ async def update_lesson(lesson_id: str, body: LessonIn, x_admin_token: Optional[
 
 
 @router.delete("/lessons/{lesson_id}", response_model=MessageResponse)
-async def delete_lesson(lesson_id: str, x_admin_token: Optional[str] = Header(default=None)):
-    _require_guru(x_admin_token)
+async def delete_lesson(lesson_id: str, authorization: Optional[str] = Header(default=None)):
+    _require_guru(authorization)
     lessons = data_store.get_lessons()
     remaining = [l for l in lessons if l.get("id") != lesson_id]
     if len(remaining) == len(lessons):
@@ -152,8 +156,8 @@ async def list_manage_quizzes():
 
 
 @router.post("/quizzes", status_code=201)
-async def create_quiz(body: QuizIn, x_admin_token: Optional[str] = Header(default=None)):
-    _require_guru(x_admin_token)
+async def create_quiz(body: QuizIn, authorization: Optional[str] = Header(default=None)):
+    _require_guru(authorization)
     quizzes = data_store.get_quizzes()
 
     if body.id:
@@ -175,8 +179,8 @@ async def create_quiz(body: QuizIn, x_admin_token: Optional[str] = Header(defaul
 
 
 @router.put("/quizzes/{quiz_id}")
-async def update_quiz(quiz_id: str, body: QuizIn, x_admin_token: Optional[str] = Header(default=None)):
-    _require_guru(x_admin_token)
+async def update_quiz(quiz_id: str, body: QuizIn, authorization: Optional[str] = Header(default=None)):
+    _require_guru(authorization)
     quizzes = data_store.get_quizzes()
     idx = next((i for i, q in enumerate(quizzes) if q.get("id") == quiz_id), None)
     if idx is None:
@@ -192,8 +196,8 @@ async def update_quiz(quiz_id: str, body: QuizIn, x_admin_token: Optional[str] =
 
 
 @router.delete("/quizzes/{quiz_id}", response_model=MessageResponse)
-async def delete_quiz(quiz_id: str, x_admin_token: Optional[str] = Header(default=None)):
-    _require_guru(x_admin_token)
+async def delete_quiz(quiz_id: str, authorization: Optional[str] = Header(default=None)):
+    _require_guru(authorization)
     quizzes = data_store.get_quizzes()
     remaining = [q for q in quizzes if q.get("id") != quiz_id]
     if len(remaining) == len(quizzes):
@@ -221,8 +225,8 @@ async def list_manage_dictionary():
 
 
 @router.post("/dictionary", status_code=201)
-async def upsert_dictionary(body: DictIn, x_admin_token: Optional[str] = Header(default=None)):
-    _require_guru(x_admin_token)
+async def upsert_dictionary(body: DictIn, authorization: Optional[str] = Header(default=None)):
+    _require_guru(authorization)
     data = data_store.get_dictionary()
     key = body.latin.strip().lower()
     data[key] = {
@@ -236,8 +240,8 @@ async def upsert_dictionary(body: DictIn, x_admin_token: Optional[str] = Header(
 
 
 @router.delete("/dictionary/{latin}", response_model=MessageResponse)
-async def delete_dictionary_entry(latin: str, x_admin_token: Optional[str] = Header(default=None)):
-    _require_guru(x_admin_token)
+async def delete_dictionary_entry(latin: str, authorization: Optional[str] = Header(default=None)):
+    _require_guru(authorization)
     data = data_store.get_dictionary()
     key = latin.strip().lower()
     if key not in data:

@@ -4,9 +4,10 @@
 #   docker compose up --build
 #   # buka http://localhost:8000
 #
-# Token produksi (WAJIB diganti):
-#   AKSARA_ADMIN_TOKEN / AKSARA_GURU_TOKEN — set lewat environment di bawah
-#   atau file .env di samping compose ini.
+# Akun login produksi (username + password, WAJIB diganti):
+#   AKSARA_ADMIN_USERNAME / AKSARA_ADMIN_PASSWORD
+#   AKSARA_GURU_USERNAME  / AKSARA_GURU_PASSWORD
+# set lewat environment di bawah atau file .env di samping compose ini.
 
 services:
   aksara:
@@ -16,8 +17,10 @@ services:
       - "8000:8000"
     environment:
       AKSARA_MODE: prod
-      AKSARA_ADMIN_TOKEN: ${AKSARA_ADMIN_TOKEN:-aksara-admin}
-      AKSARA_GURU_TOKEN: ${AKSARA_GURU_TOKEN:-aksara-guru}
+      AKSARA_ADMIN_USERNAME: ${AKSARA_ADMIN_USERNAME:-admin}
+      AKSARA_ADMIN_PASSWORD: ${AKSARA_ADMIN_PASSWORD:-aksara-admin}
+      AKSARA_GURU_USERNAME: ${AKSARA_GURU_USERNAME:-guru}
+      AKSARA_GURU_PASSWORD: ${AKSARA_GURU_PASSWORD:-aksara-guru}
     volumes:
       # persistensi: konten Panel Guru + engagement (kunjungan/twibbon/sekolah)
       - aksara-data:/app/backend/app/data

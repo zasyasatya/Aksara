@@ -8,7 +8,7 @@ export function ContentMurid() {
   return (
     <>
       <p className="text-lg leading-relaxed">
-        Halo! <span className="font-bali text-deep-brown">ᬅᬓ᭄ᬱᬭ</span> — selamat datang di Aksara.
+        Halo! <span className="font-bali text-deep-brown">ᬅᬓ᭄ᬱᬭ</span> — selamat datang di AKSA.
         Halaman ini membimbingmu langkah demi langkah memanfaatkan platform: mulai dari
         melihat progres, belajar per level, menulis aksara, hingga menguji kemampuanmu lewat kuis.
       </p>
@@ -34,7 +34,7 @@ export function ContentMurid() {
         </p>
         <Screenshot
           src="/screenshots/dashboard.png"
-          alt="Halaman dashboard Aksara menampilkan streak, XP, level, dan rekomendasi pelajaran"
+          alt="Halaman dashboard AKSA menampilkan streak, XP, level, dan rekomendasi pelajaran"
           caption="Dashboard: lihat streak, XP, level, dan pelajaran yang direkomendasikan untuk dilanjutkan."
           url="aksara.local/dashboard"
         />
