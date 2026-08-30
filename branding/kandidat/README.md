@@ -26,3 +26,20 @@ Empat arah desain baru yang lebih representatif terhadap kata dasar
   (favicon 16px hingga poster).
 - Usulan lanjutan: logo horizontal = `[ikon] AKSARA` dengan subtitle
   "Aksara Nusantara"; logo stacked = ikon di atas wordmark.
+
+## Nama aplikasi & wordmark (custom lettering)
+
+Setelah diskusi nama, dibuatkan wordmark vektor **custom lettering**
+(monoline, bukan font Google) untuk tiga opsi nama:
+
+| Nama | File vektor | File konsep AI | Keterangan |
+|------|-------------|----------------|------------|
+| **AKSA** (rekomendasi) | `wordmark-aksa.svg` | `logo-aksa.png` | Paling singkat (4 huruf), akar kata "Aksara" |
+| **AKSARA** (tetap) | `wordmark-aksara.svg` | `logo-aksara.png` | Nama lama, domain aksara.id sudah terbangun |
+| **AKSALOKA** | `wordmark-aksaloka.svg` | `logo-aksaloka.png` | "Aksara Loka" = dunia aksara, paling unik |
+
+> Nama yang sudah **tidak** dipakai karena bentrok brand lain:
+> "Aksaranta", "Aksantara", "Aksia", "Aksana", "Aksaria".
+
+Lihat `overview-nama.html` untuk perbandingan ketiganya dalam satu halaman.
+`overview.html` (lama) menampilkan keempat kandidat ikon/monogram.
