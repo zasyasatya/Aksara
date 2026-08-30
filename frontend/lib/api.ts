@@ -359,4 +359,27 @@ export const api = {
     aksaraReference: () =>
       fetchAPI<{ groups: AksaraRefGroup[] }>("/manage/aksara"),
   },
+
+  // ── Engagement & sekolah mitra ──
+  getStats: () =>
+    fetchAPI<{ visits: number; twibbons: number; schools: any[] }>("/stats"),
+
+  trackVisit: () =>
+    fetchAPI<{ message: string }>("/stats/visit", { method: "POST" }).catch(() => ({})),
+
+  trackTwibbon: () =>
+    fetchAPI<{ message: string }>("/stats/twibbon", { method: "POST" }).catch(() => ({})),
+
+  getSchools: () =>
+    fetchAPI<{ schools: any[]; total: number }>("/stats/schools"),
+
+  applySchool: (body: { school: string; region?: string; students?: number; contact: string; note?: string }) =>
+    fetchAPI<any>("/stats/schools", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
 }
+
+/** URL publik aplikasi (untuk teks share & meta). Bisa di-override via env. */
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aksara.id"
+export const SITE_HASHTAGS = "#AksaraBali #MelestarikanBudaya"

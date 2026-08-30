@@ -38,6 +38,13 @@ Platform edukasi interaktif untuk mempelajari Aksara Bali (Hanacaraka) dengan pe
 - **10 bingkai twibbon** (margin krem, garis ganda, garis titik, gradasi saffron, gradasi cokelat, sudut klasik, strip aksara “warisan”, polaroid, sudut bulat, polos)
 - 3 rasio (4:5 post IG, 1:1, 9:16 story/reels); kontrol ukuran, posisi, warna, bayangan, dan teks Latin
 - Ekspor **PNG 1080px** + **share langsung ke medsos** (Web Share API) + salin ke clipboard
+- **Branding organik**: watermark `aksara.id` (bisa dimatikan) + teks share otomatis berisi link & hashtag
+- Setiap twibbon yang dibuat tercatat di penghitung publik (`POST /api/stats/twibbon`)
+
+### 🏫 Program Sekolah & Sanggar (`/sekolah`)
+- Halaman kemitraan sekolah/sanggar/pasraman: penjelasan **Pergub Bali 7/2026** (Bahasa & Aksara Bali wajib, min. 2 JP/minggu), daftar sekolah mitra, dan **formulir pendaftaran** publik
+- Pendaftaran terekam di backend dan tampil langsung di daftar mitra (status “Verifikasi berjalan” → “Terverifikasi”)
+- **Penghitung jujur** (`GET /api/stats`): kunjungan + twibbon dibuat, rate-limited per IP (20 dtk) agar angka kredibel
 
 ### 📚 Dokumentasi, Panel Guru & Panel Admin
 - **`/docs`** — pusat dokumentasi: tata cara penggunaan untuk **murid, guru, admin**, plus halaman khusus **Metode Scientific & Referensi** (metodologi transliterasi + sumber akademik) — lengkap dengan screenshot halaman
@@ -71,24 +78,28 @@ Aksara/
 │   ├── ARCHITECTURE.md - System architecture
 │   ├── API_SPEC.md - API specification
 │   ├── DATABASE_DESIGN.md - Data model
-│   └── TEST_PLAN.md - Testing strategy
+│   ├── TEST_PLAN.md - Testing strategy
+│   ├── PAPER.md - Draft paper .id DeveloperDay 2026 (8 bagian wajib, Inggris)
+│   ├── DEMO_SCRIPT.md - Skrip video demo 5 menit
+│   └── slides/ - Deck slide (HTML 16:9, navigasi keyboard + speaker notes)
 ├── backend/
 │   ├── app/
 │   │   ├── main.py - FastAPI app
 │   │   ├── core/config.py
-│   │   ├── data/ - aksara_master.json, lessons, quiz, dictionary
+│   │   ├── data/ - aksara_master.json, lessons, quiz, dictionary, engagement.json
 │   │   ├── services/
 │   │   │   ├── transliterator.py - CORE advanced engine (800+ lines)
 │   │   │   ├── classifier.py
 │   │   │   ├── quiz_engine.py - check_answer + validate_pair (termasuk tipe write_aksara)
 │   │   │   └── data_store.py - store JSON terpusat (mampu ditulis ulang, reload per-request)
-│   │   ├── routers/ - translate, classify, lessons, quiz, docs, manage
+│   │   ├── routers/ - translate, classify, lessons, quiz, docs, manage, engagement
 │   │   ├── schemas/ - Pydantic models (termasuk manage.py)
 │   │   └── tests/ - pytest
 │   └── requirements.txt
 ├── frontend/
 │   ├── app/
-│   │   ├── page.tsx - Landing
+│   │   ├── page.tsx - Landing (+ penghitung kunjungan live & CTA sekolah)
+│   │   ├── sekolah/ - Program kemitraan sekolah & sanggar (form + daftar mitra)
 │   │   ├── dashboard/ - Dashboard progress
 │   │   ├── learn/ - Belajar bertahap
 │   │   ├── translate/ - Translate dua arah + keyboard aksara
@@ -248,6 +259,25 @@ curl -X POST http://localhost:8000/api/quiz/check \
   -d '{"quiz_id": "quiz-wres-01-1", "answer": "a"}'
 ```
 
+### Engagement & Statistik (penghitung jujur)
+
+```bash
+# Statistik publik: kunjungan, twibbon, daftar sekolah mitra
+curl http://localhost:8000/api/stats
+
+# Catat kunjungan (dipanggil otomatis landing; rate-limit 20 dtk/IP)
+curl -X POST http://localhost:8000/api/stats/visit
+
+# Catat twibbon dibuat (dipanggil studio saat unduh/share)
+curl -X POST http://localhost:8000/api/stats/twibbon
+
+# Daftar & daftarkan sekolah
+curl http://localhost:8000/api/stats/schools
+curl -X POST http://localhost:8000/api/stats/schools \
+  -H "Content-Type: application/json" \
+  -d '{"school":"SMP Negeri 1 Gianyar","region":"Gianyar","students":600,"contact":"guru@sekolah.sch.id"}'
+```
+
 ## 📚 Dokumentasi, Admin & Mode Dev/Prod
 
 Buka **`/docs`** (menu Dokumentasi) untuk panduan penggunaan per peran
@@ -322,6 +352,8 @@ Full branding di `docs/BRANDING.md`
 
 Semua docs SDLC ada di `/docs`:
 - PRD.md, ARCHITECTURE.md, API_SPEC.md, DATABASE_DESIGN.md, TEST_PLAN.md, BRANDING.md, SDLC.md
+- **PAPER.md** — draft paper .id DeveloperDay 2026 (8 bagian wajib; bahasa Inggris; data background pelestarian budaya)
+- **DEMO_SCRIPT.md** + **slides/** — skrip & deck video demo 5 menit (buka `docs/slides/index.html` di browser)
 
 ## 🤝 Kontribusi
 

@@ -7,6 +7,9 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
+  // `/_next/image` does not exist in the static export served by the
+  // no-Docker launcher, so render plain <img> tags in every mode.
+  images: { unoptimized: true },
   // `output: export` cannot be combined with rewrites. The no-Docker launcher
   // enables it only while producing backend/app/static; dev mode keeps this
   // same-origin proxy so browser code never calls a visitor's localhost API.

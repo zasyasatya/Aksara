@@ -14,9 +14,17 @@ export const metadata: Metadata = {
   authors: [{ name: "Aksara Team" }],
   openGraph: {
     title: "Aksara - Platform Belajar Aksara Bali",
-    description: "Platform interaktif belajar Aksara Bali",
+    description:
+      "Melestarikan Warisan, Menulis Masa Depan. Belajar Aksara Bali dengan transliterasi akurat, kuis menulis aksara, dan studio twibbon untuk medsos.",
+    url: "https://aksara.id",
+    siteName: "Aksara",
     type: "website",
     locale: "id_ID",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Aksara - Platform Belajar Aksara Bali",
+    description: "Belajar Aksara Bali modern: translate akurat, kuis menulis, dan twibbon budaya.",
   },
 };
 

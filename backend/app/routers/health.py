@@ -20,7 +20,8 @@ async def health_check():
         }
     }
 
-@router.get("/")
+# NOTE: bare "/" is intentionally NOT registered here. main.py owns "/" so it
+# can serve the exported UI when available and fall back to this payload.
 async def root():
     return {
         "message": "Aksara API - Platform Belajar Aksara Bali",

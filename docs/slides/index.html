@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Aksara — Deck Video Demo (.id DeveloperDay 2026)</title>
+<style>
+  :root{
+    --bg:#1c130b; --bg2:#241a10; --ink:#f7f0e3; --muted:#c9b79c;
+    --saffron:#e8890c; --saffron-d:#c96f08; --terracotta:#c14e2b;
+    --cream:#fff8e7; --sage:#7f9b6e; --sand:#e3d3b3; --line:#3a2c1d;
+    --shadow:0 24px 60px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:radial-gradient(1200px 700px at 20% -10%, #2c1f12 0%, var(--bg) 55%), var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI", Roboto, "Noto Sans", system-ui, sans-serif;
+    overflow:hidden;
+    display:flex; flex-direction:column;
+  }
+  .aksara{font-family:"Noto Sans Balinese","Balinese",serif}
+
+  .deck{flex:1; display:grid; place-items:center; padding:18px}
+  .slide{
+    position:absolute; inset:0; margin:auto;
+    width:min(96vw, calc(96vh * 16 / 9));
+    aspect-ratio:16/9;
+    background:
+      radial-gradient(900px 500px at 85% 0%, rgba(232,137,12,.10), transparent 60%),
+      linear-gradient(160deg, var(--bg2), #17100a);
+    border:1px solid var(--line);
+    border-radius:22px;
+    box-shadow:var(--shadow);
+    padding:clamp(24px,4.2vh,54px) clamp(28px,4.6vw,64px);
+    display:flex; flex-direction:column;
+    opacity:0; transform:translateX(24px) scale(.99); pointer-events:none;
+    transition:opacity .35s ease, transform .35s ease;
+    overflow:hidden;
+  }
+  .slide.active{opacity:1; transform:none; pointer-events:auto}
+  .slide::after{
+    content:"Aksara · aksara.id"; position:absolute; left:0; right:0; bottom:10px;
+    text-align:center; font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#6d5a41;
+  }
+
+  .kicker{display:inline-flex; align-items:center; gap:8px; font-size:12px; letter-spacing:.28em; text-transform:uppercase; color:var(--saffron); font-weight:700}
+  .kicker .dot{width:7px;height:7px;border-radius:50%;background:var(--saffron)}
+  h1{font-size:clamp(30px,5.2vw,60px); line-height:1.02; margin:.28em 0 .1em; font-weight:800}
+  h2{font-size:clamp(24px,3.6vw,42px); line-height:1.05; margin:.2em 0 .1em; font-weight:800}
+  .lead{color:var(--muted); font-size:clamp(13px,1.5vw,19px); line-height:1.5; max-width:60ch}
+  .accent{color:var(--saffron)}
+  .accent2{color:var(--terracotta)}
+  .big-num{font-size:clamp(40px,7vw,84px); font-weight:800; color:var(--saffron); line-height:1}
+
+  .grid{display:grid; gap:14px}
+  .cols-2{grid-template-columns:1fr 1fr}
+  .cols-3{grid-template-columns:repeat(3,1fr)}
+  .card{
+    background:linear-gradient(180deg, rgba(255,248,231,.05), rgba(255,248,231,.02));
+    border:1px solid var(--line); border-radius:16px; padding:16px 18px;
+  }
+  .card h3{margin:0 0 6px; font-size:clamp(14px,1.5vw,19px); color:var(--ink)}
+  .card p{margin:0; color:var(--muted); font-size:clamp(11px,1.2vw,15px); line-height:1.45}
+  .ico{width:34px;height:34px;border-radius:10px;background:rgba(232,137,12,.16);display:grid;place-items:center;font-size:17px;margin-bottom:10px}
+
+  .shot{
+    border:1px solid var(--line); border-radius:16px; overflow:hidden;
+    background:#000; box-shadow:0 16px 40px rgba(0,0,0,.5);
+  }
+  .shot img{display:block; width:100%; height:100%; object-fit:cover; object-position:top}
+  .shotcap{font-size:11px; color:#8b7a60; margin-top:6px; letter-spacing:.02em}
+
+  .flex1{flex:1; min-height:0}
+  .row{display:flex; gap:14px; align-items:stretch}
+  .center{justify-content:center; align-items:center; text-align:center}
+  .stack{gap:14px; display:flex; flex-direction:column}
+  .mt-auto{margin-top:auto}
+
+  ul.pts{list-style:none; margin:10px 0 0; padding:0}
+  ul.pts li{position:relative; padding-left:26px; margin:9px 0; color:var(--muted); font-size:clamp(12px,1.35vw,17px); line-height:1.4}
+  ul.pts li::before{content:""; position:absolute; left:2px; top:.45em; width:9px; height:9px; border-radius:3px; background:var(--saffron)}
+  ul.pts li b{color:var(--ink)}
+
+  table{width:100%; border-collapse:collapse; font-size:clamp(11px,1.25vw,16px)}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line)}
+  th{color:var(--saffron); font-size:11px; letter-spacing:.16em; text-transform:uppercase}
+  td b{color:var(--ink)}
+  td.mut{color:var(--muted)}
+
+  .chips{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{border:1px solid var(--line); background:rgba(255,248,231,.04); color:var(--muted);
+    padding:6px 12px; border-radius:999px; font-size:clamp(11px,1.15vw,14px)}
+  .chip.on{border-color:var(--saffron); color:var(--ink); background:rgba(232,137,12,.14)}
+
+  .footer-hud{display:flex; justify-content:space-between; align-items:center; padding:10px 22px; font-size:12px; color:#8b7a60}
+  .hud-l{display:flex; gap:14px; align-items:center}
+  .key{border:1px solid var(--line); border-radius:6px; padding:1px 7px; color:var(--muted); font-size:11px}
+  #progress{flex:1; height:3px; background:#33271a; border-radius:2px; margin:0 14px; overflow:hidden}
+  #bar{height:100%; width:0; background:linear-gradient(90deg,var(--saffron),var(--terracotta)); transition:width .3s}
+
+  #notes{
+    position:fixed; left:0; right:0; bottom:0; max-height:26vh; overflow:auto;
+    background:#120c06; border-top:1px solid var(--line); color:var(--muted);
+    padding:12px 22px; font-size:13px; line-height:1.5; display:none; z-index:5;
+  }
+  #notes.on{display:block}
+  #notes b{color:var(--saffron)}
+  .note-badge{position:absolute; top:14px; right:20px; font-size:11px; color:#8b7a60; letter-spacing:.1em}
+  .small{font-size:clamp(10px,1.1vw,14px); color:var(--muted)}
+  .tag{display:inline-block; font-size:11px; color:var(--saffron); border:1px solid rgba(232,137,12,.4); padding:3px 9px; border-radius:999px; margin-bottom:8px}
+</style>
+</head>
+<body>
+  <div class="deck" id="deck">
+
+    <!-- 1 -->
+    <section class="slide center stack" data-note="Pembukaan (±15 dtk). Sapa juri. Baca tagline pelan, beri jeda. Tekankan ini soal <b>budaya</b> sebelum soal <b>teknologi</b>." data-title="Aksara">
+      <span class="kicker"><span class="dot"></span> .id DeveloperDay 2026 · Education</span>
+      <h1>Aksara</h1>
+      <p class="lead" style="text-align:center">
+        <span class="aksara accent" style="font-size:1.4em">ᬅᬓᬱᬭ</span><br/>
+        <b style="color:var(--ink)">Melestarikan Warisan, Menulis Masa Depan</b><br/>
+        Platform digital interaktif untuk melestarikan bahasa, aksara, dan literasi Bali.
+      </p>
+      <div class="chips" style="justify-content:center">
+        <span class="chip on">Live: aksara.id</span>
+        <span class="chip">11 pelajaran · 6 level</span>
+        <span class="chip">24 kuis</span>
+        <span class="chip">Engine ≥95%</span>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section class="slide stack" data-title="Kenapa sekarang" data-note="Masalah (±35 dtk). Tiga angka ini inti. <b>3,33 jt</b> penutur, status <b>rentan</b>, dan Pergub 7/2026 yang bikin aksara jadi <b>wajib di sekolah</b> mulai 2026. Ini alasan 'kenapa sekarang' yang kuat.">
+      <span class="kicker"><span class="dot"></span> Masalah</span>
+      <h2>Warisan yang masih hidup — tapi terancam hilang</h2>
+      <div class="grid cols-3 mt-auto" style="margin-top:8px">
+        <div class="card center"><div class="big-num">3,33 jt</div><p>penutur Bahasa Bali di Pulau Bali (populasi 4,46 jt)</p></div>
+        <div class="card center"><div class="big-num" style="color:var(--terracotta)">Rentan</div><p>kategori vitalitas bahasa Bali menurut pemerintah (2022)</p></div>
+        <div class="card center"><div class="big-num">2 JP</div><p>wajib/minggu: Pergub Bali No. 7/2026 — aksara jadi mapel</p></div>
+      </div>
+      <p class="lead mt-auto">Generasi muda masih bisa <b style="color:var(--ink)">bicara</b> — tapi makin sedikit yang bisa <b class="accent">menulis aksaranya</b>. Dan 2026, negara memberi tenggat: ajar di semua sekolah.</p>
+    </section>
+
+    <!-- 3 -->
+    <section class="slide stack" data-title="Solusi" data-note="Solusi (±25 dtk). Satu kalimat besar, empat pilar. Jelaskan Aksara menutup lima gap sekaligus: kurikulum, terjemahan akurat, asesmen menulis, kendali guru, dan motivasi.">
+      <span class="kicker"><span class="dot"></span> Solusi</span>
+      <h2>Sebuah platform, empat pilar belajar</h2>
+      <p class="lead">Aksara mengubah pelestarian dari <b style="color:var(--ink)">menyimpan</b> menjadi <b class="accent">menulis kembali</b> — gratis, browser, tanpa install.</p>
+      <div class="grid cols-4" style="grid-template-columns:repeat(4,1fr); margin-top:8px">
+        <div class="card"><div class="ico"></div><h3>Translate</h3><p>Latin ↔ Aksara dua arah, akurat, dengan penjelasan aturan per suku kata.</p></div>
+        <div class="card"><div class="ico">📚</div><h3>Belajar</h3><p>11 pelajaran, 6 level, Wresastra 18 → kalimat, dengan XP &amp; streak.</p></div>
+        <div class="card"><div class="ico">✅</div><h3>Kuis</h3><p>Termasuk <b>menulis aksara</b> — tervalidasi otomatis, saran per aturan.</p></div>
+        <div class="card"><div class="ico">🎨</div><h3>Twibbon</h3><p>Foto + aksara otomatis → gambar 1080px, share ke medsos.</p></div>
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="slide stack" data-title="Translate" data-note="Demo translate (±35 dtk). Tunjukkan 'matur suksma' → aksara + breakdown. Tekankan akurasi <b>≥95% vs 68%</b> penelitian 2018. Ini bukti teknis yang membedakan.">
+      <div class="row flex1">
+        <div class="stack" style="flex:1.05">
+          <span class="kicker"><span class="dot"></span> Pilar 1 · Translate</span>
+          <h2>Transliterasi yang bisa diajarkan</h2>
+          <ul class="pts">
+            <li><b>Dua arah</b> — Latin→Aksara dan Aksara→Latin.</li>
+            <li>Aksara bisa <b>diketik, ditempel, atau dipilih</b> dari keyboard virtual.</li>
+            <li>Setiap hasil membawa <b>breakdown + penjelasan aturan</b> (wres, pangangge, gantungan, gempelan) — jadi materi belajar, bukan cuma hasil.</li>
+            <li>Confidence score + kamus khusus untuk kata-kata sulit.</li>
+          </ul>
+          <div class="chips mt-auto">
+            <span class="chip on">Akurasi ≥ 95%</span>
+            <span class="chip">vs 68% (app produksi, IJECE 2018)</span>
+          </div>
+        </div>
+        <div class="stack" style="flex:.95">
+          <div class="shot flex1"><img src="../../frontend/public/screenshots/translate.png" alt="Translate"/></div>
+          <div class="shotcap">Translate — 'matur suksma' dengan breakdown per suku kata</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="slide stack" data-title="Kuis menulis aksara" data-note="Fitur paling unik (±40 dtk). Tunjukkan kuis 'Menulis Aksara': siswa mengetik aksara, sistem memvalidasi otomatis, kasih % kesamaan + saran per aturan + bentuk benar. Tekankan: 40 siswa, koreksi instan, tanpa manual.">
+      <div class="row flex1">
+        <div class="stack" style="flex:.95">
+          <div class="shot flex1"><img src="../../frontend/public/screenshots/quiz-write.png" alt="Kuis menulis aksara"/></div>
+          <div class="shotcap">Kuis Menulis Aksara — jawaban tervalidasi otomatis</div>
+        </div>
+        <div class="stack" style="flex:1.05">
+          <span class="kicker"><span class="dot"></span> Pilar 3 · Kuis Menulis Aksara</span>
+          <h2>Asesmen yang menilai tulisan tangan digital</h2>
+          <ul class="pts">
+            <li>Siswa <b>menulis aksara</b>, bukan sekadar memilih.</li>
+            <li>Validasi lewat engine transliterasi: <b>benar / salah + % kesamaan</b>.</li>
+            <li>Masih salah? Dapat <b>saran per aturan</b> + bentuk yang benar.</li>
+            <li>Kelas 40 siswa, koreksi <b>instan tanpa manual</b> — selaras 2 JP/minggu.</li>
+          </ul>
+          <div class="chips mt-auto">
+            <span class="chip on">24 kuis terpasang</span>
+            <span class="chip">7 tipe "Menulis Aksara"</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section class="slide stack" data-title="Panel Guru" data-note="Panel Guru (±35 dtk). Karena Pergub mewajibkan konten lokal di bawah kendali sekolah. Guru CRUD pelajaran/kuis/kamus dari browser; perubahan LANGSUNG hidup, tanpa deploy. Guru tak perlu bisa coding.">
+      <div class="row flex1">
+        <div class="stack" style="flex:1.05">
+          <span class="kicker"><span class="dot"></span> Kendali Guru</span>
+          <h2>Guru menjadi pengarang konten</h2>
+          <p class="lead">Pergub 7/2026 menuntut <b style="color:var(--ink)">konten lokal di bawah kendali sekolah</b>. Panel Guru menjawab itu.</p>
+          <ul class="pts">
+            <li>CRUD <b>pelajaran, kuis, kamus transliterasi</b> dari browser.</li>
+            <li>Bisa buat kuis "Menulis Aksara" untuk asesmen kelas.</li>
+            <li>Perubahan <b>langsung hidup</b> untuk semua murid — tanpa restart, tanpa deploy.</li>
+            <li>Dilindungi <b>token</b> di produksi; form sederhana, tak perlu bisa coding.</li>
+          </ul>
+        </div>
+        <div class="stack" style="flex:.95">
+          <div class="shot flex1"><img src="../../frontend/public/screenshots/guru.png" alt="Panel Guru"/></div>
+          <div class="shotcap">Panel Guru — kelola pelajaran, kuis, dan kamus</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 -->
+    <section class="slide stack" data-title="Twibbon & growth" data-note="Mesin pertumbuhan (±30 dtk). Siswa upload foto, ketik ucapan, aksara otomatis, share. Setiap gambar membawa aksara + watermark aksara.id = growth engine organik, CAC ~ 0. Murid jadi penerbit budaya.">
+      <div class="row flex1">
+        <div class="stack" style="flex:.95">
+          <div class="shot flex1"><img src="../../frontend/public/screenshots/twibbon.png" alt="Twibbon"/></div>
+          <div class="shotcap">Studio Twibbon — foto + aksara → PNG 1080px</div>
+        </div>
+        <div class="stack" style="flex:1.05">
+          <span class="kicker"><span class="dot"></span> Pilar 4 · Twibbon</span>
+          <h2>Murid menjadi penerbit budaya</h2>
+          <ul class="pts">
+            <li>Upload foto → ketik ucapan → <b>aksara dibuat otomatis</b>.</li>
+            <li>10 frame budaya, 3 rasio, ekspor PNG 1080px, share sekali tap.</li>
+            <li>Watermark <b>aksara.id</b> — setiap share adalah back-link.</li>
+            <li><b>Growth engine organik</b>: murid mempromosikan aksara, CAC ≈ 0.</li>
+          </ul>
+          <div class="chips mt-auto">
+            <span class="chip on">PNG 1080px</span>
+            <span class="chip">Web Share API</span>
+            <span class="chip">WhatsApp · IG · X</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 -->
+    <section class="slide stack" data-title="Arsitektur" data-note="Arsitektur (±30 dtk). Satu origin, satu proses FastAPI: UI static (Next.js export) + API + JSON store atomik. Launcher 1 perintah, tanpa Node di runtime. Keputusan: same-origin (ramah kelas), konten=datang (guru pengarang), JSON+git (boring, auditable).">
+      <span class="kicker"><span class="dot"></span> Arsitektur Teknologi</span>
+      <h2>Satu origin, satu proses, nol drama deploy</h2>
+      <div class="row flex1 mt-auto" style="margin-top:8px">
+        <div class="card" style="flex:1"><div class="ico">️</div><h3>Frontend</h3><p>Next.js 15 (React 19, TS, Tailwind) diekspor statis. Canvas twibbon, keyboard aksara virtual, Zustand.</p></div>
+        <div class="card" style="flex:1"><div class="ico">⚙️</div><h3>Backend</h3><p>FastAPI single-process: translate, classify, lessons, quiz, manage, engagement. Engine rules+dictionary.</p></div>
+        <div class="card" style="flex:1"><div class="ico">💾</div><h3>Storage</h3><p>JSON store + RLock + tulis atomik, git-versioned, dibaca per request → konten guru langsung hidup.</p></div>
+        <div class="card" style="flex:1"><div class="ico">🚀</div><h3>Launcher</h3><p>run.py/run.sh/run.bat: .venv + pip + build + serve di 1 port (stdlib). Tanpa Node di runtime.</p></div>
+      </div>
+    </section>
+
+    <!-- 9 -->
+    <section class="slide stack" data-title="Dampak" data-note="Dampak (±25 dtk). Budaya: medium digital permanen, literasi bukan hafalan. Edukasi: jalan 11 pelajaran pas 2 JP, koreksi instan, guru=author. PoC: live di .id + penghitung jujur + 57 test.">
+      <span class="kicker"><span class="dot"></span> Dampak &amp; Manfaat</span>
+      <h2>Dari 'disimpan' menjadi 'dijalankan'</h2>
+      <div class="grid cols-3 mt-auto" style="margin-top:8px">
+        <div class="card"><h3>🌱 Budaya</h3><p>Medium digital permanen untuk aksara. Breakdown aturan membangun <b>literasi</b>, bukan hafalan. Twibbon menyebarkan aksara ke medsos.</p></div>
+        <div class="card"><h3>🎓 Edukasi</h3><p>11 pelajaran terstruktur pas slot <b>2 JP/minggu</b>. Asesmen menulis instan. Panel membuat <b>setiap guru</b> menjadi pengarang.</p></div>
+        <div class="card"><h3>📊 Proof</h3><p>Live di domain <b>.id</b>. Penghitung kunjungan &amp; twibbon jujur (rate-limited). <b>57 test</b> backend + build type-check frontend.</p></div>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section class="slide stack" data-title="Potensi pasar" data-note="Potensi pasar (kriteria 30%) (±35 dtk). TAM 4,46 jt / 3,33 jt penutur + semua sekolah (mandat Pergub). SAM sekolah+pasraman+sanggar+wisata. SOM thn1 pilot 10–30 sekolah + organic. Ekspansi: Aksara Nusantara (Jawa, Bugis, Batak). Model tak bergantung VC.">
+      <span class="kicker"><span class="dot"></span> Potensi Pasar</span>
+      <h2>Pasar yang di-mandat-kan negara</h2>
+      <div class="flex1" style="display:grid; grid-template-rows:auto 1fr; gap:14px">
+        <table style="margin-top:6px">
+          <thead><tr><th>Lapisan</th><th>Ukuran</th><th>Dasar</th></tr></thead>
+          <tbody>
+            <tr><td><b>TAM</b></td><td>4,46 jt penduduk Bali · 3,33 jt penutur · semua sekolah formal</td><td class="mut">Semua warga = calon pembelajar; semua sekolah = pemegang mandat</td></tr>
+            <tr><td><b>SAM</b></td><td>Sekolah + pasraman + sanggar + diaspora + wisatawan</td><td class="mut">Mandat (sekolah) + sukarela (komunitas, turis)</td></tr>
+            <tr><td><b>SOM thn 1</b></td><td>Pilot 10–30 sekolah + pertumbuhan organik</td><td class="mut">Gratis untuk murid; twibbon = channel akuisisi (CAC ≈ 0)</td></tr>
+          </tbody>
+        </table>
+        <div class="card center" style="align-items:center">
+          <p style="font-size:clamp(13px,1.5vw,18px)">
+            <span class="accent">Ekspansi — "Aksara Nusantara":</span> engine, kuis, dan twibbon bersifat <b>script-agnostic</b> → Aksara Jawa, Lontara Bugis, Batak. Model berkelanjutan (gratis murid; lisensi sekolah + white-label multi-aksara), <b>tak bergantung pendanaan VC</b>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section class="slide stack" data-title="Roadmap" data-note="Roadmap (±25 dtk). 0–3 bln: pilot 5–10 sekolah + dashboard. 3–9 bln: analitik kelas, akun, audio pengucapan. 9–18 bln: Aksara Nusantara (Jawa + Lontara) + multi-tenant. Metrik sukses thn1: ≥30 sekolah, ≥90% completion, ≥50 rb twibbon.">
+      <span class="kicker"><span class="dot"></span> Rencana Pengembangan</span>
+      <h2>Dari Bali ke Nusantara</h2>
+      <div class="grid cols-3 mt-auto" style="margin-top:8px">
+        <div class="card"><span class="tag">0–3 bulan</span><h3>Pilot &amp; hardening</h3><p>Pilot 5–10 sekolah mitra, onboarding, kuis co-design. HTTPS + backup di .id. PWA offline untuk kelas bandwidth rendah.</p></div>
+        <div class="card"><span class="tag">3–9 bulan</span><h3>Analitik &amp; aksesibilitas</h3><p>Laporan kuis per kelas, pola kesalahan menulis. Akun opsional (progress sinkron). Audio pengucapan per karakter.</p></div>
+        <div class="card"><span class="tag">9–18 bulan</span><h3>Aksara Nusantara</h3><p>Port engine ke Aksara Jawa + Lontara Bugis. Workspace multi-tenant per sekolah. Dewan konten bersama sanggar &amp; Balai Bahasa.</p></div>
+      </div>
+      <p class="lead mt-auto small">Metrik sukses tahun 1: <b style="color:var(--ink)">≥30 sekolah mitra · ≥90% completion pilot · ≥50.000 twibbon · 100% topik silabus ter-cover.</b></p>
+    </section>
+
+    <!-- 12 -->
+    <section class="slide center stack" data-title="Penutup" data-note="Penutup (±15 dtk). Ulangi tagline, tunjukkan link, minta juri coba. Akhiri dengan 'Matur suksma'. Biarkan 2 dtk jeda sebelum video berakhir.">
+      <span class="kicker"><span class="dot"></span> Penutup</span>
+      <div class="aksara accent" style="font-size:clamp(40px,7vw,80px); line-height:1.1">ᬫᬸᬃ ᬸᬱ᭄</div>
+      <h1 style="margin-top:.1em">Matur Suksma</h1>
+      <p class="lead" style="text-align:center">
+        <b style="color:var(--ink)">Coba sendiri sekarang:</b> <span class="accent">aksara.id</span>
+      </p>
+      <div class="chips" style="justify-content:center">
+        <span class="chip on">#AksaraBali</span>
+        <span class="chip">#MelestarikanBudaya</span>
+        <span class="chip">.id DeveloperDay 2026</span>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="notes"></div>
+
+  <div class="footer-hud">
+    <div class="hud-l">
+      <span id="counter">01 / 12</span>
+      <span id="title" style="color:var(--muted)"></span>
+    </div>
+    <div id="progress"><div id="bar"></div></div>
+    <div class="hud-l">
+      <span><span class="key">←</span> <span class="key">→</span> geser</span>
+      <span><span class="key">N</span> catatan</span>
+      <span><span class="key">F</span> layar penuh</span>
+    </div>
+  </div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const notesEl=document.getElementById('notes');
+  const counter=document.getElementById('counter');
+  const titleEl=document.getElementById('title');
+  const bar=document.getElementById('bar');
+  let i=0;
+  const pad=n=>String(n).padStart(2,'0');
+  function show(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    counter.textContent=pad(i+1)+' / '+pad(slides.length);
+    titleEl.textContent=slides[i].dataset.title||'';
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    const note=slides[i].dataset.note||'';
+    notesEl.innerHTML='<b>Catatan pembicara · slide '+(i+1)+'.</b> '+note;
+  }
+  function next(){show(i+1)} function prev(){show(i-1)}
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();next();}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev();}
+    else if(e.key==='Home'){show(0);}
+    else if(e.key==='End'){show(slides.length-1);}
+    else if(e.key.toLowerCase()==='n'){notesEl.classList.toggle('on');}
+    else if(e.key.toLowerCase()==='f'){
+      if(document.fullscreenElement)document.exitFullscreen();
+      else document.documentElement.requestFullscreen?.();
+    }
+  });
+  document.getElementById('deck').addEventListener('click',e=>{
+    if(e.clientX < window.innerWidth*0.32) prev(); else next();
+  });
+  show(0);
+</script>
+</body>
+</html>

@@ -6,7 +6,7 @@ import { BottomNav } from "@/components/layout/bottom-nav"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { api } from "@/lib/api"
+import { api, SITE_URL, SITE_HASHTAGS } from "@/lib/api"
 import {
   Stamp, Upload, ImagePlus, Download, Share2, Copy, Check, Trash2,
   Sparkles, Loader2, ImageIcon,
@@ -300,6 +300,7 @@ export default function TwibbonPage() {
   const [shadow, setShadow] = useState(true)
   const [showLatin, setShowLatin] = useState(true)
   const [darken, setDarken] = useState(true)
+  const [watermark, setWatermark] = useState(true)
   const [fontReady, setFontReady] = useState(false)
   const [busy, setBusy] = useState<"" | "download" | "share" | "copy">("")
 
@@ -473,7 +474,21 @@ export default function TwibbonPage() {
       ctx.globalAlpha = 1
     }
     ctx.restore()
-  }, [photo, W, H, styleId, darken, textPos, aksaraText, latinText, showLatin, textSize, colorId, shadow, fontReady])
+
+    // 5) branding kecil (watermark) — di dalam area konten, pojok kanan bawah
+    if (watermark) {
+      ctx.save()
+      ctx.font = `600 ${Math.round(W * 0.021)}px Inter, sans-serif`
+      ctx.textAlign = "right"
+      ctx.fillStyle = "rgba(255,248,231,0.8)"
+      ctx.shadowColor = "rgba(0,0,0,0.5)"
+      ctx.shadowBlur = 8
+      const wmX = W - Math.round(W * style.inset[0]) - Math.round(W * 0.025)
+      const wmY = H - Math.round(W * style.inset[1]) - Math.round(W * 0.022)
+      ctx.fillText("aksara.id · aksara bali", wmX, wmY)
+      ctx.restore()
+    }
+  }, [photo, W, H, styleId, darken, watermark, textPos, aksaraText, latinText, showLatin, textSize, colorId, shadow, fontReady])
 
   useEffect(() => { render() }, [render])
 
@@ -509,6 +524,7 @@ export default function TwibbonPage() {
       a.href = url
       a.download = "twibbon-aksara.png"
       a.click()
+      api.trackTwibbon()
       setTimeout(() => URL.revokeObjectURL(url), 4000)
     } catch (e) {
       alert("Gagal mengunduh: " + (e as Error).message)
@@ -522,18 +538,16 @@ export default function TwibbonPage() {
     try {
       const blob = await getBlob()
       const file = new File([blob], "twibbon-aksara.png", { type: "image/png" })
+      const shareText = `Twibbon Aksara Bali ✨ Buat sendiri di ${SITE_URL} ${SITE_HASHTAGS}`
       const nav = navigator as any
       if (nav.canShare?.({ files: [file] })) {
-        await nav.share({
-          files: [file],
-          title: "Twibbon Aksara Bali",
-          text: "Bikin twibbon Aksara Bali gampang — lewat aplikasi Aksara ✨",
-        })
+        await nav.share({ files: [file], title: "Twibbon Aksara Bali", text: shareText })
       } else if (nav.share) {
-        await nav.share({ title: "Twibbon Aksara Bali", text: "Bikin twibbon Aksara Bali gampang — lewat aplikasi Aksara ✨" })
+        await nav.share({ title: "Twibbon Aksara Bali", text: shareText })
       } else {
         alert("Peramban ini tidak mendukung share langsung — gunakan tombol Unduh lalu unggah ke medsos kamu.")
       }
+      api.trackTwibbon()
     } catch (e) {
       if ((e as Error).name !== "AbortError") console.error(e)
     } finally {
@@ -760,6 +774,10 @@ export default function TwibbonPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" checked={darken} onChange={(e) => setDarken(e.target.checked)} className="accent-saffron h-4 w-4" />
                     Gelapkan foto
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer" title="Tulisan kecil aksara.id di sudut gambar — bantu menyebarkan platform">
+                    <input type="checkbox" checked={watermark} onChange={(e) => setWatermark(e.target.checked)} className="accent-saffron h-4 w-4" />
+                    Branding aksara.id
                   </label>
                 </div>
               </div>

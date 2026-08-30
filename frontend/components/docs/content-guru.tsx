@@ -220,6 +220,37 @@ export function ContentGuru() {
           masuk roadmap berikutnya.
         </Callout>
       </DocSection>
+
+      <DocSection id="sekolah" number="7." title="Gabung Program Kemitraan Sekolah & Sanggar">
+        <p>
+          Sejak <strong>Pergub Bali Nomor 7 Tahun 2026</strong>, Bahasa Bali (termasuk{" "}
+          <strong>aksara</strong>) dan Kearifan Lokal Bali wajib diajarkan minimal 2 jam per
+          minggu di seluruh satuan pendidikan formal di Bali. Program kemitraan Aksara ada
+          untuk memastikan sekolah Anda tidak memulai dari nol:
+        </p>
+        <Steps items={[
+          { title: "Buka halaman Sekolah & Sanggar", body: (
+            <>
+              <Link href="/sekolah" className="font-semibold underline">aksara.id/sekolah</Link> —
+              berisi penjelasan program, daftar sekolah mitra, dan formulir pendaftaran.
+            </>
+          ) },
+          { title: "Isi formulir (±1 menit)", body: "Nama sekolah/sanggar, wilayah, perkiraan jumlah siswa, dan kontak. Gratis, tanpa komitmen." },
+          { title: "Onboarding 30 menit", body: "Tim Aksara menghubungi via kontak yang diberikan: sesi pengenalan Panel Guru, penyusunan kuis awal, dan pertanyaan teknis." },
+          { title: "Sekolah masuk daftar mitra", body: "Nama sekolah tampil di halaman /sekolah (status “Verifikasi berjalan” → “Terverifikasi” setelah onboarding)." },
+        ]} />
+        <Screenshot
+          src="/screenshots/sekolah.png"
+          alt="Halaman Sekolah & Sanggar dengan daftar mitra dan formulir pendaftaran"
+          caption="Halaman Sekolah & Sanggar — daftar sekolah mitra (live) di kiri, formulir pendaftaran di kanan."
+          url="aksara.local/sekolah"
+        />
+        <Callout variant="success" title="Apa yang sekolah dapatkan">
+          Gratis untuk murid; Panel Guru untuk menyesuaikan konten dengan silabus lokal;
+          kuis menulis aksara yang terkoreksi otomatis; dan Studio Twibbon untuk tugas
+          kreatif. Tidak ada biaya apa pun — program didukung secara mandiri.
+        </Callout>
+      </DocSection>
     </>
   )
 }

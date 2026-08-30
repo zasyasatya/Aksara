@@ -7,7 +7,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from .core.config import settings
-from .routers import health, translate, classify, lessons, quiz, docs, manage
+from .routers import health, translate, classify, lessons, quiz, docs, manage, engagement
 
 app = FastAPI(
     title=settings.app_name,
@@ -37,6 +37,7 @@ app.include_router(lessons.router, prefix=settings.api_prefix)
 app.include_router(quiz.router, prefix=settings.api_prefix)
 app.include_router(docs.router, prefix=settings.api_prefix)
 app.include_router(manage.router, prefix=settings.api_prefix)
+app.include_router(engagement.router, prefix=settings.api_prefix)
 
 @app.get("/api")
 async def api_root():
@@ -55,6 +56,8 @@ async def api_root():
             "/api/manage/lessons",
             "/api/manage/quizzes",
             "/api/manage/dictionary",
+            "/api/stats",
+            "/api/stats/schools",
         ]
     }
 

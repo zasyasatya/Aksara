@@ -1,0 +1,16 @@
+{
+  "visits": 5,
+  "twibbons": 1,
+  "schools": [
+    {
+      "id": "school-001",
+      "school": "SMP Negeri 1 Gianyar",
+      "region": "Gianyar",
+      "students": 600,
+      "contact": "guru@sekolah.sch.id",
+      "note": "pilot DeveloperDay",
+      "is_verified": false,
+      "joined_at": "2026-08-30"
+    }
+  ]
+}

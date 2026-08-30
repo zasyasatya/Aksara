@@ -72,3 +72,34 @@ def save_dictionary(data: Dict[str, Dict[str, Any]]) -> None:
 
 def get_aksara_master() -> Dict[str, Any]:
     return _read("aksara_master.json")
+
+
+# ── Engagement (counter & sekolah mitra) ───────────────────────────────
+# Data "proof of concept": kunjungan, twibbon yang dibuat, dan daftar
+# sekolah/sanggar yang mendaftar kemitraan. Dipakai di paper & landing.
+
+def get_engagement() -> Dict[str, Any]:
+    data = _read("engagement.json")
+    data.setdefault("visits", 0)
+    data.setdefault("twibbons", 0)
+    data.setdefault("schools", [])
+    return data
+
+
+def save_engagement(data: Dict[str, Any]) -> None:
+    _write("engagement.json", data)
+
+
+def bump_engagement(key: str) -> Dict[str, Any]:
+    """Tambahkan 1 pada counter (visits/twibbons) dan kembalikan data terbaru."""
+    with _lock:
+        data = _read("engagement.json")
+        data.setdefault("visits", 0)
+        data.setdefault("twibbons", 0)
+        data.setdefault("schools", [])
+        data[key] = int(data.get(key, 0)) + 1
+        tmp = DATA_DIR / "engagement.json.tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        os.replace(tmp, DATA_DIR / "engagement.json")
+        return data

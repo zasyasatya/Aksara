@@ -1,15 +1,24 @@
 "use client"
 
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Header } from "@/components/layout/header"
 import { BottomNav } from "@/components/layout/bottom-nav"
-import { ArrowRight, Sparkles, BookOpen, Languages, Gamepad2, CheckCircle2, Users, Award, Zap } from "lucide-react"
+import { api } from "@/lib/api"
+import { ArrowRight, Sparkles, BookOpen, Languages, Gamepad2, CheckCircle2, Users, Award, Zap, GraduationCap, Globe2, Stamp } from "lucide-react"
 import { motion } from "framer-motion"
 
 export default function LandingPage() {
+  const [visits, setVisits] = useState<number | null>(null)
+
+  useEffect(() => {
+    api.trackVisit()
+    api.getStats().then((d) => setVisits(d.visits)).catch(() => {})
+  }, [])
+
   return (
     <div className="min-h-screen bg-cream">
       <Header />
@@ -60,18 +69,16 @@ export default function LandingPage() {
                 </Link>
               </div>
               
-              <div className="flex items-center gap-6 pt-4">
-                <div className="flex -space-x-2">
-                  {[1,2,3,4].map(i => (
-                    <div key={i} className="h-10 w-10 rounded-full bg-gradient-to-br from-sand to-terracotta border-2 border-cream flex items-center justify-center font-bold text-deep-brown">
-                      {String.fromCharCode(64+i)}
-                    </div>
-                  ))}
+              <div className="flex items-center gap-4 pt-4">
+                <div className="flex items-center gap-2 rounded-full bg-white border border-sand px-4 py-2 shadow-soft">
+                  <Zap className="h-4 w-4 text-saffron" />
+                  <span className="text-sm font-semibold text-deep-brown">
+                    {visits != null ? `${visits.toLocaleString("id-ID")} orang telah belajar di Aksara` : "Bergabunglah dengan para penjaga aksara"}
+                  </span>
                 </div>
-                <div className="text-sm">
-                  <div className="font-semibold">10,000+ siswa</div>
-                  <div className="text-charcoal/60">telah bergabung</div>
-                </div>
+                <span className="text-xs text-charcoal/50">
+                  dari 3,3 juta penutur<br />bahasa Bali
+                </span>
               </div>
             </motion.div>
             
@@ -235,16 +242,16 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { value: "95%", label: "Akurasi Transliterasi", icon: Award },
-              { value: "11", label: "Level Pembelajaran", icon: BookOpen },
-              { value: "100+", label: "Contoh Kata", icon: Languages },
-              { value: "50+", label: "Sekolah Partner", icon: Users },
+              { value: "95%", label: "Akurasi Transliterasi (diuji 57+ kasus)", icon: Award },
+              { value: "11", label: "Level Pembelajaran · 24 Kuis", icon: BookOpen },
+              { value: "3,3 jt", label: "Penutur Bahasa Bali (2024)", icon: Users },
+              { value: "Pergub 7/2026", label: "Bahasa & Aksara Bali wajib jadi mapel di Bali", icon: GraduationCap },
             ].map((stat, i) => (
               <div key={i} className="text-center">
                 <div className="inline-flex h-12 w-12 rounded-2xl bg-cream/10 items-center justify-center mb-3">
                   <stat.icon className="h-6 w-6 text-saffron" />
                 </div>
-                <div className="font-display text-4xl font-bold">{stat.value}</div>
+                <div className="font-display text-3xl lg:text-4xl font-bold">{stat.value}</div>
                 <div className="text-sm text-cream/60 mt-1">{stat.label}</div>
               </div>
             ))}
@@ -252,6 +259,56 @@ export default function LandingPage() {
         </div>
       </section>
       
+      {/* Sekolah & Sanggar */}
+      <section className="py-16 bg-white border-t border-sand">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <Badge variant="saffron" className="mb-3">
+                <GraduationCap className="h-4 w-4 mr-1.5" /> Untuk Sekolah & Sanggar
+              </Badge>
+              <h2 className="font-display text-3xl font-bold mb-3">
+                Pergub 7/2026: Bahasa & Aksara Bali kini wajib di sekolah
+              </h2>
+              <p className="text-charcoal/70 leading-relaxed">
+                Pemerintah Provinsi Bali mewajibkan Bahasa Bali (termasuk <strong>aksara</strong>)
+                dan Kearifan Lokal Bali sebagai muatan lokal minimal 2 jam per minggu di seluruh
+                satuan pendidikan formal. Aksara menyediakan media belajar digital yang
+                selaras: materi terstruktur, kuis tervalidasi, dan panel guru untuk
+                menyesuaikan konten dengan kelas Anda — <strong>gratis untuk murid</strong>.
+              </p>
+              <div className="flex flex-wrap gap-3 mt-5">
+                <Link href="/sekolah">
+                  <Button>Daftarkan Sekolah Anda <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                </Link>
+                <Link href="/docs/penggunaan-guru">
+                  <Button variant="outline">Panduan Guru</Button>
+                </Link>
+              </div>
+            </div>
+            <Card className="p-8 bg-gradient-to-br from-sand/60 to-cream border-sand">
+              <h3 className="flex items-center gap-2 font-bold text-deep-brown mb-4">
+                <Globe2 className="h-5 w-5 text-saffron" /> Aksara Nusantara — roadmap
+              </h3>
+              <p className="text-sm text-charcoal/70 mb-4">
+                Engine transliterasi, kuis, dan studio twibbon dirancang modular — siap
+                diperluas ke aksara daerah lain sebagai platform warisan Nusantara:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="success">Aksara Bali (live)</Badge>
+                <Badge variant="outline">Aksara Jawa (segera)</Badge>
+                <Badge variant="outline">Lontara Bugis (segera)</Badge>
+                <Badge variant="outline">Aksara Batak (segera)</Badge>
+              </div>
+              <div className="mt-5 pt-5 border-t border-sand text-sm text-charcoal/70 space-y-2">
+                <div className="flex items-center gap-2"><Stamp className="h-4 w-4 text-saffron shrink-0" /> Studio Twibbon — konten buatan murid tersebar ke sosial media (growth organik)</div>
+                <div className="flex items-center gap-2"><GraduationCap className="h-4 w-4 text-saffron shrink-0" /> Program kemitraan sekolah & sanggar — <Link href="/sekolah" className="font-semibold text-saffron-dark hover:underline">daftar di sini</Link></div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-20 bg-gradient-to-br from-saffron to-terracotta text-cream relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50" />
@@ -262,7 +319,7 @@ export default function LandingPage() {
               Siap Jadi Penjaga<br />Aksara Bali?
             </h2>
             <p className="text-cream/80 text-lg">
-              Bergabunglah dengan 10,000+ siswa yang telah melestarikan warisan budaya Bali
+              Bergabunglah menjadi penjaga aksara — warisan budaya Bali ditulis masa depanmu
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Link href="/dashboard">
@@ -289,7 +346,9 @@ export default function LandingPage() {
                 <div className="text-xs text-charcoal/60">© 2026 Aksara Platform. Ngajegang Bali.</div>
               </div>
             </div>
-            <div className="flex items-center gap-6 text-sm text-charcoal/60">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-charcoal/60">
+              <Link href="/sekolah" className="hover:text-saffron-dark font-semibold">Untuk Sekolah & Sanggar</Link>
+              <Link href="/docs" className="hover:text-saffron-dark font-semibold">Dokumentasi</Link>
               <span>ᬫᬢᬸᬃ ᬲᬸᬓ᭄ᬱ᭄ᬫ • Matur Suksma</span>
             </div>
           </div>
