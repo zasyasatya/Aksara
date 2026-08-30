@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import type { ReactNode } from "react"
+import type { Metadata } from "next"
 
 /**
  * The production launcher exports the Next app as static files. Generate one
@@ -33,6 +34,48 @@ export function generateStaticParams(): { id: string }[] {
     }
     return []
   })
+}
+
+/** Metadata SEO per pelajaran (judul + deskripsi dari katalog backend). */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id: paramsId } = await params
+  const fallback: Metadata = {
+    title: `Pelajaran ${paramsId}`,
+    description: "Pelajaran interaktif Aksara Bali.",
+    alternates: { canonical: `/learn/${paramsId}` },
+  }
+  try {
+    const catalogue = join(
+      process.cwd(),
+      "..",
+      "backend",
+      "app",
+      "data",
+      "lessons.json"
+    )
+    const lessons: unknown = JSON.parse(readFileSync(catalogue, "utf-8"))
+    const lesson = (lessons as any[]).find((l) => l?.id === paramsId)
+    if (!lesson) return fallback
+    const title = `${lesson.title} — Belajar Aksara Bali`
+    const description = `${lesson.description ?? lesson.title} — pelajaran interaktif level ${lesson.level ?? "-"} platform Aksara Bali.`
+    return {
+      title,
+      description,
+      alternates: { canonical: `/learn/${paramsId}` },
+      openGraph: {
+        title,
+        description,
+        url: `/learn/${paramsId}`,
+        type: "article",
+      },
+    }
+  } catch {
+    return fallback
+  }
 }
 
 export const dynamicParams = false

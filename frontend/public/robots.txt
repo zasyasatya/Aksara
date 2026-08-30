@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /guru/
+Disallow: /admin/
+Disallow: /login/
+Disallow: /_next/
+
+Sitemap: https://aksara.id/sitemap.xml

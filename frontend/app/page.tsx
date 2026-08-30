@@ -343,7 +343,17 @@ export default function LandingPage() {
               <div className="h-10 w-10 rounded-xl bg-deep-brown text-cream font-bali flex items-center justify-center text-xl">ᬅ</div>
               <div>
                 <div className="font-bold">AKSARA</div>
-                <div className="text-xs text-charcoal/60">© 2026 Aksara Platform. Ngajegang Bali.</div>
+                <div className="text-xs text-charcoal/60">
+                  © 2026 Aksara Platform. Ngajegang Bali. — dibuat oleh{" "}
+                  <a
+                    href="https://zasya.id"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-saffron-dark hover:underline"
+                  >
+                    Zasya Satya
+                  </a>
+                </div>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-charcoal/60">
