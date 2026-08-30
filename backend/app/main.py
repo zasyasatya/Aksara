@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .core.config import settings
-from .routers import health, translate, classify, lessons, quiz, docs
+from .routers import health, translate, classify, lessons, quiz, docs, manage
 
 app = FastAPI(
     title=settings.app_name,
@@ -29,6 +29,7 @@ app.include_router(classify.router, prefix=settings.api_prefix)
 app.include_router(lessons.router, prefix=settings.api_prefix)
 app.include_router(quiz.router, prefix=settings.api_prefix)
 app.include_router(docs.router, prefix=settings.api_prefix)
+app.include_router(manage.router, prefix=settings.api_prefix)
 
 @app.get("/api")
 async def api_root():
@@ -44,5 +45,8 @@ async def api_root():
             "/api/lessons",
             "/api/quiz",
             "/api/docs/pages",
+            "/api/manage/lessons",
+            "/api/manage/quizzes",
+            "/api/manage/dictionary",
         ]
     }

@@ -141,28 +141,40 @@ export function ContentMurid() {
 
       <DocSection id="kuis" number="4." title="Uji diri dengan Kuis validasi">
         <p>
-          Buka menu <strong>Kuis</strong>. Ada beberapa tipe soal: <strong>pilihan ganda</strong>
-          (tekan aksara yang tepat), <strong>benar/salah</strong>, <strong>gantungan choice</strong>,
-          dan <strong>susun/validasi tulisan</strong> — kamu menuliskan aksara, lalu sistem
-          memvalidasi apakah tulisanmu benar atau tidak.
+          Buka menu <strong>Kuis</strong>. Ada beberapa tipe soal, dan kamu bisa memfilternya
+          dengan tombol di atas: <strong>pilihan ganda</strong> (tekan aksara yang tepat),{" "}
+          <strong>benar/salah</strong>, <strong>gantungan</strong>, dan yang baru —{" "}
+          <strong>“Menulis Aksara”</strong>: kamu melihat kata Latin, lalu <strong>menulis
+          aksaranya sendiri</strong> (ketik, paste, atau pilih dari keyboard virtual), dan sistem
+          memvalidasi tulisanmu.
         </p>
         <p>
           Setiap jawaban langsung dinilai dengan <strong>feedback detail</strong> — bukan cuma
           “benar/salah”, tapi juga penjelasannya, misalnya: <em>“Seharusnya pakai gantungan,
-          bukan adeg-adeg”</em>. Jawab benar memberikan XP.
+          bukan adeg-adeg”</em>. Kuis menulis juga menampilkan <strong>persen kemiripan</strong>{" "}
+          tulisanmu dengan kunci. Jawab benar memberikan XP.
         </p>
         <Screenshot
           src="/screenshots/quiz.png"
-          alt="Halaman kuis dengan soal transliterasi Aksara Bali"
-          caption="Halaman Kuis: soal interaktif dengan penilaian langsung dan penjelasan."
+          alt="Halaman kuis dengan filter tipe soal"
+          caption="Halaman Kuis: filter tipe soal + penilaian langsung dan penjelasan."
           url="aksara.local/quiz"
+        />
+        <Screenshot
+          src="/screenshots/quiz-write.png"
+          alt="Kuis menulis aksara dengan keyboard virtual"
+          caption="Tipe “Menulis Aksara”: tulis kata dari soal (pakai keyboard virtual bila perlu), lalu cek jawabanmu."
+          url="aksara.local/quiz?type=write_aksara"
         />
       </DocSection>
 
-      <DocSection id="translate" number="5." title="Latih penerjemahan Latin ↔ Aksara">
+      <DocSection id="translate" number="5." title="Latih penerjemahan Latin ↔ Aksara (dua arah)">
         <p>
-          Menu <strong>Translate</strong> mengubah teks Latin ke Aksara Bali (dan sebaliknya)
-          secara langsung saat kamu mengetik. Gunakan ini untuk:
+          Menu <strong>Translate</strong> mengubah teks Latin ke Aksara Bali <em>dan sebaliknya</em>{" "}
+          secara langsung saat kamu mengetik. Klik pill <strong>Latin / Bali</strong> (atau tombol
+          Tukar) untuk membalik arah. Saat arahnya <strong>Bali → Latin</strong>, aksara bisa
+          <strong> diketik, ditempel, atau dipilih</strong> lewat tombol{" "}
+          <em>“Buka Keyboard Aksara”</em>. Gunakan ini untuk:
         </p>
         <Steps
           items={[
@@ -175,6 +187,16 @@ export function ContentMurid() {
                 </>
               ),
             },
+            {
+              title: "Membaca aksara (Bali → Latin)",
+              body: (
+                <>
+                  Pilih aksara dari keyboard virtual — mis.{" "}
+                  <span className="font-bali text-deep-brown">ᬩᬮᬶ</span> — dan lihat padanan Latin
+                  “bali”. Latihan membaca yang bagus.
+                </>
+              ),
+            },
             { title: "Pelajari breakdown", body: "Panel di bawah hasil menjabarkan setiap suku kata & aturan yang dipakai engine." },
             { title: "Cek confidence", body: "Skor keyakinan engine (0–1). Dekat 1 artinya hasil sangat terpercaya." },
             { title: "Salin hasilnya", body: "Tombol salin memudahkan kamu menyalin aksara ke aplikasi lain." },
@@ -182,8 +204,8 @@ export function ContentMurid() {
         />
         <Screenshot
           src="/screenshots/translate.png"
-          alt="Halaman translate dengan input Latin dan hasil Aksara Bali"
-          caption="Translate: konversi dua arah dengan breakdown aturan dan skor confidence."
+          alt="Halaman translate dua arah dengan keyboard aksara"
+          caption="Translate dua arah: Bali → Latin memakai keyboard virtual, dengan breakdown aturan dan skor confidence."
           url="aksara.local/translate"
         />
       </DocSection>

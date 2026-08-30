@@ -7,28 +7,8 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { api } from "@/lib/api"
-import { Copy, Check, Trash2, Keyboard, Sparkles } from "lucide-react"
-
-const WRESATRA = [
-  { bali: "ᬳ", latin: "ha" }, { bali: "ᬦ", latin: "na" }, { bali: "ᬘ", latin: "ca" }, { bali: "ᬭ", latin: "ra" }, { bali: "ᬓ", latin: "ka" },
-  { bali: "ᬤ", latin: "da" }, { bali: "ᬢ", latin: "ta" }, { bali: "ᬲ", latin: "sa" }, { bali: "ᬯ", latin: "wa" }, { bali: "ᬮ", latin: "la" },
-  { bali: "ᬫ", latin: "ma" }, { bali: "ᬕ", latin: "ga" }, { bali: "ᬩ", latin: "ba" }, { bali: "ᬗ", latin: "nga" }, { bali: "ᬧ", latin: "pa" },
-  { bali: "ᬚ", latin: "ja" }, { bali: "ᬬ", latin: "ya" }, { bali: "ᬜ", latin: "nya" },
-]
-
-const PANGANGGE = [
-  { bali: "ᬶ", name: "ulu (i)", mark: "◌ᬶ" },
-  { bali: "ᬸ", name: "suku (u)", mark: "◌ᬸ" },
-  { bali: "ᬾ", name: "taleng (e)", mark: "ᬾ◌" },
-  { bali: "ᭂ", name: "pepet (ě)", mark: "◌ᭂ" },
-  { bali: "ᭀ", name: "tedong (ā/o)", mark: "◌ᭀ" },
-  { bali: "ᬄ", name: "bisah (h)", mark: "◌ᬄ" },
-  { bali: "ᬃ", name: "surang (r)", mark: "◌ᬃ" },
-  { bali: "ᬂ", name: "cecek (ng)", mark: "◌ᬂ" },
-  { bali: "᭄", name: "adeg (kill)", mark: "◌᭄" },
-  { bali: "᭄ᬭ", name: "cakra (ra)", mark: "◌᭄ᬭ" },
-  { bali: "᭄ᬬ", name: "nania (ya)", mark: "◌᭄ᬬ" },
-]
+import { Copy, Check, Trash2, Keyboard } from "lucide-react"
+import { AksaraKeyboard } from "@/components/aksara/aksara-keyboard"
 
 export default function PlaygroundPage() {
   const [baliText, setBaliText] = useState("")
@@ -38,6 +18,10 @@ export default function PlaygroundPage() {
   
   const insertChar = (char: string) => {
     setBaliText(prev => prev + char)
+  }
+
+  const backspace = () => {
+    setBaliText(prev => prev.slice(0, -1))
   }
   
   const handleTranslate = async () => {
@@ -150,41 +134,8 @@ export default function PlaygroundPage() {
           
           <div className="space-y-6">
             <Card className="p-6 bg-white">
-              <h3 className="font-semibold mb-4">Wresastra 18</h3>
-              <div className="grid grid-cols-4 gap-2">
-                {WRESATRA.map((item) => (
-                  <button
-                    key={item.latin}
-                    onClick={() => insertChar(item.bali)}
-                    className="h-16 rounded-xl bg-sand/30 border border-sand hover:border-saffron hover:bg-saffron/10 hover:text-saffron transition-all flex flex-col items-center justify-center group"
-                  >
-                    <div className="font-bali text-xl group-hover:scale-110 transition-transform">{item.bali}</div>
-                    <div className="text-[10px] font-medium">{item.latin}</div>
-                  </button>
-                ))}
-              </div>
-            </Card>
-            
-            <Card className="p-6 bg-white">
-              <h3 className="font-semibold mb-4">Pangangge</h3>
-              <div className="grid grid-cols-3 gap-2">
-                {PANGANGGE.map((item) => (
-                  <button
-                    key={item.name}
-                    onClick={() => insertChar(item.bali)}
-                    className="h-20 rounded-xl bg-cream border border-sand hover:border-saffron hover:bg-saffron/5 transition-all flex flex-col items-center justify-center p-2"
-                  >
-                    <div className="font-bali text-lg">{item.bali}</div>
-                    <div className="text-[10px] text-center leading-tight mt-1">{item.name}</div>
-                  </button>
-                ))}
-              </div>
-              <div className="mt-4 p-3 rounded-xl bg-ocean/5 border border-ocean/10 text-xs">
-                <div className="font-semibold flex items-center gap-1 mb-1">
-                  <Sparkles className="h-3 w-3 text-ocean" /> Tips
-                </div>
-                Klik pangangge setelah aksara dasar. Contoh: Ka + Ulu = Ki → ᬓ + ᬶ = ᬓᬶ
-              </div>
+              <h3 className="font-semibold mb-4">Keyboard Aksara</h3>
+              <AksaraKeyboard onInsert={insertChar} onBackspace={backspace} />
             </Card>
           </div>
         </div>

@@ -1,19 +1,8 @@
-import json
 import unicodedata
-from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List
 import random
 
-DATA_DIR = Path(__file__).parent.parent / "data"
-
-with open(DATA_DIR / "quiz.json", "r", encoding="utf-8") as f:
-    QUIZZES = json.load(f)
-
-with open(DATA_DIR / "lessons.json", "r", encoding="utf-8") as f:
-    LESSONS = json.load(f)
-
-QUIZ_BY_ID = {q["id"]: q for q in QUIZZES}
-LESSON_BY_ID = {l["id"]: l for l in LESSONS}
+from . import data_store
 
 def normalize_bali(text: str) -> str:
     """Normalize Balinese text for comparison"""
@@ -27,7 +16,7 @@ def normalize_bali(text: str) -> str:
 
 def check_answer(quiz_id: str, answer, user_input: str = None) -> Dict:
     """Check quiz answer"""
-    quiz = QUIZ_BY_ID.get(quiz_id)
+    quiz = data_store.get_quiz(quiz_id)
     if not quiz:
         return {"error": "Quiz not found", "quiz_id": quiz_id}
     
@@ -47,6 +36,13 @@ def check_answer(quiz_id: str, answer, user_input: str = None) -> Dict:
         is_correct = (str(answer).lower() == str(correct_answer).lower())
     elif q_type == "true_false":
         is_correct = (str(answer).lower() == str(correct_answer).lower())
+    elif q_type == "write_aksara":
+        # answer/user_input berisi aksara yang ditulis murid; bandingkan dengan kunci
+        expected_bali = (quiz.get("question") or {}).get("bali", "") or ""
+        user_bali = user_input if user_input else ("".join(answer) if isinstance(answer, list) else str(answer))
+        is_correct = normalize_bali(user_bali) == normalize_bali(expected_bali)
+        if not is_correct:
+            details = f"Expected: {expected_bali}, Got: {user_bali}"
     elif q_type == "arrangement":
         # answer is list of bali chars or string
         # Compare normalized
@@ -88,8 +84,8 @@ def check_answer(quiz_id: str, answer, user_input: str = None) -> Dict:
     # Find next quiz in same lesson
     next_quiz = None
     lesson_id = quiz.get("lesson_id")
-    if lesson_id and lesson_id in LESSON_BY_ID:
-        lesson = LESSON_BY_ID[lesson_id]
+    lesson = data_store.get_lesson(lesson_id) if lesson_id else None
+    if lesson:
         quiz_ids = lesson.get("quiz_ids", [])
         try:
             idx = quiz_ids.index(quiz_id)
@@ -193,11 +189,11 @@ def validate_pair(question_latin: str, question_bali: str, user_bali: str, mode:
         }
 
 def get_quizzes(filters: Dict = None) -> List[Dict]:
-    """Get quizzes with filters"""
+    """Get quizzes with filters (baca file per-request agar editan guru langsung terlihat)"""
     if not filters:
-        return QUIZZES
+        return data_store.get_quizzes()
     
-    result = QUIZZES
+    result = data_store.get_quizzes()
     
     if "lesson_id" in filters and filters["lesson_id"]:
         result = [q for q in result if q.get("lesson_id") == filters["lesson_id"]]
@@ -219,4 +215,4 @@ def get_quizzes(filters: Dict = None) -> List[Dict]:
     return result
 
 def get_quiz_by_id(quiz_id: str):
-    return QUIZ_BY_ID.get(quiz_id)
+    return data_store.get_quiz(quiz_id)

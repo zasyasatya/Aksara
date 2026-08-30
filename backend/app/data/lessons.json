@@ -8,12 +8,22 @@
     "level": 1,
     "order": 1,
     "category": "wresastra",
-    "aksara_ids": ["ha", "na", "ca", "ra", "ka"],
+    "aksara_ids": [
+      "ha",
+      "na",
+      "ca",
+      "ra",
+      "ka"
+    ],
     "pangangge_ids": [],
     "estimated_minutes": 10,
     "xp_reward": 50,
     "prerequisites": [],
-    "quiz_ids": ["quiz-wres-01-1", "quiz-wres-01-2", "quiz-wres-01-3"],
+    "quiz_ids": [
+      "quiz-wres-01-1",
+      "quiz-wres-01-2",
+      "quiz-wres-01-3"
+    ],
     "is_published": true,
     "thumbnail": "ᬳᬦᬘᬭᬓ"
   },
@@ -26,12 +36,23 @@
     "level": 1,
     "order": 2,
     "category": "wresastra",
-    "aksara_ids": ["da", "ta", "sa", "wa", "la"],
+    "aksara_ids": [
+      "da",
+      "ta",
+      "sa",
+      "wa",
+      "la"
+    ],
     "pangangge_ids": [],
     "estimated_minutes": 10,
     "xp_reward": 50,
-    "prerequisites": ["wresastra-01"],
-    "quiz_ids": ["quiz-wres-02-1", "quiz-wres-02-2"],
+    "prerequisites": [
+      "wresastra-01"
+    ],
+    "quiz_ids": [
+      "quiz-wres-02-1",
+      "quiz-wres-02-2"
+    ],
     "is_published": true,
     "thumbnail": "ᬤᬢᬲᬯᬮ"
   },
@@ -44,12 +65,22 @@
     "level": 1,
     "order": 3,
     "category": "wresastra",
-    "aksara_ids": ["pa", "ja", "ya", "nya", "ma"],
+    "aksara_ids": [
+      "pa",
+      "ja",
+      "ya",
+      "nya",
+      "ma"
+    ],
     "pangangge_ids": [],
     "estimated_minutes": 10,
     "xp_reward": 50,
-    "prerequisites": ["wresastra-02"],
-    "quiz_ids": ["quiz-wres-03-1"],
+    "prerequisites": [
+      "wresastra-02"
+    ],
+    "quiz_ids": [
+      "quiz-wres-03-1"
+    ],
     "is_published": true,
     "thumbnail": "ᬧᬚᬬᬜᬫ"
   },
@@ -62,12 +93,22 @@
     "level": 1,
     "order": 4,
     "category": "wresastra",
-    "aksara_ids": ["ma", "ga", "ba", "nga", "pa"],
+    "aksara_ids": [
+      "ma",
+      "ga",
+      "ba",
+      "nga",
+      "pa"
+    ],
     "pangangge_ids": [],
     "estimated_minutes": 10,
     "xp_reward": 50,
-    "prerequisites": ["wresastra-03"],
-    "quiz_ids": ["quiz-wres-04-1"],
+    "prerequisites": [
+      "wresastra-03"
+    ],
+    "quiz_ids": [
+      "quiz-wres-04-1"
+    ],
     "is_published": true,
     "thumbnail": "ᬫᬕᬩᬗ"
   },
@@ -80,12 +121,26 @@
     "level": 2,
     "order": 5,
     "category": "pangangge_suara",
-    "aksara_ids": ["ha", "na", "ka", "ba", "la"],
-    "pangangge_ids": ["ulu", "suku"],
+    "aksara_ids": [
+      "ha",
+      "na",
+      "ka",
+      "ba",
+      "la"
+    ],
+    "pangangge_ids": [
+      "ulu",
+      "suku"
+    ],
     "estimated_minutes": 15,
     "xp_reward": 75,
-    "prerequisites": ["wresastra-01"],
-    "quiz_ids": ["quiz-pangangge-01-1", "quiz-pangangge-01-2"],
+    "prerequisites": [
+      "wresastra-01"
+    ],
+    "quiz_ids": [
+      "quiz-pangangge-01-1",
+      "quiz-pangangge-01-2"
+    ],
     "is_published": true,
     "thumbnail": "ᬶᬸ"
   },
@@ -98,12 +153,24 @@
     "level": 2,
     "order": 6,
     "category": "pangangge_suara",
-    "aksara_ids": ["sa", "ga", "ba"],
-    "pangangge_ids": ["taleng", "pepet", "taleng_tedong"],
+    "aksara_ids": [
+      "sa",
+      "ga",
+      "ba"
+    ],
+    "pangangge_ids": [
+      "taleng",
+      "pepet",
+      "taleng_tedong"
+    ],
     "estimated_minutes": 15,
     "xp_reward": 75,
-    "prerequisites": ["pangangge-suara-01"],
-    "quiz_ids": ["quiz-pangangge-02-1"],
+    "prerequisites": [
+      "pangangge-suara-01"
+    ],
+    "quiz_ids": [
+      "quiz-pangangge-02-1"
+    ],
     "is_published": true,
     "thumbnail": "ᬾᭂ"
   },
@@ -116,12 +183,24 @@
     "level": 3,
     "order": 7,
     "category": "pangangge_tengenan",
-    "aksara_ids": ["ha", "na", "ka"],
-    "pangangge_ids": ["bisah", "surang", "cecek"],
+    "aksara_ids": [
+      "ha",
+      "na",
+      "ka"
+    ],
+    "pangangge_ids": [
+      "bisah",
+      "surang",
+      "cecek"
+    ],
     "estimated_minutes": 15,
     "xp_reward": 75,
-    "prerequisites": ["pangangge-suara-01"],
-    "quiz_ids": ["quiz-tengenan-01-1"],
+    "prerequisites": [
+      "pangangge-suara-01"
+    ],
+    "quiz_ids": [
+      "quiz-tengenan-01-1"
+    ],
     "is_published": true,
     "thumbnail": "ᬄᬃᬂ"
   },
@@ -134,12 +213,25 @@
     "level": 4,
     "order": 8,
     "category": "gantungan",
-    "aksara_ids": ["ka", "ra", "ma", "na"],
-    "pangangge_ids": ["cakra", "adeg_adeg"],
+    "aksara_ids": [
+      "ka",
+      "ra",
+      "ma",
+      "na"
+    ],
+    "pangangge_ids": [
+      "cakra",
+      "adeg_adeg"
+    ],
     "estimated_minutes": 20,
     "xp_reward": 100,
-    "prerequisites": ["pangangge-tengenan-01"],
-    "quiz_ids": ["quiz-gantungan-01", "quiz-gantungan-02"],
+    "prerequisites": [
+      "pangangge-tengenan-01"
+    ],
+    "quiz_ids": [
+      "quiz-gantungan-01",
+      "quiz-gantungan-02"
+    ],
     "is_published": true,
     "thumbnail": "᭄ᬓ᭄ᬭ"
   },
@@ -152,12 +244,25 @@
     "level": 4,
     "order": 9,
     "category": "pangangge_aksara",
-    "aksara_ids": ["ka", "ba", "sa"],
-    "pangangge_ids": ["cakra", "nania", "suku_kembung", "gantungan_la"],
+    "aksara_ids": [
+      "ka",
+      "ba",
+      "sa"
+    ],
+    "pangangge_ids": [
+      "cakra",
+      "nania",
+      "suku_kembung",
+      "gantungan_la"
+    ],
     "estimated_minutes": 20,
     "xp_reward": 100,
-    "prerequisites": ["gantungan-01"],
-    "quiz_ids": ["quiz-gantungan-03"],
+    "prerequisites": [
+      "gantungan-01"
+    ],
+    "quiz_ids": [
+      "quiz-gantungan-03"
+    ],
     "is_published": true,
     "thumbnail": "᭄ᬭ᭄ᬬ᭄ᬯ"
   },
@@ -170,12 +275,21 @@
     "level": 5,
     "order": 10,
     "category": "swalalita",
-    "aksara_ids": ["kha", "gha", "cha", "sa_sapa"],
+    "aksara_ids": [
+      "kha",
+      "gha",
+      "cha",
+      "sa_sapa"
+    ],
     "pangangge_ids": [],
     "estimated_minutes": 25,
     "xp_reward": 125,
-    "prerequisites": ["gantungan-02"],
-    "quiz_ids": ["quiz-swalalita-01"],
+    "prerequisites": [
+      "gantungan-02"
+    ],
+    "quiz_ids": [
+      "quiz-swalalita-01"
+    ],
     "is_published": true,
     "thumbnail": "ᬔᬖᬙᬱ"
   },
@@ -188,12 +302,34 @@
     "level": 6,
     "order": 11,
     "category": "kalimat",
-    "aksara_ids": ["ha", "na", "ca", "ra", "ka", "ma", "ga", "ba"],
-    "pangangge_ids": ["ulu", "suku", "taleng", "bisah", "surang", "cecek", "cakra"],
+    "aksara_ids": [
+      "ha",
+      "na",
+      "ca",
+      "ra",
+      "ka",
+      "ma",
+      "ga",
+      "ba"
+    ],
+    "pangangge_ids": [
+      "ulu",
+      "suku",
+      "taleng",
+      "bisah",
+      "surang",
+      "cecek",
+      "cakra"
+    ],
     "estimated_minutes": 30,
     "xp_reward": 150,
-    "prerequisites": ["swalalita-01"],
-    "quiz_ids": ["quiz-kalimat-01", "quiz-kalimat-02"],
+    "prerequisites": [
+      "swalalita-01"
+    ],
+    "quiz_ids": [
+      "quiz-kalimat-01",
+      "quiz-kalimat-02"
+    ],
     "is_published": true,
     "thumbnail": "ᬑᬁᬲ᭄ᬯ"
   }

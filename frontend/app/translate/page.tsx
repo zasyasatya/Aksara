@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { api } from "@/lib/api"
 import { useTranslateStore } from "@/lib/store"
-import { ArrowLeftRight, Copy, Check, Sparkles, Info, BookOpen, AlertTriangle } from "lucide-react"
+import { AksaraKeyboard } from "@/components/aksara/aksara-keyboard"
+import { ArrowLeftRight, Copy, Check, Sparkles, Info, BookOpen, AlertTriangle, Keyboard } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 export default function TranslatePage() {
@@ -17,6 +18,24 @@ export default function TranslatePage() {
   const [copied, setCopied] = useState(false)
   const [warnings, setWarnings] = useState<string[]>([])
   const [confidence, setConfidence] = useState(1)
+  const [showKeyboard, setShowKeyboard] = useState(false)
+
+  const isBaliInput = direction === "bali-to-latin"
+
+  /** Sisipkan aksara ke input (memilih aksara dari keyboard virtual). */
+  const insertAksara = (char: string) => setInput(input + char)
+  const backspaceAksara = () => setInput(input.slice(0, -1))
+
+  /** Pilih arah dua-arah: Latin → Bali atau Bali → Latin. */
+  const pickDirection = (dir: "latin-to-bali" | "bali-to-latin") => {
+    if (dir === direction) return
+    setDirection(dir)
+    // pindah input ke sisi yang sesuai dengan isi hasil sebelumnya
+    if (output) {
+      setInput(output)
+      setOutput(input)
+    }
+  }
   
   const handleTranslate = async (text: string, dir: typeof direction) => {
     if (!text.trim()) {
@@ -87,13 +106,21 @@ export default function TranslatePage() {
             {/* Direction toggle */}
             <div className="flex items-center justify-between p-4 border-b border-sand bg-sand/20">
               <div className="flex items-center gap-2">
-                <div className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${direction === "latin-to-bali" ? "bg-deep-brown text-cream shadow-soft" : "bg-white text-charcoal/60"}`}>
+                <button
+                  type="button"
+                  onClick={() => pickDirection("latin-to-bali")}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${direction === "latin-to-bali" ? "bg-deep-brown text-cream shadow-soft" : "bg-white text-charcoal/60 hover:text-deep-brown"}`}
+                >
                   Latin
-                </div>
+                </button>
                 <ArrowLeftRight className="h-4 w-4 text-charcoal/40" />
-                <div className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${direction === "bali-to-latin" ? "bg-deep-brown text-cream shadow-soft" : "bg-white text-charcoal/60"}`}>
+                <button
+                  type="button"
+                  onClick={() => pickDirection("bali-to-latin")}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${direction === "bali-to-latin" ? "bg-deep-brown text-cream shadow-soft" : "bg-white text-charcoal/60 hover:text-deep-brown"}`}
+                >
                   <span className="font-bali">ᬩᬮᬶ</span> Bali
-                </div>
+                </button>
               </div>
               <Button variant="ghost" size="sm" onClick={swapDirection} className="rounded-full">
                 <ArrowLeftRight className="h-4 w-4 mr-2" />
@@ -116,6 +143,21 @@ export default function TranslatePage() {
                   placeholder={direction === "latin-to-bali" ? "Ketik teks latin, misal: bali, om swastyastu..." : "Paste aksara Bali, misal: ᬩᬮᬶ"}
                   className={`w-full h-40 p-4 rounded-2xl bg-sand/30 border border-sand focus:border-saffron focus:ring-2 focus:ring-saffron/20 outline-none resize-none transition-all ${direction === "bali-to-latin" ? "font-bali text-xl" : "text-base"}`}
                 />
+                {isBaliInput && (
+                <button
+                  type="button"
+                  onClick={() => setShowKeyboard(v => !v)}
+                  className={`mt-3 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition-colors ${showKeyboard ? "border-saffron bg-saffron/10 text-saffron-dark" : "border-sand bg-cream text-charcoal/60 hover:border-saffron/50"}`}
+                >
+                  <Keyboard className="h-3.5 w-3.5" />
+                  {showKeyboard ? "Tutup Keyboard Aksara" : "Buka Keyboard Aksara"}
+                </button>
+                )}
+                {showKeyboard && isBaliInput && (
+                  <div className="mt-3 rounded-2xl border border-sand bg-cream/60 p-3">
+                    <AksaraKeyboard onInsert={insertAksara} onBackspace={backspaceAksara} compact />
+                  </div>
+                )}
                 <div className="flex gap-2 mt-3 flex-wrap">
                   {examples.map((ex) => (
                     <button

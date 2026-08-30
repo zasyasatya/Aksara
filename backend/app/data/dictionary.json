@@ -1,23 +1,110 @@
 {
-  "angklung": {"latin": "angklung", "bali": "ᬅᬗ᭄ᬓ᭄ᬮᬸᬂ", "meaning": "alat musik", "note": "A independent karena diawali vokal"},
-  "aksara": {"latin": "aksara", "bali": "ᬅᬓ᭄ᬱᬭ", "meaning": "huruf", "note": "Sa sapa untuk ssa"},
-  "bali": {"latin": "bali", "bali": "ᬩᬮᬶ", "meaning": "Bali"},
-  "bleganjur": {"latin": "bleganjur", "bali": "ᬩᬼᬕᬜ᭄ᬚᬸᬃ", "meaning": "gamelan", "note": "La gantungan + pepet allowed"},
-  "om swastyastu": {"latin": "om swastyastu", "bali": "ᬑᬁ ᬲ᭄ᬯᬲ᭄ᬢ᭄ᬬᬲ᭄ᬢᬸ", "meaning": "salam Bali"},
-  "rahajeng": {"latin": "rahajeng", "bali": "ᬭᬳᬚᭂᬂ", "meaning": "selamat"},
-  "matur suksma": {"latin": "matur suksma", "bali": "ᬫᬢᬸᬃ ᬲᬸᬓ᭄ᬱ᭄ᬫ", "meaning": "terima kasih"},
-  "dharma": {"latin": "dharma", "bali": "ᬤᬃᬫ", "meaning": "kebenaran"},
-  "karma": {"latin": "karma", "bali": "ᬓᬃᬫ", "meaning": "perbuatan"},
-  "bapa": {"latin": "bapa", "bali": "ᬩᬧ", "meaning": "ayah"},
-  "memek": {"latin": "memek", "bali": "ᬫᬾᬫᬾᬓ᭄", "meaning": "ibu"},
-  "guru": {"latin": "guru", "bali": "ᬕᬸᬭᬸ", "meaning": "guru"},
-  "sastra": {"latin": "sastra", "bali": "ᬲᬲ᭄ᬢ᭄ᬭ", "meaning": "tulisan"},
-  "hanacaraka": {"latin": "hanacaraka", "bali": "ᬳᬦᬘᬭᬓ", "meaning": "urutan aksara"},
-  "karangkung": {"latin": "karangkung", "bali": "ᬓᬭᬗ᭄ᬓᬸᬂ", "meaning": "nama tarian"},
-  "bajra": {"latin": "bajra", "bali": "ᬩᬚ᭄ᬭ", "meaning": "petir"},
-  "cakra": {"latin": "cakra", "bali": "ᬘᬓ᭄ᬭ", "meaning": "cakra"},
-  "kembang": {"latin": "kembang", "bali": "ᬓᭂᬫ᭄ᬩᬂ", "meaning": "bunga"},
-  "surya": {"latin": "surya", "bali": "ᬲᬸᬃᬬ", "meaning": "matahari"},
-  "wulan": {"latin": "wulan", "bali": "ᬯᬸᬮᬦ᭄", "meaning": "bulan"},
-  "sasih": {"latin": "sasih", "bali": "ᬲᬲᬶᬄ", "meaning": "bulan kalender Bali"}
+  "angklung": {
+    "latin": "angklung",
+    "bali": "ᬅᬗ᭄ᬓ᭄ᬮᬸᬂ",
+    "meaning": "alat musik",
+    "note": "A independent karena diawali vokal"
+  },
+  "aksara": {
+    "latin": "aksara",
+    "bali": "ᬅᬓ᭄ᬱᬭ",
+    "meaning": "huruf",
+    "note": "Sa sapa untuk ssa"
+  },
+  "bali": {
+    "latin": "bali",
+    "bali": "ᬩᬮᬶ",
+    "meaning": "Bali"
+  },
+  "bleganjur": {
+    "latin": "bleganjur",
+    "bali": "ᬩᬼᬕᬜ᭄ᬚᬸᬃ",
+    "meaning": "gamelan",
+    "note": "La gantungan + pepet allowed"
+  },
+  "om swastyastu": {
+    "latin": "om swastyastu",
+    "bali": "ᬑᬁ ᬲ᭄ᬯᬲ᭄ᬢ᭄ᬬᬲ᭄ᬢᬸ",
+    "meaning": "salam Bali"
+  },
+  "rahajeng": {
+    "latin": "rahajeng",
+    "bali": "ᬭᬳᬚᭂᬂ",
+    "meaning": "selamat"
+  },
+  "matur suksma": {
+    "latin": "matur suksma",
+    "bali": "ᬫᬢᬸᬃ ᬲᬸᬓ᭄ᬱ᭄ᬫ",
+    "meaning": "terima kasih"
+  },
+  "dharma": {
+    "latin": "dharma",
+    "bali": "ᬤᬃᬫ",
+    "meaning": "kebenaran"
+  },
+  "karma": {
+    "latin": "karma",
+    "bali": "ᬓᬃᬫ",
+    "meaning": "perbuatan"
+  },
+  "bapa": {
+    "latin": "bapa",
+    "bali": "ᬩᬧ",
+    "meaning": "ayah"
+  },
+  "memek": {
+    "latin": "memek",
+    "bali": "ᬫᬾᬫᬾᬓ᭄",
+    "meaning": "ibu"
+  },
+  "guru": {
+    "latin": "guru",
+    "bali": "ᬕᬸᬭᬸ",
+    "meaning": "guru"
+  },
+  "sastra": {
+    "latin": "sastra",
+    "bali": "ᬲᬲ᭄ᬢ᭄ᬭ",
+    "meaning": "tulisan"
+  },
+  "hanacaraka": {
+    "latin": "hanacaraka",
+    "bali": "ᬳᬦᬘᬭᬓ",
+    "meaning": "urutan aksara"
+  },
+  "karangkung": {
+    "latin": "karangkung",
+    "bali": "ᬓᬭᬗ᭄ᬓᬸᬂ",
+    "meaning": "nama tarian"
+  },
+  "bajra": {
+    "latin": "bajra",
+    "bali": "ᬩᬚ᭄ᬭ",
+    "meaning": "petir"
+  },
+  "cakra": {
+    "latin": "cakra",
+    "bali": "ᬘᬓ᭄ᬭ",
+    "meaning": "cakra"
+  },
+  "kembang": {
+    "latin": "kembang",
+    "bali": "ᬓᭂᬫ᭄ᬩᬂ",
+    "meaning": "bunga"
+  },
+  "surya": {
+    "latin": "surya",
+    "bali": "ᬲᬸᬃᬬ",
+    "meaning": "matahari"
+  },
+  "wulan": {
+    "latin": "wulan",
+    "bali": "ᬯᬸᬮᬦ᭄",
+    "meaning": "bulan"
+  },
+  "sasih": {
+    "latin": "sasih",
+    "bali": "ᬲᬲᬶᬄ",
+    "meaning": "bulan kalender Bali"
+  }
 }

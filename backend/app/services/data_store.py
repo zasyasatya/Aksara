@@ -1,0 +1,74 @@
+"""Penyimpanan JSON thread-safe untuk konten yang bisa diedit guru.
+
+Semua pembaca/pengguna konten dinamis (lessons, quiz, dictionary) harus
+melalui modul ini agar editan guru langsung terlihat tanpa restart server.
+Penulisan dilakukan atomik (file sementara + os.replace).
+"""
+
+import json
+import os
+import threading
+from pathlib import Path
+from typing import Any, Dict, List
+
+DATA_DIR = Path(__file__).parent.parent / "data"
+
+_lock = threading.RLock()
+
+
+def _read(name: str) -> Any:
+    with _lock:
+        with open(DATA_DIR / name, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+
+def _write(name: str, data: Any) -> None:
+    with _lock:
+        tmp = DATA_DIR / f"{name}.tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        os.replace(tmp, DATA_DIR / name)
+
+
+# ── Lessons (materi) ────────────────────────────────────────────────────
+
+def get_lessons() -> List[Dict[str, Any]]:
+    return _read("lessons.json")
+
+
+def save_lessons(lessons: List[Dict[str, Any]]) -> None:
+    _write("lessons.json", lessons)
+
+
+def get_lesson(lesson_id: str) -> Dict[str, Any] | None:
+    return next((l for l in get_lessons() if l.get("id") == lesson_id), None)
+
+
+# ── Quizzes (kuis) ──────────────────────────────────────────────────────
+
+def get_quizzes() -> List[Dict[str, Any]]:
+    return _read("quiz.json")
+
+
+def save_quizzes(quizzes: List[Dict[str, Any]]) -> None:
+    _write("quiz.json", quizzes)
+
+
+def get_quiz(quiz_id: str) -> Dict[str, Any] | None:
+    return next((q for q in get_quizzes() if q.get("id") == quiz_id), None)
+
+
+# ── Dictionary (kamus kata khusus) ──────────────────────────────────────
+
+def get_dictionary() -> Dict[str, Dict[str, Any]]:
+    return _read("dictionary.json")
+
+
+def save_dictionary(data: Dict[str, Dict[str, Any]]) -> None:
+    _write("dictionary.json", data)
+
+
+# ── Aksara master (read-only reference untuk form guru) ─────────────────
+
+def get_aksara_master() -> Dict[str, Any]:
+    return _read("aksara_master.json")

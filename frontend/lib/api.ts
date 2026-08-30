@@ -86,7 +86,74 @@ export interface VisibilityResponse {
   message: string
 }
 
+// ── Manajemen konten (Guru) ─────────────────────────────────────────────
+
+export interface ManageStatus {
+  mode: "dev" | "prod"
+  is_guru: boolean
+  is_admin: boolean
+}
+
+export interface LessonIn {
+  id?: string
+  title: string
+  slug?: string
+  description?: string
+  story?: string
+  level: number
+  order: number
+  category?: string
+  aksara_ids: string[]
+  pangangge_ids: string[]
+  estimated_minutes: number
+  xp_reward: number
+  prerequisites: string[]
+  quiz_ids: string[]
+  is_published: boolean
+  thumbnail?: string
+}
+
+export interface QuizQuestionIn {
+  text: string
+  latin?: string
+  bali?: string
+  hint?: string
+}
+
+export interface QuizOptionIn {
+  id: string
+  bali?: string
+  latin?: string
+  label?: string
+  is_correct?: boolean
+}
+
+export interface QuizIn {
+  id?: string
+  lesson_id?: string
+  type: string
+  difficulty: "easy" | "medium" | "hard"
+  question: QuizQuestionIn
+  options: QuizOptionIn[]
+  correct_answer?: string
+  explanation?: string
+  xp: number
+}
+
+export interface DictEntry {
+  latin: string
+  bali: string
+  meaning?: string
+  note?: string
+}
+
+export interface AksaraRefGroup {
+  category: string
+  items: { id: string; bali: string; latin: string; name: string }[]
+}
+
 const ADMIN_TOKEN_KEY = "aksara_admin_token"
+const GURU_TOKEN_KEY = "aksara_guru_token"
 
 /** Ambil token admin tersimpan (null bila belum login). Hanya jalan di browser. */
 export function getAdminToken(): string | null {
@@ -99,6 +166,19 @@ export function setAdminToken(token: string | null): void {
   if (typeof window === "undefined") return
   if (token) window.localStorage.setItem(ADMIN_TOKEN_KEY, token)
   else window.localStorage.removeItem(ADMIN_TOKEN_KEY)
+}
+
+/** Ambil token guru tersimpan (null bila belum login). */
+export function getGuruToken(): string | null {
+  if (typeof window === "undefined") return null
+  return window.localStorage.getItem(GURU_TOKEN_KEY)
+}
+
+/** Simpan atau hapus token guru. */
+export function setGuruToken(token: string | null): void {
+  if (typeof window === "undefined") return
+  if (token) window.localStorage.setItem(GURU_TOKEN_KEY, token)
+  else window.localStorage.removeItem(GURU_TOKEN_KEY)
 }
 
 async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -204,4 +284,79 @@ export const api = {
       body: JSON.stringify({ is_public: isPublic }),
       headers: adminToken ? { "X-Admin-Token": adminToken } : {},
     }),
+
+  // ── Manajemen konten (Guru) ──
+  manage: {
+    status: (guruToken: string | null = null) =>
+      fetchAPI<ManageStatus>("/manage/status", {
+        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+      }),
+
+    // Materi
+    listLessons: (guruToken: string | null = null) =>
+      fetchAPI<{ lessons: any[]; total: number }>("/manage/lessons", {
+        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+      }),
+    createLesson: (body: LessonIn, guruToken: string | null = null) =>
+      fetchAPI<any>("/manage/lessons", {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+      }),
+    updateLesson: (id: string, body: LessonIn, guruToken: string | null = null) =>
+      fetchAPI<any>(`/manage/lessons/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(body),
+        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+      }),
+    deleteLesson: (id: string, guruToken: string | null = null) =>
+      fetchAPI<{ message: string }>(`/manage/lessons/${id}`, {
+        method: "DELETE",
+        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+      }),
+
+    // Kuis
+    listQuizzes: (guruToken: string | null = null) =>
+      fetchAPI<{ quizzes: any[]; total: number }>("/manage/quizzes", {
+        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+      }),
+    createQuiz: (body: QuizIn, guruToken: string | null = null) =>
+      fetchAPI<any>("/manage/quizzes", {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+      }),
+    updateQuiz: (id: string, body: QuizIn, guruToken: string | null = null) =>
+      fetchAPI<any>(`/manage/quizzes/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(body),
+        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+      }),
+    deleteQuiz: (id: string, guruToken: string | null = null) =>
+      fetchAPI<{ message: string }>(`/manage/quizzes/${id}`, {
+        method: "DELETE",
+        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+      }),
+
+    // Kamus
+    listDictionary: (guruToken: string | null = null) =>
+      fetchAPI<{ entries: DictEntry[]; total: number }>("/manage/dictionary", {
+        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+      }),
+    upsertDict: (body: { latin: string; bali: string; meaning?: string; note?: string }, guruToken: string | null = null) =>
+      fetchAPI<DictEntry>("/manage/dictionary", {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+      }),
+    deleteDict: (latin: string, guruToken: string | null = null) =>
+      fetchAPI<{ message: string }>(`/manage/dictionary/${encodeURIComponent(latin)}`, {
+        method: "DELETE",
+        headers: guruToken ? { "X-Admin-Token": guruToken } : {},
+      }),
+
+    // Referensi aksara untuk form
+    aksaraReference: () =>
+      fetchAPI<{ groups: AksaraRefGroup[] }>("/manage/aksara"),
+  },
 }

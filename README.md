@@ -22,15 +22,23 @@ Platform edukasi interaktif untuk mempelajari Aksara Bali (Hanacaraka) dengan pe
 
 ### ✅ Quiz Validasi
 - Murid menulis aksara, sistem validasi apakah benar sesuai soal
-- Tipe: pilihan ganda, benar/salah, gantungan choice, susun kalimat
+- Tipe: pilihan ganda, benar/salah, gantungan choice, **menulis aksara** (murid menulis kata dari soal, divalidasi otomatis + skor kemiripan), susun kalimat
+- Filter tipe soal di halaman kuis + **keyboard virtual** untuk menulis aksara
 - Feedback detail: jelaskan kesalahan (misal: "Seharusnya pakai gantungan, bukan adeg-adeg")
 - Endpoint `/api/quiz/validate-pair` untuk validasi custom
 
-### 📚 Dokumentasi & Panel Admin
+### ✍️ Panel Guru (`/guru`)
+- Guru **menambah / mengubah / menghapus** materi, kuis, dan kamus langsung dari peramban — **tanpa edit file**
+- Tab **Materi** (judul, level, urutan, aksara, kuis terkait), **Kuis** (semua tipe termasuk *menulis aksara*), **Kamus** (kata khusus transliterasi)
+- Perubahan **langsung efektif** untuk murid (store JSON + reload per-request, tanpa restart)
+- Mode DEV: langsung terbuka. Mode PROD: login dengan token `AKSARA_GURU_TOKEN` (token admin juga diterima)
+
+### 📚 Dokumentasi, Panel Guru & Panel Admin
 - **`/docs`** — pusat dokumentasi: tata cara penggunaan untuk **murid, guru, admin**, plus halaman khusus **Metode Scientific & Referensi** (metodologi transliterasi + sumber akademik) — lengkap dengan screenshot halaman
+- **`/guru`** — panel guru: kelola konten (materi/kuis/kamus) secara real-time
 - **`/admin`** — panel admin: atur halaman dokumentasi mana yang **go public**
-- **Mode DEV** (`AKSARA_MODE=dev`): semua halaman dokumentasi selalu tampil, akses admin otomatis
-- **Mode PROD** (`AKSARA_MODE=prod`): hanya halaman publik yang tampil; admin login via token (`AKSARA_ADMIN_TOKEN`)
+- **Mode DEV** (`AKSARA_MODE=dev`): semua halaman dokumentasi selalu tampil, akses admin & guru otomatis
+- **Mode PROD** (`AKSARA_MODE=prod`): hanya halaman publik yang tampil; admin login via token (`AKSARA_ADMIN_TOKEN`), guru via token (`AKSARA_GURU_TOKEN`)
 
 ### 🎨 Design System
 - Branding kuat: Saffron (#FF6B35), Deep Brown (#2C1810), Cream (#FFF8E7), Terracotta
@@ -66,9 +74,10 @@ Aksara/
 │   │   ├── services/
 │   │   │   ├── transliterator.py - CORE advanced engine (800+ lines)
 │   │   │   ├── classifier.py
-│   │   │   └── quiz_engine.py
-│   │   ├── routers/ - translate, classify, lessons, quiz
-│   │   ├── schemas/ - Pydantic models
+│   │   │   ├── quiz_engine.py - check_answer + validate_pair (termasuk tipe write_aksara)
+│   │   │   └── data_store.py - store JSON terpusat (mampu ditulis ulang, reload per-request)
+│   │   ├── routers/ - translate, classify, lessons, quiz, docs, manage
+│   │   ├── schemas/ - Pydantic models (termasuk manage.py)
 │   │   └── tests/ - pytest
 │   └── requirements.txt
 ├── frontend/
@@ -76,16 +85,18 @@ Aksara/
 │   │   ├── page.tsx - Landing
 │   │   ├── dashboard/ - Dashboard progress
 │   │   ├── learn/ - Belajar bertahap
-│   │   ├── translate/ - Translate live
-│   │   ├── quiz/ - Kuis validasi
+│   │   ├── translate/ - Translate dua arah + keyboard aksara
+│   │   ├── quiz/ - Kuis validasi (filter tipe + menulis aksara)
 │   │   ├── playground/ - Keyboard virtual
 │   │   ├── docs/ - Pusat dokumentasi (hub + [slug])
+│   │   ├── guru/ - Panel guru (Materi/Kuis/Kamus)
 │   │   └── admin/ - Panel admin (publikasi dokumentasi)
 │   ├── components/docs/ - Shell, konten per-role, screenshot
+│   ├── components/guru/ - Form & helper panel guru (BaliInput, dll)
 │   ├── components/ui/ - Button, Card, Badge
 │   ├── components/layout/ - Header, BottomNav
-│   ├── components/aksara/ - AksaraCard, etc
-│   ├── lib/api.ts - Typed fetch
+│   ├── components/aksara/ - AksaraCard, AksaraKeyboard (keyboard virtual bersama)
+│   ├── lib/api.ts - Typed fetch (termasuk manage.* + token guru)
 │   ├── lib/store.ts - Zustand
 │   └── public/screenshots/ - Screenshot halaman (untuk dokumentasi)
 ├── branding/ - Logo, colors, etc
@@ -185,8 +196,9 @@ curl -X POST http://localhost:8000/api/quiz/check \
 ## 📚 Dokumentasi, Admin & Mode Dev/Prod
 
 Buka **`/docs`** (menu Dokumentasi) untuk panduan penggunaan per peran
-(murid/guru/admin) dan halaman **Metode Scientific & Referensi**, serta
-**`/admin`** untuk mengatur publikasi halaman dokumentasi.
+(murid/guru/admin) dan halaman **Metode Scientific & Referensi**,
+**`/guru`** untuk mengelola konten (materi, kuis, kamus), serta **`/admin`**
+untuk mengatur publikasi halaman dokumentasi.
 
 ```bash
 # Daftar halaman dokumentasi (field mode + is_admin menentukan tampilan)
@@ -203,10 +215,43 @@ curl -X PATCH http://localhost:8000/api/docs/pages/metode-scientific/visibility 
 
 | Var | Default | Keterangan |
 | --- | --- | --- |
-| `AKSARA_MODE` | `dev` | `dev` = semua halaman docs tampil + admin otomatis; `prod` = hanya halaman publik, admin butuh token |
+| `AKSARA_MODE` | `dev` | `dev` = semua halaman docs tampil + admin & guru otomatis; `prod` = hanya halaman publik, admin & guru butuh token |
 | `AKSARA_ADMIN_TOKEN` | `aksara-admin` | Token admin untuk mode prod (header `X-Admin-Token`). **Wajib diganti di produksi.** |
+| `AKSARA_GURU_TOKEN` | `aksara-guru` | Token guru untuk mode prod (header `X-Admin-Token`). Token admin juga diterima di panel guru. **Wajib diganti di produksi.** |
 
-Status publikasi disimpan di `backend/app/data/docs.json`.
+Status publikasi disimpan di `backend/app/data/docs.json`. Konten dinamis
+(materi, kuis, kamus) dikelola lewat panel guru dan disimpan di
+`backend/app/data/lessons.json`, `quiz.json`, dan `dictionary.json`.
+
+### Manage API (Panel Guru)
+
+```bash
+# Status akses (mode + is_guru + is_admin)
+curl http://localhost:8000/api/manage/status
+
+# Tambah materi (mode prod: butuh header token)
+curl -X POST http://localhost:8000/api/manage/lessons \
+  -H "Content-Type: application/json" \
+  -H "X-Admin-Token: $AKSARA_GURU_TOKEN" \
+  -d '{"title":"Ha Na Ca Ra Ka","level":1,"order":1,"category":"wresastra","aksara_ids":[],"pangangge_ids":[],"estimated_minutes":10,"xp_reward":50,"prerequisites":[],"quiz_ids":[],"is_published":true}'
+
+# Tambah kuis tipe "menulis aksara"
+curl -X POST http://localhost:8000/api/manage/quizzes \
+  -H "Content-Type: application/json" \
+  -H "X-Admin-Token: $AKSARA_GURU_TOKEN" \
+  -d '{"lesson_id":"wresastra-01","type":"write_aksara","difficulty":"easy","question":{"text":"Tuliskan kata \"ha\" dalam Aksara Bali","latin":"ha","bali":"ᬳ"},"options":[],"correct_answer":"","explanation":"ha = aksara pertama Wresastra 18","xp":10}'
+
+# Upsert entri kamus
+curl -X POST http://localhost:8000/api/manage/dictionary \
+  -H "Content-Type: application/json" \
+  -H "X-Admin-Token: $AKSARA_GURU_TOKEN" \
+  -d '{"latin":"angklung","bali":"ᬅᬋ᭄ᬓᬮᬸ","note":"A independent"}'
+```
+
+Endpoint lengkap: `GET/POST /api/manage/lessons`, `GET/PUT/DELETE /api/manage/lessons/{id}`,
+`GET/POST /api/manage/quizzes`, `GET/PUT/DELETE /api/manage/quizzes/{id}`,
+`GET/POST /api/manage/dictionary`, `DELETE /api/manage/dictionary/{latin}`,
+`GET /api/manage/aksara`.
 
 ## 🎨 Branding
 

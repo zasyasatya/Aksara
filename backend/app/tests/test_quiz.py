@@ -10,19 +10,23 @@ def test_get_quizzes_filter():
     assert len(quizzes) <= 5
     assert all(q["lesson_id"] == "wresastra-01" for q in quizzes)
 
+def _choice_quiz():
+    """Ambil kuis ber-pilihan (correct_answer terisi); write_aksara dinilai via validate-pair."""
+    for q in get_quizzes({"limit": 50}):
+        if q.get("correct_answer"):
+            return q
+    return None
+
 def test_check_correct():
-    # Find a quiz
-    quizzes = get_quizzes({"limit": 1})
-    if quizzes:
-        q = quizzes[0]
+    q = _choice_quiz()
+    if q:
         result = check_answer(q["id"], q["correct_answer"])
         assert result["correct"] == True
         assert result["xp_earned"] > 0
 
 def test_check_incorrect():
-    quizzes = get_quizzes({"limit": 1})
-    if quizzes:
-        q = quizzes[0]
+    q = _choice_quiz()
+    if q:
         # Wrong answer
         wrong = "z" if q["correct_answer"] != "z" else "y"
         result = check_answer(q["id"], wrong)

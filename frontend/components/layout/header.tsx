@@ -5,13 +5,14 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useProgressStore } from "@/lib/store"
-import { Flame, Trophy, BookOpen, BookOpenCheck, Languages, LayoutDashboard, Gamepad2, ShieldCheck } from "lucide-react"
+import { Flame, Trophy, BookOpen, BookOpenCheck, Languages, LayoutDashboard, Gamepad2, PenSquare, ShieldCheck } from "lucide-react"
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/learn", label: "Belajar", icon: BookOpen },
   { href: "/translate", label: "Translate", icon: Languages },
   { href: "/quiz", label: "Kuis", icon: Gamepad2 },
+  { href: "/guru", label: "Guru", icon: PenSquare },
   { href: "/docs", label: "Dokumentasi", icon: BookOpenCheck },
 ]
 
@@ -71,6 +72,14 @@ export function Header() {
             </div>
           </div>
           
+          <Link
+            href="/guru"
+            title="Panel Guru"
+            aria-label="Panel Guru"
+            className="flex sm:hidden h-9 w-9 items-center justify-center rounded-full border border-sand bg-white text-deep-brown/60 shadow-soft transition-colors hover:text-saffron-dark hover:border-saffron/40"
+          >
+            <PenSquare className="h-5 w-5" />
+          </Link>
           <Link
             href="/admin"
             title="Panel Admin"

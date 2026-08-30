@@ -77,9 +77,9 @@ def test_quiz_list():
     assert "quizzes" in data
 
 def test_quiz_check():
-    # Get a quiz first
-    response = client.get("/api/quiz?limit=1")
-    quizzes = response.json()["quizzes"]
+    # Get quizzes; pilih yang ber-pilihan (correct_answer terisi) — write_aksara dinilai via validate-pair
+    response = client.get("/api/quiz?limit=50")
+    quizzes = [q for q in response.json()["quizzes"] if q.get("correct_answer")]
     if quizzes:
         quiz_id = quizzes[0]["id"]
         correct = quizzes[0]["correct_answer"]

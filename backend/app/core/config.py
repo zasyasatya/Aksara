@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     # Token untuk autentikasi admin di mode prod (header X-Admin-Token).
     # Wajib diset via env AKSARA_ADMIN_TOKEN (alias: ADMIN_TOKEN) pada produksi.
     admin_token: str = Field(default="aksara-admin", validation_alias=AliasChoices("AKSARA_ADMIN_TOKEN", "ADMIN_TOKEN", "admin_token"))
+    # Token untuk autentikasi GURU di mode prod (update materi/kuis/kamus).
+    # Env AKSARA_GURU_TOKEN (alias: GURU_TOKEN). Token admin juga diterima.
+    guru_token: str = Field(default="aksara-guru", validation_alias=AliasChoices("AKSARA_GURU_TOKEN", "GURU_TOKEN", "guru_token"))
 
     class Config:
         env_file = ".env"
