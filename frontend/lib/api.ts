@@ -285,6 +285,17 @@ export const api = {
       headers: adminToken ? { "X-Admin-Token": adminToken } : {},
     }),
 
+  // ── Otentikasi (Guru & Admin) ──
+  auth: {
+    info: () =>
+      fetchAPI<{ mode: "dev" | "prod" }>("/auth/info"),
+    login: (role: "guru" | "admin", token: string) =>
+      fetchAPI<{ ok: boolean; message: string; mode: string }>("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ role, token }),
+      }),
+  },
+
   // ── Manajemen konten (Guru) ──
   manage: {
     status: (guruToken: string | null = null) =>

@@ -17,7 +17,7 @@
  */
 
 const FONT_STACK = "'Noto Sans Balinese', 'Balinese', sans-serif"
-const NORM_SIZE = 96 // ukuran maska normalisasi (px)
+const NORM_SIZE = 128 // ukuran maska normalisasi (px) — lebih besar = detail lebih baik
 const INK_THRESHOLD = 200 // luminansi < nilai ini = tinta
 
 /** Codepoint Aksara Bali (subset yang dipakai modul ini). */
@@ -53,7 +53,7 @@ function ensureFont(px: number): Promise<void> {
 }
 
 /** Render teks (1 glyph/segmen) ke canvas putih dengan font Balinese. */
-export async function renderGlyphToCanvas(text: string, size = 240): Promise<HTMLCanvasElement> {
+export async function renderGlyphToCanvas(text: string, size = 320): Promise<HTMLCanvasElement> {
   await ensureFont(size * 0.6)
   const c = document.createElement("canvas")
   c.width = size
@@ -181,12 +181,13 @@ export interface TraceResult {
  * `correct` = bentuk terlengkapi dengan baik; `close` = hampir.
  */
 export async function classifyTracing(inkCanvas: HTMLCanvasElement, targetGlyph: string): Promise<TraceResult> {
-  const templateCanvas = await renderGlyphToCanvas(targetGlyph, 240)
+  const templateCanvas = await renderGlyphToCanvas(targetGlyph, 320)
   const a = normalizeToMask(inkCanvas)
   const b = normalizeToMask(templateCanvas)
   if (!a || !b) return { score: 0, correct: false, close: false }
   const score = compareMasks(a, b)
-  return { score, correct: score >= 0.5, close: score >= 0.32 }
+  // Ambang lebih ketat: hanya bentuk yang jelas terlengkapi dianggap benar.
+  return { score, correct: score >= 0.55, close: score >= 0.35 }
 }
 
 export interface RecognitionResult {
@@ -209,7 +210,7 @@ export async function recognizeAksara(
 
   const scored: { char: string; score: number }[] = []
   for (const ch of candidates) {
-    const t = await renderGlyphToCanvas(ch, 240)
+    const t = await renderGlyphToCanvas(ch, 320)
     const b = normalizeToMask(t)
     if (!b) continue
     scored.push({ char: ch, score: compareMasks(a, b) })
@@ -218,7 +219,9 @@ export async function recognizeAksara(
   const best = scored[0]
   const second = scored[1] ?? null
   if (!best) return { char: "", score: 0, second: null, confident: false }
-  const confident = best.score >= 0.42 && (!second || best.score - second.score >= 0.06)
+  // confident = skor memadai DAN unggul jelas dari kandidat kedua
+  // (ambang ketat agar klasifikasi tidak salah menebak).
+  const confident = best.score >= 0.5 && (!second || best.score - second.score >= 0.08)
   return { char: best.char, score: best.score, second, confident }
 }
 

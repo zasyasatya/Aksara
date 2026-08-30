@@ -7,7 +7,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from .core.config import settings
-from .routers import health, translate, classify, lessons, quiz, docs, manage, engagement
+from .routers import health, translate, classify, lessons, quiz, docs, manage, engagement, auth
 
 app = FastAPI(
     title=settings.app_name,
@@ -38,6 +38,8 @@ app.include_router(quiz.router, prefix=settings.api_prefix)
 app.include_router(docs.router, prefix=settings.api_prefix)
 app.include_router(manage.router, prefix=settings.api_prefix)
 app.include_router(engagement.router, prefix=settings.api_prefix)
+app.include_router(auth.router)
+app.include_router(auth.router, prefix=settings.api_prefix)
 
 @app.get("/api")
 async def api_root():

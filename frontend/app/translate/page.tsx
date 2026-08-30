@@ -210,7 +210,7 @@ export default function TranslatePage() {
                       Tulis <b>satu aksara</b> (misal k, ki, ku) di kotak putih — AI on-device
                       mengenali lalu menambahkannya ke input. Tidak perlu internet.
                     </p>
-                    <HandwritingCanvas ref={hwRef} width={520} height={220} />
+                    <HandwritingCanvas ref={hwRef} width={560} height={320} />
                     <div className="flex gap-2">
                       <Button onClick={handleHandwrite} disabled={hwBusy} className="flex-1">
                         <Sparkles className="h-4 w-4 mr-1.5" />

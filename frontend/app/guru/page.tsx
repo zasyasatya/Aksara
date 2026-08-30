@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   api,
   ManageStatus,
@@ -27,7 +28,7 @@ export default function GuruPage() {
   const [status, setStatus] = useState<ManageStatus | null>(null)
   const [tab, setTab] = useState<TabKey>("materi")
   const [error, setError] = useState<string | null>(null)
-  const [tokenInput, setTokenInput] = useState("")
+  const router = useRouter()
 
   const load = useCallback(async (token: string | null) => {
     setError(null)
@@ -42,27 +43,15 @@ export default function GuruPage() {
   }, [])
 
   useEffect(() => {
-    load(getGuruToken())
-  }, [load])
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const token = tokenInput.trim()
-    if (!token) return
-    setGuruToken(token)
-    const s = await load(token)
-    if (!s?.is_guru) {
-      setGuruToken(null)
-      setError("Token guru tidak valid. Periksa AKSARA_GURU_TOKEN pada backend (token admin juga bisa).")
-      setStatus(null)
-    } else {
-      setTokenInput("")
-    }
-  }
+    // Belum login (token tersimpan kosong / ditolak backend) → halaman /login.
+    load(getGuruToken()).then((s) => {
+      if (!s?.is_guru) router.replace("/login?next=/guru")
+    })
+  }, [load, router])
 
   const handleLogout = () => {
     setGuruToken(null)
-    load(null)
+    router.replace("/login?next=/guru")
   }
 
   const isGuru = status?.is_guru ?? false
@@ -103,39 +92,6 @@ export default function GuruPage() {
           <div className="mt-4 flex items-start gap-3 rounded-2xl border border-terracotta/40 bg-terracotta/10 px-4 py-3 text-sm text-terracotta">
             <KeyRound className="mt-0.5 h-4 w-4 shrink-0" />
             <span>{error}</span>
-          </div>
-        )}
-
-        {/* Login (mode prod) */}
-        {!isGuru && status && (
-          <div className="mt-6 rounded-3xl border border-sand bg-white p-6 lg:p-8 shadow-soft">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sand">
-                <KeyRound className="h-5 w-5 text-deep-brown" />
-              </div>
-              <div>
-                <h2 className="font-display text-lg font-bold text-deep-brown">Masuk sebagai Guru</h2>
-                <p className="text-sm text-charcoal/60">
-                  Mode prod aktif — masukkan token guru (env <code className="rounded bg-sand px-1">AKSARA_GURU_TOKEN</code>),
-                  atau token admin.
-                </p>
-              </div>
-            </div>
-            <form onSubmit={handleLogin} className="mt-5 flex flex-col sm:flex-row gap-3">
-              <input
-                type="password"
-                value={tokenInput}
-                onChange={(e) => setTokenInput(e.target.value)}
-                placeholder="Token guru…"
-                className="flex-1 rounded-xl border border-sand bg-cream px-4 py-2.5 text-sm outline-none focus:border-saffron"
-              />
-              <button
-                type="submit"
-                className="rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white shadow-soft transition-colors hover:bg-ocean"
-              >
-                Masuk
-              </button>
-            </form>
           </div>
         )}
 

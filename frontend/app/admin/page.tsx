@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   api,
   DocsPagesResponse,
@@ -27,9 +28,9 @@ export default function AdminPage() {
   const [data, setData] = useState<DocsPagesResponse | null>(null)
   const [version, setVersion] = useState<string>("")
   const [error, setError] = useState<string | null>(null)
-  const [tokenInput, setTokenInput] = useState("")
   const [savingSlug, setSavingSlug] = useState<string | null>(null)
   const [flash, setFlash] = useState<string | null>(null)
+  const router = useRouter()
 
   const load = useCallback(async (token: string | null) => {
     setError(null)
@@ -44,28 +45,16 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
-    load(getAdminToken())
+    // Belum login (token tersimpan kosong / ditolak backend) → halaman /login.
+    load(getAdminToken()).then((d) => {
+      if (!d?.is_admin) router.replace("/login?next=/admin")
+    })
     api.health().then((h) => setVersion(h.version ?? "")).catch(() => {})
-  }, [load])
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const token = tokenInput.trim()
-    if (!token) return
-    setAdminToken(token)
-    const d = await load(token)
-    if (!d?.is_admin) {
-      setAdminToken(null)
-      setError("Token admin tidak valid. Periksa AKSARA_ADMIN_TOKEN pada backend.")
-      setData(null)
-    } else {
-      setTokenInput("")
-    }
-  }
+  }, [load, router])
 
   const handleLogout = () => {
     setAdminToken(null)
-    load(null)
+    router.replace("/login?next=/admin")
   }
 
   const toggleVisibility = async (slug: string, isPublic: boolean) => {
@@ -140,40 +129,6 @@ export default function AdminPage() {
           <div className="mt-4 flex items-center gap-2 rounded-2xl border border-sage/50 bg-sage/10 px-4 py-3 text-sm text-deep-brown">
             <CheckCircle2 className="h-4 w-4 text-sage" />
             {flash}
-          </div>
-        )}
-
-        {/* Login (hanya dibutuhkan di mode prod) */}
-        {!isAdmin && (
-          <div className="mt-6 rounded-3xl border border-sand bg-white p-6 lg:p-8 shadow-soft">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sand">
-                <KeyRound className="h-5 w-5 text-deep-brown" />
-              </div>
-              <div>
-                <h2 className="font-display text-lg font-bold text-deep-brown">
-                  Masuk sebagai admin
-                </h2>
-                <p className="text-sm text-charcoal/60">
-                  Mode prod aktif — masukkan token admin (env <code className="rounded bg-sand px-1">AKSARA_ADMIN_TOKEN</code>) untuk melanjutkan.
-                </p>
-              </div>
-            </div>
-            <form onSubmit={handleLogin} className="mt-5 flex flex-col sm:flex-row gap-3">
-              <input
-                type="password"
-                value={tokenInput}
-                onChange={(e) => setTokenInput(e.target.value)}
-                placeholder="Token admin…"
-                className="flex-1 rounded-xl border border-sand bg-cream px-4 py-2.5 text-sm outline-none focus:border-saffron"
-              />
-              <button
-                type="submit"
-                className="rounded-xl bg-saffron px-6 py-2.5 text-sm font-semibold text-cream shadow-soft transition-colors hover:bg-saffron-dark"
-              >
-                Masuk
-              </button>
-            </form>
           </div>
         )}
 

@@ -35,16 +35,24 @@ export function ContentAdmin() {
               ),
             },
             {
-              title: "Mode prod → login token",
+              title: "Mode prod → halaman login",
               body: (
                 <>
-                  Saat backend dalam mode <Code>prod</Code>, form login muncul. Masukkan{" "}
-                  <strong>token admin</strong> yang diset operator (env{" "}
-                  <Code>AKSARA_ADMIN_TOKEN</Code>). Token tersimpan di localStorage peramban.
+                  Saat backend dalam mode <Code>prod</Code> dan token belum tersimpan, Anda
+                  diarahkan ke halaman <Link href="/login" className="text-saffron-dark font-semibold hover:underline">/login</Link>.
+                  Pilih peran <strong>Admin</strong>, masukkan <strong>token admin</strong> yang
+                  diset operator (env <Code>AKSARA_ADMIN_TOKEN</Code>), lalu klik “Simpan &amp; Lanjut”.
+                  Token tersimpan di localStorage peramban — klik “Keluar” untuk menghapusnya.
                 </>
               ),
             },
           ]}
+        />
+        <Screenshot
+          src="/screenshots/login.png"
+          alt="Halaman login Aksara dengan pilihan peran Guru dan Admin"
+          caption="Halaman login: pilih peran (Guru/Admin) lalu masukkan token sesuai env backend."
+          url="aksara.local/login"
         />
         <Screenshot
           src="/screenshots/admin.png"

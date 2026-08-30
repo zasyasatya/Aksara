@@ -22,7 +22,7 @@ LATIN_TO_BALI_CASES = [
 
 BALI_TO_LATIN_CASES = [
     ("ᬩᬮᬶ", "bali"),
-    ("ᬳ", "ha"),
+    ("ᬳ", "a"),  # ha tunggal dibaca "a" (standar LOC/bennylin)
     ("ᬦ", "na"),
     ("ᬅᬓ᭄ᬱᬭ", "aksara"),
 ]
@@ -47,6 +47,16 @@ def test_bali_to_latin_basic():
             # Normalize: remove diacritics for comparison? For now just check contains
             assert expected_latin[0] in result or result == expected_latin
         print(f"{bali} -> {result}")
+
+
+def test_ha_vocalization():
+    # ha (ᬳ) berfungsi ganda sesuai standar LOC & romanisasi umum (bennylin):
+    # tunggal -> "a"; + tanda vokal -> tanda dibaca langsung; + adeg -> konsonan "h".
+    assert transliterate_bali_to_latin("ᬳ")[0] == "a"
+    assert transliterate_bali_to_latin("ᬳᬶ")[0] == "i"
+    assert transliterate_bali_to_latin("ᬳᬧ")[0] == "apa"
+    assert transliterate_bali_to_latin("ᬳ᭄ᬕ")[0] == "hga"
+
 
 def test_tumpuk_telu_detection():
     # Should detect tumpuk telu: base + adeg + base + adeg + base
@@ -117,11 +127,11 @@ def test_cluster_exact_cases():
     # Kasus cluster konsonan yang dulu bocor Latin (regresi bug onset/koda).
     # Nilai expected = keluaran engine terverifikasi (escape eksplisit).
     exact = {
-        "kadek": "\u1b13\u1b3e\u1b24\u1b13\u1b44",
-        "dek": "\u1b3e\u1b24\u1b13\u1b44",
+        "kadek": "\u1b13\u1b24\u1b3e\u1b13\u1b44",
+        "dek": "\u1b24\u1b3e\u1b13\u1b44",
         "angga": "\u1b05\u1b17\u1b44\u1b15",
         "sakra": "\u1b32\u1b13\u1b44\u1b2d",
-        "gempalan": "\u1b3e\u1b15\u1b2b\u1b44\u1b27\u1b2e\u1b26\u1b44",
+        "gempalan": "\u1b15\u1b3e\u1b2b\u1b44\u1b27\u1b2e\u1b26\u1b44",
         "banyu": "\u1b29\u1b1c\u1b38",
         "banya": "\u1b29\u1b1c",
         "buku": "\u1b29\u1b38\u1b13\u1b38",
@@ -135,7 +145,7 @@ def test_cluster_exact_cases():
 def test_tengenan_exact_cases():
     # h/r/ng di akhir kata -> bisah/surang/cecek
     exact = {
-        "tong": "\u1b3e\u1b22\u1b40\u1b02",
+        "tong": "\u1b22\u1b40\u1b02",
         "bang": "\u1b29\u1b02",
         "nang": "\u1b26\u1b02",
         "batur": "\u1b29\u1b22\u1b38\u1b03",
