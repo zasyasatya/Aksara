@@ -173,8 +173,10 @@ export function ContentMurid() {
           Menu <strong>Translate</strong> mengubah teks Latin ke Aksara Bali <em>dan sebaliknya</em>{" "}
           secara langsung saat kamu mengetik. Klik pill <strong>Latin / Bali</strong> (atau tombol
           Tukar) untuk membalik arah. Saat arahnya <strong>Bali → Latin</strong>, aksara bisa
-          <strong> diketik, ditempel, atau dipilih</strong> lewat tombol{" "}
-          <em>“Buka Keyboard Aksara”</em>. Gunakan ini untuk:
+          <strong> diketik, ditempel, dipilih</strong> lewat tombol{" "}
+          <em>“Keyboard Aksara”</em>, <strong>atau ditulis tangan</strong> di kanvas
+          <em>“Tulis Tangan”</em> — AI on-device mengenali satu aksara yang kamu gores
+          (jari, mouse, atau pena; tanpa internet). Gunakan ini untuk:
         </p>
         <Steps
           items={[
@@ -184,6 +186,16 @@ export function ContentMurid() {
                 <>
                   Ketik “aksara bali” dan lihat hasilnya:{" "}
                   <span className="font-bali text-deep-brown">ᬅᬓ᭄ᬱᬭ ᬩᬮᬶ</span>.
+                </>
+              ),
+            },
+            {
+              title: "Tulis tangan satu aksara",
+              body: (
+                <>
+                  Buka <strong>Tulis Tangan</strong>, gores satu aksara di kanvas putih, lalu
+                  tekan <em>“Kenali &amp; Tambah”</em> — aksara yang dikenali langsung masuk
+                  ke input. Cocok untuk ponsel (sentuhan) maupun laptop (mouse/stylus).
                 </>
               ),
             },
@@ -204,8 +216,8 @@ export function ContentMurid() {
         />
         <Screenshot
           src="/screenshots/translate.png"
-          alt="Halaman translate dua arah dengan keyboard aksara"
-          caption="Translate dua arah: Bali → Latin memakai keyboard virtual, dengan breakdown aturan dan skor confidence."
+          alt="Halaman translate dua arah dengan keyboard aksara dan kanvas tulis tangan"
+          caption="Translate dua arah: input aksara bisa lewat keyboard virtual ATAU tulis tangan di kanvas (AI on-device), plus breakdown aturan & skor confidence."
           url="aksara.local/translate"
         />
       </DocSection>
@@ -215,12 +227,17 @@ export function ContentMurid() {
           <strong>Playground</strong> adalah keyboard virtual Aksara Bali: ketuk aksara{" "}
           <span className="font-bali">ᬳᬘᬭ…</span>, pangangge <span className="font-bali">ᬶᬸᬾᭂ</span>,
           atau tanda seperti bisah, surang, cecek — lalu baca hasilnya dalam Latin secara real-time.
+          <br />
+          Ada juga mode <strong>Tulis Tangan</strong>: pilih aksara target (atau tombol{" "}
+          <em>“Acak”</em>), telusuri siluetnya di kanvas dengan jari/mouse/pena, lalu tekan{" "}
+          <em>“Klasifikasi”</em> — AI on-device menilai tulisanmu <strong>benar atau salah</strong>{" "}
+          lengkap dengan persentase kemiripan. Tanpa internet, tulisanmu tidak dikirim ke mana pun.
           Tempat terbaik untuk bermain sambil belajar sebelum menghadapi kuis.
         </p>
         <Screenshot
           src="/screenshots/playground.png"
-          alt="Playground keyboard virtual Aksara Bali"
-          caption="Playground: ketik aksara bebas dengan keyboard virtual dan transliterasi langsung."
+          alt="Playground mode tulis tangan: telusuri siluet aksara dan klasifikasi AI"
+          caption="Playground mode Tulis Tangan: telusuri siluet aksara, AI on-device mengklasifikasi benar/salah. Mode keyboard virtual juga tersedia."
           url="aksara.local/playground"
         />
       </DocSection>

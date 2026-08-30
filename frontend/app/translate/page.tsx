@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useRef, useState, useEffect } from "react"
 import { Header } from "@/components/layout/header"
 import { BottomNav } from "@/components/layout/bottom-nav"
 import { Card } from "@/components/ui/card"
@@ -9,8 +9,13 @@ import { Badge } from "@/components/ui/badge"
 import { api } from "@/lib/api"
 import { useTranslateStore } from "@/lib/store"
 import { AksaraKeyboard } from "@/components/aksara/aksara-keyboard"
-import { ArrowLeftRight, Copy, Check, Sparkles, Info, BookOpen, AlertTriangle, Keyboard } from "lucide-react"
+import { ArrowLeftRight, Copy, Check, Sparkles, Info, BookOpen, AlertTriangle, Keyboard, PenLine, Trash2, Undo2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { HandwritingCanvas, HandwritingCanvasHandle } from "@/components/aksara/handwriting-canvas"
+import { recognizeAksara, buildCandidateSet } from "@/lib/aksara-recognition"
+
+/** Kandidat pengenalan tulis tangan (18 Wresastra + vokal i/u) — dibangun sekali. */
+const HW_CANDIDATES = buildCandidateSet()
 
 export default function TranslatePage() {
   const { input, output, direction, breakdown, setInput, setOutput, setDirection, setBreakdown } = useTranslateStore()
@@ -18,13 +23,44 @@ export default function TranslatePage() {
   const [copied, setCopied] = useState(false)
   const [warnings, setWarnings] = useState<string[]>([])
   const [confidence, setConfidence] = useState(1)
-  const [showKeyboard, setShowKeyboard] = useState(false)
+  /** Alat input sisi Bali: keyboard virtual, kanvas tulis tangan, atau keduanya dimatikan. */
+  const [tool, setTool] = useState<"none" | "keyboard" | "tulis">("none")
+  const hwRef = useRef<HandwritingCanvasHandle>(null)
+  const [hwBusy, setHwBusy] = useState(false)
+  const [hwMsg, setHwMsg] = useState<{ ok: boolean; text: string } | null>(null)
 
   const isBaliInput = direction === "bali-to-latin"
 
   /** Sisipkan aksara ke input (memilih aksara dari keyboard virtual). */
   const insertAksara = (char: string) => setInput(input + char)
   const backspaceAksara = () => setInput(input.slice(0, -1))
+
+  /** Kenali satu aksara yang ditulis bebas di kanvas, lalu sisipkan ke input. */
+  const handleHandwrite = async () => {
+    const canvas = hwRef.current?.getInkCanvas()
+    const isEmpty = hwRef.current?.isEmpty() ?? true
+    if (!canvas || isEmpty) {
+      setHwMsg({ ok: false, text: "Tulis satu aksara di kanvas dulu." })
+      return
+    }
+    setHwBusy(true)
+    setHwMsg(null)
+    try {
+      const res = await recognizeAksara(canvas, HW_CANDIDATES)
+      if (res.confident) {
+        setInput(input + res.char)
+        hwRef.current?.clear()
+        setHwMsg({ ok: true, text: `Ditambahkan: ${res.char} (${Math.round(res.score * 100)}%)` })
+      } else {
+        const best = res.char
+          ? `terdekat: ${res.char} (${Math.round(res.score * 100)}%)`
+          : "tidak ada kecocokan"
+        setHwMsg({ ok: false, text: `Tidak yakin — ${best}. Tulis lebih besar & jelas, lalu coba lagi.` })
+      }
+    } finally {
+      setHwBusy(false)
+    }
+  }
 
   /** Pilih arah dua-arah: Latin → Bali atau Bali → Latin. */
   const pickDirection = (dir: "latin-to-bali" | "bali-to-latin") => {
@@ -144,18 +180,70 @@ export default function TranslatePage() {
                   className={`w-full h-40 p-4 rounded-2xl bg-sand/30 border border-sand focus:border-saffron focus:ring-2 focus:ring-saffron/20 outline-none resize-none transition-all ${direction === "bali-to-latin" ? "font-bali text-xl" : "text-base"}`}
                 />
                 {isBaliInput && (
-                <button
-                  type="button"
-                  onClick={() => setShowKeyboard(v => !v)}
-                  className={`mt-3 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition-colors ${showKeyboard ? "border-saffron bg-saffron/10 text-saffron-dark" : "border-sand bg-cream text-charcoal/60 hover:border-saffron/50"}`}
-                >
-                  <Keyboard className="h-3.5 w-3.5" />
-                  {showKeyboard ? "Tutup Keyboard Aksara" : "Buka Keyboard Aksara"}
-                </button>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setTool(tool === "keyboard" ? "none" : "keyboard")}
+                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition-colors ${tool === "keyboard" ? "border-saffron bg-saffron/10 text-saffron-dark" : "border-sand bg-cream text-charcoal/60 hover:border-saffron/50"}`}
+                  >
+                    <Keyboard className="h-3.5 w-3.5" />
+                    {tool === "keyboard" ? "Tutup Keyboard Aksara" : "Keyboard Aksara"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTool(tool === "tulis" ? "none" : "tulis")}
+                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition-colors ${tool === "tulis" ? "border-saffron bg-saffron/10 text-saffron-dark" : "border-sand bg-cream text-charcoal/60 hover:border-saffron/50"}`}
+                  >
+                    <PenLine className="h-3.5 w-3.5" />
+                    {tool === "tulis" ? "Tutup Tulis Tangan" : "Tulis Tangan"}
+                  </button>
+                </div>
                 )}
-                {showKeyboard && isBaliInput && (
+                {tool === "keyboard" && isBaliInput && (
                   <div className="mt-3 rounded-2xl border border-sand bg-cream/60 p-3">
                     <AksaraKeyboard onInsert={insertAksara} onBackspace={backspaceAksara} compact />
+                  </div>
+                )}
+                {tool === "tulis" && isBaliInput && (
+                  <div className="mt-3 rounded-2xl border border-sand bg-cream/60 p-3 space-y-3">
+                    <p className="text-xs text-charcoal/60">
+                      Tulis <b>satu aksara</b> (misal k, ki, ku) di kotak putih — AI on-device
+                      mengenali lalu menambahkannya ke input. Tidak perlu internet.
+                    </p>
+                    <HandwritingCanvas ref={hwRef} width={520} height={220} />
+                    <div className="flex gap-2">
+                      <Button onClick={handleHandwrite} disabled={hwBusy} className="flex-1">
+                        <Sparkles className="h-4 w-4 mr-1.5" />
+                        {hwBusy ? "Mengenali..." : "Kenali & Tambah"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          hwRef.current?.undo()
+                          setHwMsg(null)
+                        }}
+                        title="Undo"
+                      >
+                        <Undo2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          hwRef.current?.clear()
+                          setHwMsg(null)
+                        }}
+                        title="Bersihkan"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    {hwMsg && (
+                      <div
+                        className={`p-2.5 rounded-lg text-xs font-medium border ${hwMsg.ok ? "bg-sage/10 border-sage/30 text-sage" : "bg-amber-50 border-amber-200 text-amber-800"}`}
+                      >
+                        <span className="font-bali text-sm">{hwMsg.text}</span>
+                      </div>
+                    )}
                   </div>
                 )}
                 <div className="flex gap-2 mt-3 flex-wrap">

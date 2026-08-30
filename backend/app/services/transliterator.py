@@ -284,7 +284,7 @@ def transliterate_latin_to_bali(text: str, use_dictionary: bool = True) -> Tuple
             continue
         
         # Process word via rule engine
-        bali_word, word_breakdown, word_warnings = _transliterate_word_latin_to_bali(word)
+        bali_word, word_breakdown, word_warnings = _transliterate_word_latin_to_bali_improved(word)
         result += bali_word
         breakdown.extend(word_breakdown)
         warnings.extend(word_warnings)
@@ -293,466 +293,256 @@ def transliterate_latin_to_bali(text: str, use_dictionary: bool = True) -> Tuple
     
     return result, breakdown, warnings
 
+# ---------------------------------------------------------------------------
+# Latin -> Bali (word level) — parse silabis dengan aturan onset/koda.
+#
+# Implementasi mengikuti Unicode Balinese U+1B00-U+1B7F, Nala (2006)
+# Pedoman Aksara Bali, dan LOC Balinese Romanization Table (2025).
+# Prinsip utama:
+#   * Stem konsonan di-match terpanjang-terlebih dahulu (ng, ny, kh, gh, ...).
+#   * Konsonan yang diikuti VOKAL = onset -> vokal jadi pangangge
+#     (i=ulu, u=suku, e=taleng, o=taleng+tedong, ai/au, a=inheren).
+#   * Konsonan yang diikuti KONSONAN lain, atau di akhir kata = CODA
+#     -> adeg-adeg (virama) mematikan vokal inheren (cluster/gantungan).
+#   * >=3 coda beruntun = tumpuk telu (dilarang) -> warning.
+#   * h/r/ng di akhir kata -> tengenan bisah/surang/cecek.
+#   * Vokal di awal kata (atau setelah vokal) -> aksara suara independen.
+#   * TIDAK ADA huruf Latin yang bocor ke hasil: setiap huruf dipetakan ke
+#     aksara; f/v/x/z (tanpa padanan native) dipekatkan + warning.
+# ---------------------------------------------------------------------------
+
+
+def _build_stem_table():
+    """Stem = kunci romanisasi tanpa 'a' inheren (semua kunci berakhiran a).
+
+    Turun langsung dari LATIN_TO_BALI_BASE agar tidak ada typo manual;
+    diurutkan terpanjang lebih dulu untuk longest-match.
+    """
+    table = []
+    for key, base in LATIN_TO_BALI_BASE.items():
+        assert key.endswith("a"), f"kunci romanisasi harus berakhiran a: {key}"
+        table.append((key[:-1], base, key))
+    table.sort(key=lambda t: len(t[0]), reverse=True)
+    # Pemekatan fonetis untuk huruf tanpa padanan native (dengan warning).
+    table.append(("f", "ᬧ", "f~pa"))   # /f/ ~ /p/
+    table.append(("v", "ᬯ", "v~wa"))   # /v/ ~ /w/
+    table.append(("q", "ᬓ", "q~ka"))   # /k/ (huruf q pada serapan)
+    table.append(("x", "ᬲ", "x~sa"))   # /ks/ ~ /s/
+    table.append(("z", "ᬓ", "z~ka"))   # /z/ ~ /k/
+    return table
+
+
+_CONSONANT_STEMS = _build_stem_table()
+
+# Unit vokal, terpanjang lebih dulu (diftong, vokal panjang, vokal pendek).
+_VOWEL_UNITS = ["ai", "au", "ā", "ī", "ū", "a", "i", "u", "e", "o"]
+
+
+def _match_stem(word: str, pos: int):
+    """(stem, base, nama latin) terpanjang yang cocok di `pos`, atau None."""
+    for stem, base, name in _CONSONANT_STEMS:
+        if word[pos:pos + len(stem)] == stem:
+            return stem, base, name
+    return None
+
+
+def _match_vowel(word: str, pos: int):
+    """Unit vokal terpanjang yang cocok di `pos`, atau None."""
+    for v in _VOWEL_UNITS:
+        if word[pos:pos + len(v)] == v:
+            return v
+    return None
+
+
+def _apply_pangangge(base: str, vowel: str):
+    """Pangangge untuk vokal `vowel` pada `base` -> (string, deskripsi).
+
+    Konvensi urutan (sama dengan kode lama): taleng di depan base,
+    ulu/suku/tedong/cecek di belakang base.
+    """
+    if vowel == "a":
+        return base, "a inheren"
+    if vowel == "ā":
+        return base + "ᭀ", "tedong (ā)"
+    if vowel == "i":
+        return base + "ᬶ", "ulu (i)"
+    if vowel == "ī":
+        return base + "ᬷ", "ulu sari (ī)"
+    if vowel == "u":
+        return base + "ᬸ", "suku (u)"
+    if vowel == "ū":
+        return base + "ᬹ", "suku ilut (ū)"
+    if vowel == "e":
+        return "ᬾ" + base, "taleng (e)"
+    if vowel == "ai":
+        return "ᬿ" + base, "taleng detya (ai)"
+    if vowel == "o":
+        return "ᬾ" + base + "ᭀ", "taleng tedong (o)"
+    if vowel == "au":
+        return "ᬿ" + base + "ᭀ", "taleng detya tedong (au)"
+    return base, vowel
+
+
 def _transliterate_word_latin_to_bali(word: str) -> Tuple[str, List[Dict], List[str]]:
-    """Transliterate single word latin -> bali"""
+    """Transliterasi satu kata Latin -> Bali (parse silabis onset/koda).
+
+    Mengembalikan (bali_text, breakdown, warnings). Hasil tidak pernah
+    mengandung huruf Latin.
+    """
     if not word:
         return "", [], []
-    
-    warnings = []
-    breakdown = []
+
+    warnings: List[str] = []
+    breakdown: List[Dict] = []
     result = ""
-    
     i = 0
-    # Track if previous char had gantungan (for tumpuk telu check)
-    has_gantungan_on_current = False
-    last_base = ""
-    
-    # Handle if word starts with vowel -> independent vowel
-    # For simplicity, if word starts with 'a' and next is consonant, use independent Akara?
-    # Rule: In Balinese, words starting with vowel use aksara suara, not ha.
-    # But many words like "aksara" start with a independent.
-    # We'll detect: if word[0] in vowels and (len==1 or word[1] is consonant cluster start)
-    # Use independent vowel for first char
-    
-    # Special handling for "a" at start vs "ha"
-    # If word starts with 'a' and second char is consonant, use Akara ᬅ
-    # Example: "aksara" -> a = ᬅ
-    # But "anak" -> a = ᬅ? In common Balinese, "anak" is ᬅᬦᬓ᭄
-    # We'll implement: if word starts with vowel, first char is independent suara
-    
-    # Let's iterate
-    word_len = len(word)
-    
-    while i < word_len:
-        char = word[i]
-        
-        # Skip non-alpha? Keep numbers? For MVP, only handle alpha
-        if not char.isalpha():
-            result += char
+    n = len(word)
+    coda_run = 0  # coda beruntun (deteksi tumpuk telu)
+
+    while i < n:
+        ch = word[i]
+
+        # Karakter non-huruf (angka, tanda baca) dilewati apa adanya.
+        if not ch.isalpha():
+            result += ch
             i += 1
             continue
-        
-        # Check for special clusters like "ng", "ny" that are single aksara
-        # Lookahead 3,2,1 for base consonant
-        matched = None
-        matched_bali = None
-        matched_len = 0
-        
-        # Try longest match for base consonant
-        for key in SORTED_LATIN_KEYS:
-            if word[i:i+len(key)] == key:
-                # Ensure it's not part of vowel combination that should be pangangge?
-                # For example, "nga" is base, but "ng" as cecek is different
-                # If key is "nga" and next char is vowel, it's still base nga + vowel
-                # That's correct
-                matched = key
-                matched_bali = LATIN_TO_BALI_BASE[key]
-                matched_len = len(key)
-                break
-        
-        # If no consonant match, maybe it's a vowel that should be independent or pangangge?
-        if not matched:
-            # Check if char is vowel
-            if char in ['a', 'i', 'u', 'e', 'o']:
-                # If at start of word or after space, use independent suara
-                if i == 0 or (i > 0 and not word[i-1].isalpha()):
-                    # Independent vowel
-                    # Map vowel to suara
-                    # For 'a' -> ᬅ, 'i' -> ᬇ, etc
-                    # But need to handle 'e' as pepet vs taleng? At start, use Ekara
-                    vowel_map = {
-                        'a': 'ᬅ',
-                        'i': 'ᬇ',
-                        'u': 'ᬉ',
-                        'e': 'ᬏ',
-                        'o': 'ᬑ',
-                    }
-                    bali_char = vowel_map.get(char, 'ᬅ')
-                    result += bali_char
-                    breakdown.append({
-                        "latin": char,
-                        "bali": bali_char,
-                        "type": "suara",
-                        "description": f"Aksara Suara {char.upper()}"
-                    })
-                    i += 1
-                    has_gantungan_on_current = False
-                    continue
-                else:
-                    # This vowel should have been handled as pangangge after previous consonant
-                    # But if we are here, previous was not consonant? Maybe previous was vowel? Then use independent?
-                    # For simplicity, treat as independent if previous char was vowel (diphthong)
-                    # Actually "ae" etc not common
-                    # Let's treat as independent
-                    vowel_map = {
-                        'a': 'ᬅ',
-                        'i': 'ᬇ',
-                        'u': 'ᬉ',
-                        'e': 'ᬏ',
-                        'o': 'ᬑ',
-                    }
-                    bali_char = vowel_map.get(char, 'ᬅ')
-                    result += bali_char
-                    breakdown.append({
-                        "latin": char,
-                        "bali": bali_char,
-                        "type": "suara",
-                        "description": f"Aksara Suara {char.upper()} (after vowel)"
-                    })
-                    i += 1
-                    continue
-            else:
-                # Unknown char, skip with warning
-                warnings.append(f"Unknown char '{char}' at position {i}")
-                result += char
-                i += 1
+
+        # 1) Posisi vokal -> aksara suara independen.
+        v = _match_vowel(word, i)
+        if v is not None:
+            bali_v = SUARA_LATIN_TO_BALI.get(v)
+            if bali_v is None:
+                warnings.append(f"Vokal '{v}' tidak dikenal; dilewati")
+                i += len(v)
                 continue
-        
-        # We have a consonant base matched
-        base_latin = matched
-        base_bali = matched_bali
-        next_pos = i + matched_len
-        
-        # Look ahead for vowel that modifies this base
-        vowel = None
-        vowel_len = 0
-        pangangge_mark = None
-        
-        if next_pos < word_len:
-            next_char = word[next_pos]
-            # Check for vowel combinations: ai, au, etc
-            # Try 2-char vowel first
-            if next_pos + 1 < word_len:
-                two = word[next_pos:next_pos+2]
-                if two in ['ai', 'au', 'aa', 'ii', 'uu']:
-                    vowel = two
-                    vowel_len = 2
-            if not vowel and next_char in ['a', 'i', 'u', 'e', 'o']:
-                # Check if this vowel is actually part of next consonant? 
-                # For example, "bali" -> b a l i, so after "ba", next is "l" not vowel? Actually "ba" is ba + a? Wait
-                # Our logic: consonant + vowel = base + pangangge
-                # So if we have "ba", we matched "ba" as base? No, "ba" base is "ba" = ᬩ which already includes inherent a
-                # Actually our mapping: "ba" -> ᬩ, which is ba (consonant+inherent a)
-                # But we also have "b" + "a"? Our keys include "ba"? No, we have "ba" as key for ᬩ? Actually WRESATRA keys are "ba", "ha", etc, which are consonant + a.
-                # So we matched "ba" as whole? But word "bali" is b-a-l-i, not ba-li? Let's think.
-                # Better approach: our keys should be consonant only? But we defined as "ba" for ᬩ.
-                # We need to handle: if we match "ba" and next char is vowel, that vowel is separate?
-                # Actually Balinese: ᬩ is ba (b + inherent a). To get bi, we need ba + ulu = ᬩᬶ
-                # So "bali" = ba + li = ba (ᬩ) + la (ᬮ) + ulu (ᬶ) = ᬩᬮᬶ
-                # So "bali" parsing: 
-                # - At i=0, we try match: "ba" matches "bali"[0:2]="ba" => base ba = ᬩ, next_pos=2
-                # - Next char at 2 is 'l', which is consonant start, not vowel, so no pangangge, result = ᬩ
-                # - Then i=2, match "la" = ᬮ, next_pos=4, next char at 4 is 'i', which is vowel
-                # - So we should apply pangangge for i to previous base? Actually "li" = la + ulu
-                # So we need to detect vowel after base and apply pangangge
-                vowel = next_char
-                vowel_len = 1
-                # Special: if vowel is 'a', no pangangge needed (inherent)
-                # If vowel is 'i', need ulu, etc
-        
-        # Determine pangangge
-        bali_with_pangangge = base_bali
-        pangangge_desc = ""
-        
-        if vowel:
-            if vowel == 'a':
-                # inherent, no mark
-                pangangge_mark = None
-                pangangge_desc = "inherent a"
-            elif vowel in VOWEL_TO_PANGANGGE:
-                pang = VOWEL_TO_PANGANGGE[vowel]
-                if pang:
-                    # Special handling for o and au which are taleng + tedong
-                    if vowel == 'o':
-                        # Taleng + Tedong = ᬾ + ᭀ surrounding
-                        # In Unicode, o is represented as taleng (front) + tedong (behind)
-                        # So we need to produce: taleng + base + tedong? Actually order: taleng before base, tedong after
-                        # But our base already emitted? We need to handle: for o, result should be taleng + base + tedong
-                        # So we need to prepend taleng
-                        # Let's handle: result currently doesn't have base yet, we will emit taleng+base+tedong
-                        bali_with_pangangge = "ᬾ" + base_bali + "ᭀ"
-                        pangangge_desc = "taleng tedong (o)"
-                    elif vowel == 'au':
-                        bali_with_pangangge = "ᬾ" + base_bali + "ᭀ"  # Actually taleng detya tedong? For simplicity use same? Need correct: Au is taleng detya + tedong?
-                        # According to master, au is ᭁ which is combination, but representation is ᬿ + base + ᭀ?
-                        # Let's use "ᬿ" + base + "ᭀ" for ai? Wait
-                        # Simplify: use precomposed forms? In Unicode, taleng tedong is two codepoints
-                        # We'll use: ᬾ + base + ᭀ for o, ᬿ + base + ᭀ for au? Let's check
-                        # Actually from data: taleng = ᬾ (front), tedong = ᭀ (behind)
-                        # taleng detya = ᬿ (front) for ai
-                        # So: e = ᬾ + base, ai = ᬿ + base, o = ᬾ + base + ᭀ, au = ᬿ + base + ᭀ
-                        # We'll implement
-                        if vowel == 'ai':
-                            bali_with_pangangge = "ᬿ" + base_bali
-                        else:  # au
-                            bali_with_pangangge = "ᬿ" + base_bali + "ᭀ"
-                        pangangge_desc = f"taleng detya tedong ({vowel})"
-                    elif vowel in ['e', 'é']:
-                        # Taleng front
-                        bali_with_pangangge = "ᬾ" + base_bali
-                        pangangge_desc = "taleng (e)"
-                    else:
-                        bali_with_pangangge = base_bali + pang
-                        pangangge_desc = f"{PANGANGGE_SUARA.get(vowel, {}).get('name', vowel)} ({vowel})"
-                    pangangge_mark = pang
-                else:
-                    bali_with_pangangge = base_bali
-            else:
-                bali_with_pangangge = base_bali
-        else:
-            # No vowel ahead, check if this is at end of word or next is consonant
-            # If at end of word and base is consonant, need to decide: kill vowel with adeg-adeg?
-            # In Balinese, word final consonant often uses adeg-adeg
-            # But our base already includes inherent a, so to kill, add adeg-adeg
-            # However, if word ends with "ng" etc, we should use cecek not nga+adeg
-            # Handle tengenan
-            pass
-        
-        # Now check for tengenan and gantungan logic
-        # If next after vowel is end or consonant, we may need to handle
-        # Let's look ahead after consuming vowel
-        after_vowel_pos = next_pos + vowel_len if vowel else next_pos
-        
-        # Check for final tengenan: h, r, ng at end
-        # For simplicity, if after_vowel_pos == word_len and base_latin in certain, and previous char was vowel?
-        # Actually tengenan is after vowel: e.g., "bah" = ba + bisah? No, "bah" = ba + a + h? 
-        # In our parsing, "bah" would be: base "ba" (ᬩ) + vowel? Actually "bah" = b a h, so after matching "ba" (which is b+a), next char is 'h' which is not vowel, so we need to detect tengenan
-        
-        # Detect tengenan
-        is_tengenan_handled = False
-        if after_vowel_pos < word_len:
-            remaining = word[after_vowel_pos:]
-            # Check for "ng" at end or before consonant? Cecek for ng
-            if remaining.startswith("ng"):
-                # If this ng is at end of word, use cecek
-                # If ng is followed by consonant or end, it's cecek, not nga gantungan?
-                # Rule: cecek is for final ng, gantungan nga is for medial ng cluster like "angka" = a + ngka?
-                # For simplicity: if ng at end of word, use cecek
-                if after_vowel_pos + 2 == word_len:
-                    # End of word: use cecek
-                    bali_with_pangangge += "ᬂ"  # cecek
-                    breakdown.append({
-                        "latin": base_latin + (vowel or "") + "ng",
-                        "bali": bali_with_pangangge,
-                        "type": "wresastra+pangangge_tengenan",
-                        "description": f"{base_latin} + {vowel or 'a'} + cecek (ng)"
-                    })
-                    result += bali_with_pangangge
-                    i = after_vowel_pos + 2
-                    has_gantungan_on_current = False
-                    is_tengenan_handled = True
-                else:
-                    # Medial ng, treat as gantungan? Actually "angka" = a + nga + ka gantungan? Let's treat as gantungan
-                    # For now, emit base + adeg-adeg + nga
-                    # But we already have base, need to add adeg-adeg + nga
-                    # So result will be base + adeg-adeg + nga
-                    # We'll handle as gantungan cluster
-                    pass  # fall through to gantungan handling
-            elif remaining.startswith("h") and after_vowel_pos + 1 == word_len:
-                # final h -> bisah
-                bali_with_pangangge += "ᬄ"
-                breakdown.append({
-                    "latin": base_latin + (vowel or "") + "h",
-                    "bali": bali_with_pangangge,
-                    "type": "wresastra+bisah",
-                    "description": f"{base_latin} + bisah (h)"
-                })
-                result += bali_with_pangangge
-                i = after_vowel_pos + 1
-                has_gantungan_on_current = False
-                is_tengenan_handled = True
-            elif remaining.startswith("r") and after_vowel_pos + 1 == word_len:
-                # final r -> surang
-                bali_with_pangangge += "ᬃ"
-                breakdown.append({
-                    "latin": base_latin + (vowel or "") + "r",
-                    "bali": bali_with_pangangge,
-                    "type": "wresastra+surang",
-                    "description": f"{base_latin} + surang (r)"
-                })
-                result += bali_with_pangangge
-                i = after_vowel_pos + 1
-                has_gantungan_on_current = False
-                is_tengenan_handled = True
-        
-        if is_tengenan_handled:
-            continue
-        
-        # If not tengenan, check if next char starts a new consonant (cluster) -> need gantungan
-        if after_vowel_pos < word_len and word[after_vowel_pos].isalpha():
-            # Next char is start of next syllable, so current base should have adeg-adeg if next is consonant cluster?
-            # Actually in Balinese, consonant clusters are written with gantungan: first consonant + adeg-adeg + second consonant (which renders as gantungan)
-            # So we should add adeg-adeg after current base if next is consonant and not vowel?
-            # But our current base already emitted? We haven't emitted yet
-            # Let's check: if after vowel, next is consonant, then we need adeg-adeg before next base
-            # So emit current base with pangangge, plus adeg-adeg
-            # Then next iteration will emit next base which will visually be gantungan
-            # However, need to check tumpuk telu: if current already has gantungan, cannot add another gantungan
-            # Our has_gantungan_on_current tracks if current base is already a gantungan
-            # Actually we need to track if we are about to add gantungan to current
-            
-            # If next is consonant and we have not yet emitted, we emit current + adeg-adeg
-            # Then continue
-            # But only if next is consonant and not start of new word? Yes
-            
-            # Check if next char is consonant (not vowel)
-            next_char = word[after_vowel_pos]
-            if next_char not in ['a', 'i', 'u', 'e', 'o']:
-                # It's consonant, so need adeg-adeg
-                # Check tumpuk telu
-                if has_gantungan_on_current:
-                    warnings.append(f"Tumpuk telu prevented at position {after_vowel_pos} in word '{word}'")
-                    # To prevent, we should not add gantungan, instead start new syllable with adeg-adeg? Actually need to break
-                    # For MVP, we will still add adeg-adeg but note warning, and reset has_gantungan
-                    # In real Balinese, you'd need to use adeg-adeg to break cluster
-                    result += bali_with_pangangge + ADEG_ADEG
-                    breakdown.append({
-                        "latin": base_latin + (vowel or ""),
-                        "bali": bali_with_pangangge + ADEG_ADEG,
-                        "type": "wresastra+gantungan",
-                        "description": f"{base_latin} with adeg-adeg (cluster, tumpuk telu avoided)"
-                    })
-                    i = after_vowel_pos
-                    has_gantungan_on_current = False
-                    continue
-                else:
-                    # Normal gantungan
-                    result += bali_with_pangangge + ADEG_ADEG
-                    breakdown.append({
-                        "latin": base_latin + (vowel or ""),
-                        "bali": bali_with_pangangge + ADEG_ADEG,
-                        "type": "wresastra+gantungan",
-                        "description": f"{base_latin} + adeg-adeg for cluster, next will be gantungan"
-                    })
-                    i = after_vowel_pos
-                    # Next base will be gantungan
-                    has_gantungan_on_current = True
-                    continue
-            else:
-                # Next is vowel, but that vowel should be part of next syllable? Actually if next is vowel and we are at consonant, then next vowel is independent? No, vowel after consonant should have been consumed as pangangge
-                # But we already consumed vowel, so after_vowel_pos points after vowel, and next_char is vowel? That would be two vowels in a row -> second is independent
-                # So emit current without adeg-adeg
-                result += bali_with_pangangge
-                breakdown.append({
-                    "latin": base_latin + (vowel or ""),
-                    "bali": bali_with_pangangge,
-                    "type": "wresastra+pangangge" if pangangge_mark else "wresastra",
-                    "description": f"{base_latin} + {pangangge_desc or 'inherent a'}"
-                })
-                i = after_vowel_pos
-                has_gantungan_on_current = False
-                continue
-        else:
-            # End of word
-            # Check if current base at end should have adeg-adeg to kill inherent a?
-            # In Balinese, if word ends with consonant without vowel, need adeg-adeg
-            # But our base already has inherent a, so if word ends and we have no vowel, we need adeg-adeg?
-            # Actually our logic: base_latin like "ba" includes a, so "b" alone would be "ba" + adeg-adeg?
-            # But we matched "ba" as base, which is "b" + "a". If word is "bab" (b a b), then after first ba, next is b at end, so previous handling would have added adeg-adeg and then final b needs adeg-adeg
-            # For final consonant without vowel, we should add adeg-adeg
-            # Determine: if base_latin was matched and we are at end, and base_latin ends with 'a' (inherent), and we had no explicit vowel that is 'a'? Actually we did
-            # For word ending with consonant like "bali" ends with vowel i, so no adeg-adeg needed
-            # For word like "anak" = a na k, last k should have adeg-adeg? In Balinese, "anak" is ᬅᬦᬓ᭄ (a + na + ka + adeg-adeg)
-            # So if word ends with consonant and we matched that consonant as base, we need adeg-adeg at end
-            
-            # Check if word ends with consonant (not vowel)
-            # Our current base is at end, and we have no vowel after (or vowel is a)
-            # If word ends with consonant cluster that is not 'a', we need adeg-adeg
-            # Actually "anak": parsing: a (independent) + na (ᬦ) + ka (ᬓ) + adeg-adeg?
-            # Let's see: word "anak" = a n a k
-            # i=0: a -> independent ᬅ
-            # i=1: na -> ᬦ (n+a)
-            # i=3: k -> base "ka"? But "k" alone, our key "ka" is 2 chars, but remaining is "k" (1 char) -> no match for "ka" because need 2 chars "ka", but we have only "k" left
-            # So we need to handle single consonant at end: map "k" -> "ka" + adeg-adeg?
-            # For simplicity, if remaining single consonant at end, treat as base + adeg-adeg
-            
-            # For now, if we are at end and base_latin is like "ka" etc, but word actually ended with that base, we need to check if original word ended with consonant without vowel?
-            # Example: "anak" -> last char 'k' should be ka + adeg-adeg
-            # Our matching: at i=2, word[2:]= "ak", we match "a" as vowel independent? No, we match consonant first, but "ak" starts with 'a' vowel, so we go to vowel handling, emit ᬅ, i=3, now word[3:]="k", we try match keys: "ka" needs 2 chars, but only 1 left, so no match, then we go to unknown? We need to handle single consonant fallback
-            
-            # Let's handle fallback: if no match and char is consonant single, map it
-            # For MVP, we will emit base as is, and if at end and not followed by vowel, add adeg-adeg if needed
-            # Check if after_vowel_pos == word_len and vowel is None or vowel == 'a'? Actually if vowel is None, it means base had inherent a, but if at end, we might need adeg-adeg to kill it? 
-            # In Balinese, words ending with consonant need adeg-adeg, but words ending with vowel 'a' keep inherent
-            # So "bali" ends with i (vowel), no adeg-adeg
-            # "anak" ends with k (consonant), need adeg-adeg
-            # How to detect? If original word ends with consonant letter that is not 'a', and we are at last base, need adeg-adeg
-            # Our base_latin always ends with 'a' except 'ng', 'ny', etc? Actually "ka" ends with a, but represents k
-            # So if word ends with 'k' (single), we matched "ka"? No, we matched nothing? Let's re-evaluate
-            # For "anak", at i=3, char='k', we try match SORTED keys: "kha" (3), "ka" (2), etc. "k" alone not in keys. So matched remains None, then we go to vowel check: 'k' not vowel, so warning and result+=char
-            # That's wrong. We need fallback for single consonant letters: map 'k'->'ka', 'b'->'ba', etc
-            
-            # Let's add fallback mapping for single letters
-            pass  # will be handled below after this block, but for now emit
-            
-            result += bali_with_pangangge
+            result += bali_v
             breakdown.append({
-                "latin": base_latin + (vowel or ""),
-                "bali": bali_with_pangangge,
-                "type": "wresastra",
-                "description": f"{base_latin} final"
+                "latin": v, "bali": bali_v, "type": "suara",
+                "description": f"Aksara Suara {v}",
             })
-            i = after_vowel_pos if vowel else next_pos
-            # If word ends with consonant and we didn't have vowel, need adeg-adeg?
-            # Check if i == word_len and word[-1] not in vowels and not already has adeg-adeg
-            if i == word_len and word[-1] not in ['a', 'i', 'u', 'e', 'o']:
-                # Need adeg-adeg to kill inherent vowel
-                # But only if base_bali doesn't already have adeg-adeg
-                if not result.endswith(ADEG_ADEG):
-                    result += ADEG_ADEG
-                    breakdown[-1]["bali"] += ADEG_ADEG
-                    breakdown[-1]["description"] += " + adeg-adeg (final consonant)"
-            has_gantungan_on_current = False
+            i += len(v)
+            coda_run = 0
             continue
 
-    # After loop, handle any leftover single consonants that were not matched due to fallback needed
-    # For robustness, if result contains latin chars (a-z) still, it means we failed to transliterate some
-    # We'll try second pass for single consonants
-    # This is a safety net
-    
+        # 2) Stem konsonan.
+        m = _match_stem(word, i)
+        if m is None:
+            warnings.append(f"Karakter '{ch}' tidak punya padanan aksara")
+            result += ch
+            i += 1
+            coda_run = 0
+            continue
+
+        stem, base, name = m
+        i += len(stem)
+
+        approx = "~" in name
+        latin_label = name.split("~")[0]
+        if approx:
+            warnings.append(
+                f"'{latin_label}' tidak ada dalam Aksara Bali; "
+                f"dipekati sebagai {name.split('~')[1]}"
+            )
+
+        # 2a) Akhir kata.
+        if i == n:
+            if stem == "ng":
+                if result:
+                    unit = "ᬂ"
+                    breakdown.append({
+                        "latin": "ng", "bali": "ᬂ", "type": "tengenan",
+                        "description": "cecek (ng final)",
+                    })
+                else:
+                    unit = base + ADEG_ADEG
+                    breakdown.append({
+                        "latin": "ng", "bali": unit, "type": "wresastra+gantungan",
+                        "description": "nga + adeg-adeg (kata hanya 'ng')",
+                    })
+            elif stem == "h":
+                unit = "ᬄ"
+                breakdown.append({
+                    "latin": "h", "bali": "ᬄ", "type": "tengenan",
+                    "description": "bisah (h final)",
+                })
+            elif stem == "r":
+                unit = "ᬃ"
+                breakdown.append({
+                    "latin": "r", "bali": "ᬃ", "type": "tengenan",
+                    "description": "surang (r final)",
+                })
+            else:
+                unit = base + ADEG_ADEG
+                breakdown.append({
+                    "latin": latin_label, "bali": unit,
+                    "type": "wresastra+gantungan",
+                    "description": f"{latin_label} + adeg-adeg (konsonan akhir kata)",
+                })
+            result += unit
+            coda_run = 0
+            continue
+
+        # 2b) Onset: vokal berikutnya jadi pangangge.
+        v_after = _match_vowel(word, i)
+        if v_after is not None:
+            unit, p_desc = _apply_pangangge(base, v_after)
+            result += unit
+            breakdown.append({
+                "latin": latin_label + v_after, "bali": unit,
+                "type": "wresastra+pangangge" if v_after != "a" else "wresastra",
+                "description": f"{latin_label} + {p_desc}",
+            })
+            i += len(v_after)
+            coda_run = 0
+            continue
+
+        # 2c) Coda: konsonan berikutnya -> adeg-adeg (cluster/gantungan).
+        coda_run += 1
+        if coda_run >= 3:
+            warnings.append(
+                f"Tumpuk telu terdeteksi pada '{word}' (>=3 konsonan beruntun); "
+                f"dilarang dalam Aksara Bali"
+            )
+        unit = base + ADEG_ADEG
+        result += unit
+        breakdown.append({
+            "latin": latin_label, "bali": unit,
+            "type": "wresastra+gantungan",
+            "description": f"{latin_label} + adeg-adeg (cluster/gantungan)",
+        })
+
     return result, breakdown, warnings
 
-# Fallback single consonant mapping for edge cases
+
+# Jaring pengaman: huruf Latin apa pun yang lolos dipaksa ke dasar terdekat.
 SINGLE_CONSONANT_FALLBACK = {
-    "k": "ᬓ",
-    "g": "ᬕ",
-    "b": "ᬩ",
-    "p": "ᬧ",
-    "m": "ᬫ",
-    "n": "ᬦ",
-    "t": "ᬢ",
-    "d": "ᬤ",
-    "s": "ᬲ",
-    "w": "ᬯ",
-    "l": "ᬮ",
-    "h": "ᬳ",
-    "c": "ᬘ",
-    "r": "ᬭ",
-    "j": "ᬚ",
-    "y": "ᬬ",
+    "k": "ᬓ", "g": "ᬕ", "b": "ᬩ", "p": "ᬧ", "m": "ᬫ", "n": "ᬦ",
+    "t": "ᬢ", "d": "ᬤ", "s": "ᬲ", "w": "ᬯ", "l": "ᬮ", "h": "ᬳ",
+    "c": "ᬘ", "r": "ᬭ", "j": "ᬚ", "y": "ᬬ",
+    "f": "ᬧ", "v": "ᬯ", "q": "ᬓ", "x": "ᬲ", "z": "ᬓ",
 }
 
+
 def _transliterate_word_latin_to_bali_improved(word: str) -> Tuple[str, List[Dict], List[str]]:
-    """Improved version with single consonant fallback"""
-    # This function wraps the previous but adds fallback
-    # For now we call original and then fix latin leftovers
+    """Jaring pengaman: pastikan 100% hasil bebas huruf Latin."""
     result, breakdown, warnings = _transliterate_word_latin_to_bali(word)
-    
-    # Check if result still contains ascii letters (meaning untranslated)
-    # If so, try to transliterate those single letters
-    # This is a simple fix: replace any remaining ascii consonants with base + adeg if needed
-    fixed_result = ""
-    for char in result:
-        if char in SINGLE_CONSONANT_FALLBACK:
-            fixed_result += SINGLE_CONSONANT_FALLBACK[char] + ADEG_ADEG
-        else:
-            fixed_result += char
-    
-    return fixed_result, breakdown, warnings
+
+    if any(c.isalpha() and c.isascii() for c in result):
+        fixed = []
+        for char in result:
+            if char in SINGLE_CONSONANT_FALLBACK:
+                fixed.append(SINGLE_CONSONANT_FALLBACK[char] + ADEG_ADEG)
+                warnings.append(f"Jaring pengaman: '{char}' dipaksa ke aksara")
+            else:
+                fixed.append(char)
+        result = "".join(fixed)
+
+    return result, breakdown, warnings
 
 # Override to use improved
 def transliterate_word_wrapper(word: str):
-    return _transliterate_word_latin_to_bali(word)
+    return _transliterate_word_latin_to_bali_improved(word)
 
 @lru_cache(maxsize=2000)
 def transliterate_bali_to_latin(text: str) -> Tuple[str, List[Dict], List[str]]:
