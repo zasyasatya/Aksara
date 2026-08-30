@@ -73,7 +73,7 @@ Wresastra 18 → vocalic signs → final signs → clusters → Sanskrit/Kawi lo
 Four question types, filterable in one screen: multiple choice, true/false, cluster-choice, and the novel **write-aksara** type: the student sees a Latin word and *writes the aksara* (keyboard virtual, typing, or paste); the system validates the answer via the transliteration engine's pair-validator (`POST /api/quiz/validate-pair`, exact or tolerant mode) and returns **correct/incorrect + similarity % + per-rule suggestions + the correct form**. 24 quizzes ship out of the box (7 are write-aksara, from single letters to full phrases like *matur suksma*).
 
 ### 4.4 Teacher Panel (Panel Guru, `/guru`)
-Full CRUD for **lessons, quizzes, and the special dictionary** from the browser — with a mini aksara keyboard in the form fields, pickers for characters/quizzes, and two-step delete confirmation. In production the panel is protected by a teacher token (`AKSARA_GURU_TOKEN`); in development mode it is open. Content is persisted to JSON stores with atomic writes and **re-read per request**, so a teacher's edit is live for students immediately — no restart, no deploy. This directly serves the Pergub requirement that schools control their own local curriculum content.
+Full CRUD for **lessons, quizzes, and the special dictionary** from the browser — with a mini aksara keyboard in the form fields, pickers for characters/quizzes, and two-step delete confirmation. In production the panel is protected by a teacher login (username + password, `AKSARA_GURU_USERNAME` / `AKSARA_GURU_PASSWORD`); in development mode it is open. Content is persisted to JSON stores with atomic writes and **re-read per request**, so a teacher's edit is live for students immediately — no restart, no deploy. This directly serves the Pergub requirement that schools control their own local curriculum content.
 
 ### 4.5 Studio Twibbon (`/twibbon`) — the viral layer
 Upload a photo → type a phrase in Latin (auto-translated to aksara) or paste aksara directly → choose among **10 twibbon frames** (including a signature "strip aksara warisan" band), 3 aspect ratios (4:5 / 1:1 / 9:16), text size/position/color/shadow → export a **1080px PNG** and **share directly to WhatsApp/Instagram/X** via the Web Share API, or copy to clipboard. A subtle `aksara.id` watermark (toggleable) turns every shared image into a back-link to the platform.
@@ -120,7 +120,7 @@ A public page documenting the Pergub 7/2026 opportunity, listing partner schools
 │  routers: translate · classify · lessons · quiz · docs · manage · engagement  │
 │  services: transliterator (rules+dict) · quiz_engine (check+validate_pair)    │
 │            data_store (RLock JSON, atomic writes, per-request reads)           │
-│  config: AKSARA_MODE dev/prod · AKSARA_ADMIN_TOKEN · AKSARA_GURU_TOKEN        │
+│  config: AKSARA_MODE dev/prod · admin/guru username+password login             │
 └───────────────▲───────────────────────────────────────────────────────────────┘
                 │ read/write (atomic)
 ┌───────────────▼───────────────────────────────────────────────────────────────┐

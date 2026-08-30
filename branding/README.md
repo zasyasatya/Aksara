@@ -26,5 +26,10 @@ See ../docs/BRANDING.md for full guide.
 - Patra pattern
 - Illustrations
 
+## Kandidat logo baru (Aksara Nusantara)
+Lihat `kandidat/` — empat arah desain yang lebih merepresentasikan
+**Aksara Nusantara** (monogram, daun lontar, gunungan, stempel aksara).
+`kandidat/overview.html` menampilkan keempatnya berdampingan.
+
 ## Voice
 - Santai tapi hormat, encouraging, use Balinese words occasionally

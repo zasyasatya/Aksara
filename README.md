@@ -31,7 +31,7 @@ Platform edukasi interaktif untuk mempelajari Aksara Bali (Hanacaraka) dengan pe
 - Guru **menambah / mengubah / menghapus** materi, kuis, dan kamus langsung dari peramban — **tanpa edit file**
 - Tab **Materi** (judul, level, urutan, aksara, kuis terkait), **Kuis** (semua tipe termasuk *menulis aksara*), **Kamus** (kata khusus transliterasi)
 - Perubahan **langsung efektif** untuk murid (store JSON + reload per-request, tanpa restart)
-- Mode DEV: langsung terbuka. Mode PROD: login dengan token `AKSARA_GURU_TOKEN` (token admin juga diterima)
+- Mode DEV: langsung terbuka. Mode PROD: login dengan username & password (`AKSARA_GURU_USERNAME`/`AKSARA_GURU_PASSWORD`, akun admin juga diterima)
 
 ### 🖼️ Studio Twibbon
 - **Foto + tulisan Aksara Bali** dalam satu gambar: tulis Latin → otomatis jadi aksara (engine translate), atau paste aksara langsung
@@ -51,7 +51,7 @@ Platform edukasi interaktif untuk mempelajari Aksara Bali (Hanacaraka) dengan pe
 - **`/guru`** — panel guru: kelola konten (materi/kuis/kamus) secara real-time
 - **`/admin`** — panel admin: atur halaman dokumentasi mana yang **go public**
 - **Mode DEV** (`AKSARA_MODE=dev`): semua halaman dokumentasi selalu tampil, akses admin & guru otomatis
-- **Mode PROD** (`AKSARA_MODE=prod`): hanya halaman publik yang tampil; admin login via token (`AKSARA_ADMIN_TOKEN`), guru via token (`AKSARA_GURU_TOKEN`)
+- **Mode PROD** (`AKSARA_MODE=prod`): hanya halaman publik yang tampil; admin & guru login via username + password (`AKSARA_ADMIN_USERNAME`/`AKSARA_ADMIN_PASSWORD` dan `AKSARA_GURU_USERNAME`/`AKSARA_GURU_PASSWORD`)
 
 ### 🎨 Design System
 - Branding kuat: Saffron (#FF6B35), Deep Brown (#2C1810), Cream (#FFF8E7), Terracotta
@@ -114,7 +114,7 @@ Aksara/
 │   ├── components/ui/ - Button, Card, Badge
 │   ├── components/layout/ - Header, BottomNav
 │   ├── components/aksara/ - AksaraCard, AksaraKeyboard (keyboard virtual bersama)
-│   ├── lib/api.ts - Typed fetch (termasuk manage.* + token guru)
+│   ├── lib/api.ts - Typed fetch (termasuk manage.* + sesi login guru/admin)
 │   ├── lib/store.ts - Zustand
 │   ├── public/screenshots/ - Screenshot halaman (untuk dokumentasi)
 │   └── public/sample/ - Foto contoh untuk Studio Twibbon
@@ -206,9 +206,11 @@ Variabel lingkungan:
 
 | Var | Default | Keterangan |
 | --- | --- | --- |
-| `AKSARA_MODE` | `prod` | `prod` = hanya docs publik + admin/guru butuh token; `dev` = semua terbuka |
-| `AKSARA_ADMIN_TOKEN` | `aksara-admin` | **Wajib diganti** di produksi (panel `/admin`) |
-| `AKSARA_GURU_TOKEN` | `aksara-guru` | **Wajib diganti** di produksi (panel `/guru`) |
+| `AKSARA_MODE` | `prod` | `prod` = hanya docs publik + admin/guru butuh login; `dev` = semua terbuka |
+| `AKSARA_ADMIN_USERNAME` | `admin` | Username login admin (panel `/admin`) |
+| `AKSARA_ADMIN_PASSWORD` | `aksara-admin` | **Wajib diganti** di produksi (panel `/admin`) |
+| `AKSARA_GURU_USERNAME` | `guru` | Username login guru (panel `/guru`) |
+| `AKSARA_GURU_PASSWORD` | `aksara-guru` | **Wajib diganti** di produksi (panel `/guru`) |
 
 Persistensi: mount volume di `/app/backend/app/data` agar perubahan Panel Guru dan
 engagement (kunjungan/twibbon/sekolah) tidak hilang saat redeploy.
@@ -220,7 +222,8 @@ engagement (kunjungan/twibbon/sekolah) tidak hilang saat redeploy.
 2. Sumber: repo ini; Coolify otomatis memakai `Dockerfile` di root dan `.dockerignore`.
 3. **Port / domain**: set port internal **`8000`** (bukan 3000). Tautkan domain
    (mis. `aksara.id`) — Coolify menangani reverse-proxy & TLS.
-4. **Environment**: set `AKSARA_ADMIN_TOKEN` dan `AKSARA_GURU_TOKEN` (nilai acak kuat).
+4. **Environment**: set `AKSARA_ADMIN_USERNAME`/`AKSARA_ADMIN_PASSWORD` dan
+   `AKSARA_GURU_USERNAME`/`AKSARA_GURU_PASSWORD` (password kuat).
    `AKSARA_MODE` default sudah `prod`.
 5. **Persistence** (opsional, disarankan): tambah volume/bind-mount ke
    `/app/backend/app/data`.
@@ -319,13 +322,19 @@ Buka **`/docs`** (menu Dokumentasi) untuk panduan penggunaan per peran
 untuk mengatur publikasi halaman dokumentasi.
 
 ```bash
+# Login (mode prod): dapatkan session token
+curl -X POST http://localhost:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"role":"admin","username":"admin","password":"aksara-admin"}'
+# → {"ok":true,"session_token":"..."} — simpan ke $SESSION
+
 # Daftar halaman dokumentasi (field mode + is_admin menentukan tampilan)
 curl http://localhost:8000/api/docs/pages
 
 # Ubah status publik/privat (admin only)
 curl -X PATCH http://localhost:8000/api/docs/pages/metode-scientific/visibility \
   -H "Content-Type: application/json" \
-  -H "X-Admin-Token: $AKSARA_ADMIN_TOKEN" \
+  -H "Authorization: Bearer $SESSION" \
   -d '{"is_public": false}'
 ```
 
@@ -333,9 +342,11 @@ curl -X PATCH http://localhost:8000/api/docs/pages/metode-scientific/visibility 
 
 | Var | Default | Keterangan |
 | --- | --- | --- |
-| `AKSARA_MODE` | `dev` | `dev` = semua halaman docs tampil + admin & guru otomatis; `prod` = hanya halaman publik, admin & guru butuh token |
-| `AKSARA_ADMIN_TOKEN` | `aksara-admin` | Token admin untuk mode prod (header `X-Admin-Token`). **Wajib diganti di produksi.** |
-| `AKSARA_GURU_TOKEN` | `aksara-guru` | Token guru untuk mode prod (header `X-Admin-Token`). Token admin juga diterima di panel guru. **Wajib diganti di produksi.** |
+| `AKSARA_MODE` | `dev` | `dev` = semua halaman docs tampil + admin & guru otomatis; `prod` = hanya halaman publik, admin & guru butuh login |
+| `AKSARA_ADMIN_USERNAME` | `admin` | Username login admin untuk mode prod. |
+| `AKSARA_ADMIN_PASSWORD` | `aksara-admin` | Password admin. **Wajib diganti di produksi.** |
+| `AKSARA_GURU_USERNAME` | `guru` | Username login guru untuk mode prod. |
+| `AKSARA_GURU_PASSWORD` | `aksara-guru` | Password guru (akun admin juga diterima di panel guru). **Wajib diganti di produksi.** |
 
 Status publikasi disimpan di `backend/app/data/docs.json`. Konten dinamis
 (materi, kuis, kamus) dikelola lewat panel guru dan disimpan di
@@ -347,22 +358,22 @@ Status publikasi disimpan di `backend/app/data/docs.json`. Konten dinamis
 # Status akses (mode + is_guru + is_admin)
 curl http://localhost:8000/api/manage/status
 
-# Tambah materi (mode prod: butuh header token)
+# Tambah materi (mode prod: butuh header sesi login)
 curl -X POST http://localhost:8000/api/manage/lessons \
   -H "Content-Type: application/json" \
-  -H "X-Admin-Token: $AKSARA_GURU_TOKEN" \
+  -H "Authorization: Bearer $SESSION" \
   -d '{"title":"Ha Na Ca Ra Ka","level":1,"order":1,"category":"wresastra","aksara_ids":[],"pangangge_ids":[],"estimated_minutes":10,"xp_reward":50,"prerequisites":[],"quiz_ids":[],"is_published":true}'
 
 # Tambah kuis tipe "menulis aksara"
 curl -X POST http://localhost:8000/api/manage/quizzes \
   -H "Content-Type: application/json" \
-  -H "X-Admin-Token: $AKSARA_GURU_TOKEN" \
+  -H "Authorization: Bearer $SESSION" \
   -d '{"lesson_id":"wresastra-01","type":"write_aksara","difficulty":"easy","question":{"text":"Tuliskan kata \"ha\" dalam Aksara Bali","latin":"ha","bali":"ᬳ"},"options":[],"correct_answer":"","explanation":"ha = aksara pertama Wresastra 18","xp":10}'
 
 # Upsert entri kamus
 curl -X POST http://localhost:8000/api/manage/dictionary \
   -H "Content-Type: application/json" \
-  -H "X-Admin-Token: $AKSARA_GURU_TOKEN" \
+  -H "Authorization: Bearer $SESSION" \
   -d '{"latin":"angklung","bali":"ᬅᬋ᭄ᬓᬮᬸ","note":"A independent"}'
 ```
 

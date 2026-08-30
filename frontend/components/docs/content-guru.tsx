@@ -69,10 +69,10 @@ export function ContentGuru() {
         <Callout title="Akses & keamanan">
           Di <strong>mode dev</strong> panel langsung terbuka untuk semua orang. Di <strong>mode
           prod</strong>, guru diarahkan ke halaman <Link href="/login" className="text-saffron-dark font-semibold hover:underline">/login</Link>{" "}
-          dan memilih peran <strong>Guru</strong> lalu memasukkan <strong>token</strong> — nilai
-          environment <Code>AKSARA_GURU_TOKEN</Code> (token admin juga diterima). Token disimpan
-          lokal di peramban guru, bukan di server. Halaman murid tidak terpengaruh — tetap bisa
-          diakses tanpa login.
+          dan memilih peran <strong>Guru</strong> lalu memasukkan <strong>username &amp; password</strong> — nilai
+          environment <Code>AKSARA_GURU_USERNAME</Code> / <Code>AKSARA_GURU_PASSWORD</Code> (akun admin
+          juga diterima). Sesi login tersimpan lokal di peramban guru, bukan di server. Halaman murid
+          tidak terpengaruh — tetap bisa diakses tanpa login.
         </Callout>
         <Screenshot
           src="/screenshots/guru.png"

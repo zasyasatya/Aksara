@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { api, DocsPagesResponse, getAdminToken } from "@/lib/api"
+import { api, DocsPagesResponse } from "@/lib/api"
 import { Header } from "@/components/layout/header"
 import { BottomNav } from "@/components/layout/bottom-nav"
 import { DocsShell } from "@/components/docs/docs-shell"
@@ -27,7 +27,7 @@ export function DocsArticleClient() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    api.getDocsPages(getAdminToken()).then(setData).catch((e) => setError((e as Error).message))
+    api.getDocsPages().then(setData).catch((e) => setError((e as Error).message))
   }, [])
 
   const shell = (children: React.ReactNode) => (

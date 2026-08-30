@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation"
 import {
   api,
   DocsPagesResponse,
-  getAdminToken,
-  setAdminToken,
+  setSession,
 } from "@/lib/api"
 import { Header } from "@/components/layout/header"
 import { BottomNav } from "@/components/layout/bottom-nav"
@@ -32,10 +31,10 @@ export default function AdminPage() {
   const [flash, setFlash] = useState<string | null>(null)
   const router = useRouter()
 
-  const load = useCallback(async (token: string | null) => {
+  const load = useCallback(async () => {
     setError(null)
     try {
-      const d = await api.getDocsPages(token)
+      const d = await api.getDocsPages()
       setData(d)
       return d
     } catch (e) {
@@ -45,25 +44,26 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
-    // Belum login (token tersimpan kosong / ditolak backend) → halaman /login.
-    load(getAdminToken()).then((d) => {
+    // Belum login (sesi kosong / ditolak backend) → halaman /login.
+    load().then((d) => {
       if (!d?.is_admin) router.replace("/login?next=/admin")
     })
     api.health().then((h) => setVersion(h.version ?? "")).catch(() => {})
   }, [load, router])
 
   const handleLogout = () => {
-    setAdminToken(null)
+    api.auth.logout().catch(() => {})
+    setSession(null, null)
     router.replace("/login?next=/admin")
   }
 
   const toggleVisibility = async (slug: string, isPublic: boolean) => {
     setSavingSlug(slug)
     try {
-      const res = await api.setDocVisibility(slug, isPublic, getAdminToken())
+      const res = await api.setDocVisibility(slug, isPublic)
       setFlash(res.message)
       setTimeout(() => setFlash(null), 2500)
-      await load(getAdminToken())
+      await load()
     } catch (e) {
       setError((e as Error).message)
     } finally {
@@ -162,7 +162,7 @@ export default function AdminPage() {
                   </div>
                 </div>
                 <button
-                  onClick={() => load(getAdminToken())}
+                  onClick={() => load()}
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-charcoal/50 hover:text-saffron-dark"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
@@ -226,7 +226,7 @@ export default function AdminPage() {
             {/* Aksi */}
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
               <div className="text-xs text-charcoal/50">
-                Token tersimpan di peramban ini (localStorage).
+                Sesi login tersimpan di peramban ini.
               </div>
               <button
                 onClick={handleLogout}

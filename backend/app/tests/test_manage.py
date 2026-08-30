@@ -169,24 +169,44 @@ def test_dictionary_upsert_delete(restore_data):
 
 # ── Prod mode: auth ─────────────────────────────────────────────────────
 
-def test_prod_blocks_without_token(restore_data, prod_mode):
+def _login_headers(role: str, username: str = "", password: str = ""):
+    r = client.post(
+        "/auth/login", json={"role": role, "username": username, "password": password}
+    )
+    assert r.status_code == 200, r.text
+    data = r.json()
+    assert data["ok"] is True, data
+    return {"Authorization": f"Bearer {data['session_token']}"}
+
+
+def test_prod_blocks_without_login(restore_data, prod_mode):
     assert client.post("/api/manage/lessons", json={"title": "X"}).status_code == 403
     assert client.delete("/api/manage/quizzes/quiz-wres-01-1").status_code == 403
     assert client.post("/api/manage/dictionary", json={"latin": "x", "bali": "y"}).status_code == 403
 
-    # token guru benar → boleh
-    tok = {"X-Admin-Token": settings.guru_token}
+    # login guru benar → boleh
+    tok = _login_headers("guru", settings.guru_username, settings.guru_password)
     r = client.post("/api/manage/lessons", json={"title": "Uji Prod", "id": "uji-prod"}, headers=tok)
     assert r.status_code == 201
     assert client.delete("/api/manage/lessons/uji-prod", headers=tok).status_code == 200
 
-    # status memuat is_guru sesuai token
+    # status memuat is_guru sesuai sesi
     assert client.get("/api/manage/status").json()["is_guru"] is False
     assert client.get("/api/manage/status", headers=tok).json()["is_guru"] is True
 
 
-def test_prod_accepts_admin_token_too(restore_data, prod_mode):
-    tok = {"X-Admin-Token": settings.admin_token}
+def test_prod_accepts_admin_login_too(restore_data, prod_mode):
+    tok = _login_headers("admin", settings.admin_username, settings.admin_password)
     r = client.get("/api/manage/status", headers=tok)
     assert r.json()["is_guru"] is True
     assert r.json()["is_admin"] is True
+
+
+def test_prod_login_wrong_credentials(prod_mode):
+    r = client.post(
+        "/auth/login",
+        json={"role": "guru", "username": settings.guru_username, "password": "salah"},
+    )
+    assert r.status_code == 200
+    assert r.json()["ok"] is False
+    assert r.json()["session_token"] is None

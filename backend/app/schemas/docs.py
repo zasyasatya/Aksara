@@ -21,7 +21,7 @@ class DocsPagesResponse(BaseModel):
     """Respons daftar halaman dokumentasi.
 
     - `mode`: "dev" | "prod" — menentukan perilaku visibilitas di frontend.
-    - `is_admin`: True bila pemegang token admin (atau mode dev).
+    - `is_admin`: True bila sesi login admin aktif (atau mode dev).
     """
 
     mode: str

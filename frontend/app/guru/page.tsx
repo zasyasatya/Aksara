@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation"
 import {
   api,
   ManageStatus,
-  getGuruToken,
-  setGuruToken,
+  setSession,
 } from "@/lib/api"
 import { Header } from "@/components/layout/header"
 import { BottomNav } from "@/components/layout/bottom-nav"
@@ -30,10 +29,10 @@ export default function GuruPage() {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
-  const load = useCallback(async (token: string | null) => {
+  const load = useCallback(async () => {
     setError(null)
     try {
-      const s = await api.manage.status(token)
+      const s = await api.manage.status()
       setStatus(s)
       return s
     } catch (e) {
@@ -43,14 +42,15 @@ export default function GuruPage() {
   }, [])
 
   useEffect(() => {
-    // Belum login (token tersimpan kosong / ditolak backend) → halaman /login.
-    load(getGuruToken()).then((s) => {
+    // Belum login (sesi kosong / ditolak backend) → halaman /login.
+    load().then((s) => {
       if (!s?.is_guru) router.replace("/login?next=/guru")
     })
   }, [load, router])
 
   const handleLogout = () => {
-    setGuruToken(null)
+    api.auth.logout().catch(() => {})
+    setSession(null, null)
     router.replace("/login?next=/guru")
   }
 
@@ -145,9 +145,9 @@ export default function GuruPage() {
             </div>
 
             <div className="mt-5">
-              {tab === "materi" && <TabsMateri token={getGuruToken()} />}
-              {tab === "kuis" && <TabsKuis token={getGuruToken()} />}
-              {tab === "kamus" && <TabsKamus token={getGuruToken()} />}
+              {tab === "materi" && <TabsMateri />}
+              {tab === "kuis" && <TabsKuis />}
+              {tab === "kamus" && <TabsKamus />}
             </div>
           </>
         )}

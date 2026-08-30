@@ -46,7 +46,7 @@ bukan *adeg*'. Guru bisa menilai kelas berisi 40 orang dalam hitungan detik, tan
 
 ## SCENE 4 — PANEL GURU (2:40–3:30)
 
-**Visual:** /guru → token dev → CRUD: ubah judul pelajaran → SIMPAN → (tab lain /learn) langsung berubah. Buat kuis baru tipe "Menulis Aksara".
+**Visual:** /guru → login (mode dev otomatis) → CRUD: ubah judul pelajaran → SIMPAN → (tab lain /learn) langsung berubah. Buat kuis baru tipe "Menulis Aksara".
 
 **Narasi:**
 "Dan karena Pergub 7/2026 mengharuskan **konten lokal di bawah kendali sekolah**,

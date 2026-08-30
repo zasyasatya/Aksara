@@ -20,13 +20,13 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-cream pb-20 lg:pb-0">
       <Header />
       
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-sand via-cream to-cream" />
-        <div className="absolute top-20 right-10 text-[200px] font-bali text-sand/30 select-none hidden lg:block">
+        <div className="pointer-events-none absolute top-24 right-8 text-[160px] leading-none font-bali text-sand/25 select-none hidden lg:block">
           ᬅᬓ᭄ᬱᬭ
         </div>
         

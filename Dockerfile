@@ -4,9 +4,11 @@
 #   docker compose up --build     # http://localhost:8000
 #
 # Variabel lingkungan (set di Coolify / compose):
-#   AKSARA_MODE          prod (default di image) | dev
-#   AKSARA_ADMIN_TOKEN   wajib diganti di produksi (header X-Admin-Token, panel /admin)
-#   AKSARA_GURU_TOKEN    wajib diganti di produksi (header X-Admin-Token, panel /guru)
+#   AKSARA_MODE             prod (default di image) | dev
+#   AKSARA_ADMIN_USERNAME   username login admin (panel /admin)
+#   AKSARA_ADMIN_PASSWORD   password login admin — wajib diganti di produksi
+#   AKSARA_GURU_USERNAME    username login guru (panel /guru)
+#   AKSARA_GURU_PASSWORD    password login guru — wajib diganti di produksi
 #
 # Persistensi: mount volume di /app/backend/app/data
 # (lessons.json, quiz.json, dictionary.json, docs.json, engagement.json)
