@@ -17,6 +17,10 @@ WORKDIR /build
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 COPY frontend/ .
+# Static export membaca katalog pelajaran saat build (app/learn/[id]/layout.tsx:
+# join(process.cwd(), "..", "backend", "app", "data", "lessons.json")).
+# WORKDIR = /build, jadi letakkan data backend di lokasi yang dicover path relatif itu.
+COPY backend/app/data /backend/app/data
 ENV BUILD_EXPORT=1 NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 # hasil: /build/out  (UI statis; akan disajikan oleh FastAPI → same origin, tanpa CORS)
