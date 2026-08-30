@@ -1,0 +1,44 @@
+{
+  "pages": [
+    {
+      "slug": "penggunaan-murid",
+      "title": "Tata Cara Penggunaan — Murid",
+      "subtitle": "Panduan langkah demi langkah untuk belajar Aksara Bali sebagai murid",
+      "role": "murid",
+      "icon": "GraduationCap",
+      "is_public": true,
+      "order": 1,
+      "updated_at": "2026-08-30"
+    },
+    {
+      "slug": "penggunaan-guru",
+      "title": "Tata Cara Penggunaan — Guru",
+      "subtitle": "Cara guru memanfaatkan platform untuk mengajar dan menilai",
+      "role": "guru",
+      "icon": "Presentation",
+      "is_public": true,
+      "order": 2,
+      "updated_at": "2026-08-30"
+    },
+    {
+      "slug": "penggunaan-admin",
+      "title": "Tata Cara Penggunaan — Admin",
+      "subtitle": "Akses panel admin dan pengaturan halaman dokumentasi",
+      "role": "admin",
+      "icon": "ShieldCheck",
+      "is_public": true,
+      "order": 3,
+      "updated_at": "2026-08-30"
+    },
+    {
+      "slug": "metode-scientific",
+      "title": "Metode Scientific & Referensi",
+      "subtitle": "Metodologi ilmiah di balik mesin transliterasi dan daftar sumber rujukan",
+      "role": "metodologi",
+      "icon": "Microscope",
+      "is_public": true,
+      "order": 4,
+      "updated_at": "2026-08-30"
+    }
+  ]
+}

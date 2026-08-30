@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .core.config import settings
-from .routers import health, translate, classify, lessons, quiz
+from .routers import health, translate, classify, lessons, quiz, docs
 
 app = FastAPI(
     title=settings.app_name,
@@ -28,12 +28,21 @@ app.include_router(translate.router, prefix=settings.api_prefix)
 app.include_router(classify.router, prefix=settings.api_prefix)
 app.include_router(lessons.router, prefix=settings.api_prefix)
 app.include_router(quiz.router, prefix=settings.api_prefix)
+app.include_router(docs.router, prefix=settings.api_prefix)
 
 @app.get("/api")
 async def api_root():
     return {
         "message": "Aksara API v1",
         "version": settings.version,
+        "mode": "prod" if settings.is_prod else "dev",
         "docs": "/docs",
-        "endpoints": ["/api/health", "/api/translate", "/api/classify", "/api/lessons", "/api/quiz"]
+        "endpoints": [
+            "/api/health",
+            "/api/translate",
+            "/api/classify",
+            "/api/lessons",
+            "/api/quiz",
+            "/api/docs/pages",
+        ]
     }

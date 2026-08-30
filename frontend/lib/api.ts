@@ -1,4 +1,6 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"
+// Same-origin by default: next.config.js mem-proxy /api ke FastAPI di server
+// side, sehingga browser tidak pernah memanggil localhost backend secara langsung.
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api"
 
 type TranslateDirection = "latin-to-bali" | "bali-to-latin"
 
@@ -57,6 +59,48 @@ export interface Quiz {
   xp: number
 }
 
+// ── Dokumentasi & Admin ─────────────────────────────────────────────────
+
+export type DocsRole = "murid" | "guru" | "admin" | "metodologi"
+
+export interface DocsPageMeta {
+  slug: string
+  title: string
+  subtitle: string
+  role: DocsRole
+  icon: string
+  is_public: boolean
+  order: number
+  updated_at: string
+}
+
+export interface DocsPagesResponse {
+  mode: "dev" | "prod"
+  is_admin: boolean
+  pages: DocsPageMeta[]
+}
+
+export interface VisibilityResponse {
+  slug: string
+  is_public: boolean
+  message: string
+}
+
+const ADMIN_TOKEN_KEY = "aksara_admin_token"
+
+/** Ambil token admin tersimpan (null bila belum login). Hanya jalan di browser. */
+export function getAdminToken(): string | null {
+  if (typeof window === "undefined") return null
+  return window.localStorage.getItem(ADMIN_TOKEN_KEY)
+}
+
+/** Simpan atau hapus token admin. */
+export function setAdminToken(token: string | null): void {
+  if (typeof window === "undefined") return
+  if (token) window.localStorage.setItem(ADMIN_TOKEN_KEY, token)
+  else window.localStorage.removeItem(ADMIN_TOKEN_KEY)
+}
+
 async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE}${endpoint}`
   const res = await fetch(url, {
@@ -76,7 +120,7 @@ async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise
 }
 
 export const api = {
-  health: () => fetchAPI<{status: string}>("/health"),
+  health: () => fetchAPI<{status: string; version?: string; service?: string}>("/health"),
   
   translate: (text: string, direction: TranslateDirection, useDictionary = true) =>
     fetchAPI<TranslateResponse>("/translate", {
@@ -146,5 +190,18 @@ export const api = {
     fetchAPI<any>("/translate/gantungan/analyze", {
       method: "POST",
       body: JSON.stringify({ text, direction })
-    })
+    }),
+
+  // ── Dokumentasi ──
+  getDocsPages: (adminToken: string | null = null) =>
+    fetchAPI<DocsPagesResponse>("/docs/pages", {
+      headers: adminToken ? { "X-Admin-Token": adminToken } : {},
+    }),
+
+  setDocVisibility: (slug: string, isPublic: boolean, adminToken: string | null = null) =>
+    fetchAPI<VisibilityResponse>(`/docs/pages/${slug}/visibility`, {
+      method: "PATCH",
+      body: JSON.stringify({ is_public: isPublic }),
+      headers: adminToken ? { "X-Admin-Token": adminToken } : {},
+    }),
 }

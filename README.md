@@ -26,6 +26,12 @@ Platform edukasi interaktif untuk mempelajari Aksara Bali (Hanacaraka) dengan pe
 - Feedback detail: jelaskan kesalahan (misal: "Seharusnya pakai gantungan, bukan adeg-adeg")
 - Endpoint `/api/quiz/validate-pair` untuk validasi custom
 
+### 📚 Dokumentasi & Panel Admin
+- **`/docs`** — pusat dokumentasi: tata cara penggunaan untuk **murid, guru, admin**, plus halaman khusus **Metode Scientific & Referensi** (metodologi transliterasi + sumber akademik) — lengkap dengan screenshot halaman
+- **`/admin`** — panel admin: atur halaman dokumentasi mana yang **go public**
+- **Mode DEV** (`AKSARA_MODE=dev`): semua halaman dokumentasi selalu tampil, akses admin otomatis
+- **Mode PROD** (`AKSARA_MODE=prod`): hanya halaman publik yang tampil; admin login via token (`AKSARA_ADMIN_TOKEN`)
+
 ### 🎨 Design System
 - Branding kuat: Saffron (#FF6B35), Deep Brown (#2C1810), Cream (#FFF8E7), Terracotta
 - Font: Plus Jakarta Sans + Noto Sans Balinese
@@ -72,12 +78,16 @@ Aksara/
 │   │   ├── learn/ - Belajar bertahap
 │   │   ├── translate/ - Translate live
 │   │   ├── quiz/ - Kuis validasi
-│   │   └── playground/ - Keyboard virtual
+│   │   ├── playground/ - Keyboard virtual
+│   │   ├── docs/ - Pusat dokumentasi (hub + [slug])
+│   │   └── admin/ - Panel admin (publikasi dokumentasi)
+│   ├── components/docs/ - Shell, konten per-role, screenshot
 │   ├── components/ui/ - Button, Card, Badge
 │   ├── components/layout/ - Header, BottomNav
 │   ├── components/aksara/ - AksaraCard, etc
 │   ├── lib/api.ts - Typed fetch
-│   └── lib/store.ts - Zustand
+│   ├── lib/store.ts - Zustand
+│   └── public/screenshots/ - Screenshot halaman (untuk dokumentasi)
 ├── branding/ - Logo, colors, etc
 └── docker-compose.yml
 ```
@@ -171,6 +181,32 @@ curl -X POST http://localhost:8000/api/quiz/check \
   -H "Content-Type: application/json" \
   -d '{"quiz_id": "quiz-wres-01-1", "answer": "a"}'
 ```
+
+## 📚 Dokumentasi, Admin & Mode Dev/Prod
+
+Buka **`/docs`** (menu Dokumentasi) untuk panduan penggunaan per peran
+(murid/guru/admin) dan halaman **Metode Scientific & Referensi**, serta
+**`/admin`** untuk mengatur publikasi halaman dokumentasi.
+
+```bash
+# Daftar halaman dokumentasi (field mode + is_admin menentukan tampilan)
+curl http://localhost:8000/api/docs/pages
+
+# Ubah status publik/privat (admin only)
+curl -X PATCH http://localhost:8000/api/docs/pages/metode-scientific/visibility \
+  -H "Content-Type: application/json" \
+  -H "X-Admin-Token: $AKSARA_ADMIN_TOKEN" \
+  -d '{"is_public": false}'
+```
+
+### Variabel lingkungan
+
+| Var | Default | Keterangan |
+| --- | --- | --- |
+| `AKSARA_MODE` | `dev` | `dev` = semua halaman docs tampil + admin otomatis; `prod` = hanya halaman publik, admin butuh token |
+| `AKSARA_ADMIN_TOKEN` | `aksara-admin` | Token admin untuk mode prod (header `X-Admin-Token`). **Wajib diganti di produksi.** |
+
+Status publikasi disimpan di `backend/app/data/docs.json`.
 
 ## 🎨 Branding
 

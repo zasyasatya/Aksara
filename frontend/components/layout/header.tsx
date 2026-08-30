@@ -5,13 +5,14 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useProgressStore } from "@/lib/store"
-import { Flame, Trophy, BookOpen, Languages, LayoutDashboard, Gamepad2 } from "lucide-react"
+import { Flame, Trophy, BookOpen, BookOpenCheck, Languages, LayoutDashboard, Gamepad2, ShieldCheck } from "lucide-react"
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/learn", label: "Belajar", icon: BookOpen },
   { href: "/translate", label: "Translate", icon: Languages },
   { href: "/quiz", label: "Kuis", icon: Gamepad2 },
+  { href: "/docs", label: "Dokumentasi", icon: BookOpenCheck },
 ]
 
 export function Header() {
@@ -69,6 +70,15 @@ export function Header() {
               Lv {level}
             </div>
           </div>
+          
+          <Link
+            href="/admin"
+            title="Panel Admin"
+            aria-label="Panel Admin"
+            className="hidden sm:flex h-9 w-9 items-center justify-center rounded-full border border-sand bg-white text-deep-brown/60 shadow-soft transition-colors hover:text-saffron-dark hover:border-saffron/40"
+          >
+            <ShieldCheck className="h-5 w-5" />
+          </Link>
           
           <Button variant="primary" size="sm" className="hidden sm:inline-flex">
             Rahajeng! 👋
