@@ -3,15 +3,16 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, BookOpen, BookOpenCheck, Languages, Gamepad2, User } from "lucide-react"
+import { LayoutDashboard, BookOpen, BookOpenCheck, Languages, Gamepad2, Stamp, User } from "lucide-react"
 
 const navItems = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/learn", label: "Belajar", icon: BookOpen },
   { href: "/translate", label: "Translate", icon: Languages },
   { href: "/quiz", label: "Kuis", icon: Gamepad2 },
-  { href: "/docs", label: "Dok", icon: BookOpenCheck },
+  { href: "/twibbon", label: "Twibbon", icon: Stamp },
   { href: "/playground", label: "Play", icon: User },
+  { href: "/docs", label: "Dok", icon: BookOpenCheck },
 ]
 
 export function BottomNav() {

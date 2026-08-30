@@ -208,6 +208,12 @@ export function ContentGuru() {
             { title: "5 menit — Refleksi", body: "Ingatkan menjaga streak harian & tugas: 1 kata Aksara di buku tulis." },
           ]}
         />
+        <Callout variant="success" title="Ekstrakurikuler & promosi budaya">
+          Gunakan <Link href="/twibbon" className="font-semibold underline">Studio Twibbon</Link> untuk
+          tugas kreatif: murid membuat kartu ucapan, caption profil, atau konten sosmed berbahasa
+          Bali dari foto mereka sendiri — hasil terjemahan aksara otomatis membuat tugas ini
+          layak dinilai dari segi ejaan (bukan sekadar desain).
+        </Callout>
         <Callout title="Catatan jujur (MVP)">
           <strong>Panel Guru</strong> untuk mengelola konten (materi, kuis, kamus) sudah
           tersedia. Penugasan massal, laporan per-murid, dan portal orang tua belum tersedia —

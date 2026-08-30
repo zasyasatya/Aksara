@@ -225,7 +225,30 @@ export function ContentMurid() {
         />
       </DocSection>
 
-      <DocSection id="tips" number="7." title="Tips belajar efektif">
+      <DocSection id="twibbon" number="7." title="Bikin twibbon aksara & bagikan ke medsos">
+        <p>
+          <strong>Studio Twibbon</strong> (menu <Link href="/twibbon" className="text-saffron-dark font-semibold hover:underline">Twibbon</Link>)
+          membuat <strong>foto kamu + tulisan Aksara Bali</strong> dalam satu gambar siap
+          dibagikan. Teks ditulis dalam Latin, lalu <strong>otomatis diterjemahkan ke aksara</strong>{" "}
+          memakai engine translate yang sama — atau kamu bisa mem-paste aksara langsung.
+        </p>
+        <Steps
+          items={[
+            { title: "Unggah foto", body: "Pilih foto dari perangkat, atau pakai foto contoh. Ada 3 rasio: 4:5 (post IG), 1:1 (kotak), 9:16 (story/reels)." },
+            { title: "Tulis teks", body: "Ketik kalimat Latin (mis. “matur suksma”) — aksaranya muncul otomatis; atur ukuran, posisi, warna, bayangan, dan teks Latin kecil di bawahnya." },
+            { title: "Pilih bingkai", body: "10 gaya twibbon: margin krem, garis ganda, garis titik, dua gradasi, sudut klasik, strip aksara “warisan”, polaroid, sudut bulat, dan polos." },
+            { title: "Bagikan", body: "Tombol Bagikan memakai berbagi peramban (WhatsApp/IG/X) — atau Unduh PNG 1080px lalu unggah manual; hasil juga bisa disalin ke clipboard." },
+          ]}
+        />
+        <Screenshot
+          src="/screenshots/twibbon.png"
+          alt="Studio Twibbon: foto pura dengan tulisan aksara matur suksma dan bingkai strip aksara"
+          caption="Studio Twibbon: foto + aksara hasil translate + bingkai pilihan — langsung bisa dishare ke sosial media."
+          url="aksara.local/twibbon"
+        />
+      </DocSection>
+
+      <DocSection id="tips" number="8." title="Tips belajar efektif">
         <ul className="list-disc space-y-2 pl-5">
           <li>
             <strong>Jaga streak harian</strong> — 10 menit setiap hari lebih baik daripada 1 jam seminggu sekali.

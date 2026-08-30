@@ -22,7 +22,6 @@ Platform edukasi interaktif untuk mempelajari Aksara Bali (Hanacaraka) dengan pe
 
 ### ✅ Quiz Validasi
 - Murid menulis aksara, sistem validasi apakah benar sesuai soal
-<<<<<<< HEAD
 - Tipe: pilihan ganda, benar/salah, gantungan choice, **menulis aksara** (murid menulis kata dari soal, divalidasi otomatis + skor kemiripan), susun kalimat
 - Filter tipe soal di halaman kuis + **keyboard virtual** untuk menulis aksara
 - Feedback detail: jelaskan kesalahan (misal: "Seharusnya pakai gantungan, bukan adeg-adeg")
@@ -34,6 +33,12 @@ Platform edukasi interaktif untuk mempelajari Aksara Bali (Hanacaraka) dengan pe
 - Perubahan **langsung efektif** untuk murid (store JSON + reload per-request, tanpa restart)
 - Mode DEV: langsung terbuka. Mode PROD: login dengan token `AKSARA_GURU_TOKEN` (token admin juga diterima)
 
+### 🖼️ Studio Twibbon
+- **Foto + tulisan Aksara Bali** dalam satu gambar: tulis Latin → otomatis jadi aksara (engine translate), atau paste aksara langsung
+- **10 bingkai twibbon** (margin krem, garis ganda, garis titik, gradasi saffron, gradasi cokelat, sudut klasik, strip aksara “warisan”, polaroid, sudut bulat, polos)
+- 3 rasio (4:5 post IG, 1:1, 9:16 story/reels); kontrol ukuran, posisi, warna, bayangan, dan teks Latin
+- Ekspor **PNG 1080px** + **share langsung ke medsos** (Web Share API) + salin ke clipboard
+
 ### 📚 Dokumentasi, Panel Guru & Panel Admin
 - **`/docs`** — pusat dokumentasi: tata cara penggunaan untuk **murid, guru, admin**, plus halaman khusus **Metode Scientific & Referensi** (metodologi transliterasi + sumber akademik) — lengkap dengan screenshot halaman
 - **`/guru`** — panel guru: kelola konten (materi/kuis/kamus) secara real-time
@@ -41,12 +46,6 @@ Platform edukasi interaktif untuk mempelajari Aksara Bali (Hanacaraka) dengan pe
 - **Mode DEV** (`AKSARA_MODE=dev`): semua halaman dokumentasi selalu tampil, akses admin & guru otomatis
 - **Mode PROD** (`AKSARA_MODE=prod`): hanya halaman publik yang tampil; admin login via token (`AKSARA_ADMIN_TOKEN`), guru via token (`AKSARA_GURU_TOKEN`)
 
-=======
-- Tipe: pilihan ganda, benar/salah, gantungan choice, susun kalimat
-- Feedback detail: jelaskan kesalahan (misal: "Seharusnya pakai gantungan, bukan adeg-adeg")
-- Endpoint `/api/quiz/validate-pair` untuk validasi custom
-
->>>>>>> origin/main
 ### 🎨 Design System
 - Branding kuat: Saffron (#FF6B35), Deep Brown (#2C1810), Cream (#FFF8E7), Terracotta
 - Font: Plus Jakarta Sans + Noto Sans Balinese
@@ -81,16 +80,10 @@ Aksara/
 │   │   ├── services/
 │   │   │   ├── transliterator.py - CORE advanced engine (800+ lines)
 │   │   │   ├── classifier.py
-<<<<<<< HEAD
 │   │   │   ├── quiz_engine.py - check_answer + validate_pair (termasuk tipe write_aksara)
 │   │   │   └── data_store.py - store JSON terpusat (mampu ditulis ulang, reload per-request)
 │   │   ├── routers/ - translate, classify, lessons, quiz, docs, manage
 │   │   ├── schemas/ - Pydantic models (termasuk manage.py)
-=======
-│   │   │   └── quiz_engine.py
-│   │   ├── routers/ - translate, classify, lessons, quiz
-│   │   ├── schemas/ - Pydantic models
->>>>>>> origin/main
 │   │   └── tests/ - pytest
 │   └── requirements.txt
 ├── frontend/
@@ -98,12 +91,12 @@ Aksara/
 │   │   ├── page.tsx - Landing
 │   │   ├── dashboard/ - Dashboard progress
 │   │   ├── learn/ - Belajar bertahap
-<<<<<<< HEAD
 │   │   ├── translate/ - Translate dua arah + keyboard aksara
 │   │   ├── quiz/ - Kuis validasi (filter tipe + menulis aksara)
 │   │   ├── playground/ - Keyboard virtual
 │   │   ├── docs/ - Pusat dokumentasi (hub + [slug])
 │   │   ├── guru/ - Panel guru (Materi/Kuis/Kamus)
+│   │   ├── twibbon/ - Studio Twibbon (canvas + share medsos)
 │   │   └── admin/ - Panel admin (publikasi dokumentasi)
 │   ├── components/docs/ - Shell, konten per-role, screenshot
 │   ├── components/guru/ - Form & helper panel guru (BaliInput, dll)
@@ -112,22 +105,12 @@ Aksara/
 │   ├── components/aksara/ - AksaraCard, AksaraKeyboard (keyboard virtual bersama)
 │   ├── lib/api.ts - Typed fetch (termasuk manage.* + token guru)
 │   ├── lib/store.ts - Zustand
-│   └── public/screenshots/ - Screenshot halaman (untuk dokumentasi)
-=======
-│   │   ├── translate/ - Translate live
-│   │   ├── quiz/ - Kuis validasi
-│   │   └── playground/ - Keyboard virtual
-│   ├── components/ui/ - Button, Card, Badge
-│   ├── components/layout/ - Header, BottomNav
-│   ├── components/aksara/ - AksaraCard, etc
-│   ├── lib/api.ts - Typed fetch
-│   └── lib/store.ts - Zustand
->>>>>>> origin/main
+│   ├── public/screenshots/ - Screenshot halaman (untuk dokumentasi)
+│   └── public/sample/ - Foto contoh untuk Studio Twibbon
 ├── branding/ - Logo, colors, etc
 └── docker-compose.yml
 ```
 
-<<<<<<< HEAD
 ## 🚀 Quick Start (tanpa Docker)
 
 Cara paling mudah untuk menjalankan Aksara adalah launcher satu-perintah. Ia
@@ -265,7 +248,6 @@ curl -X POST http://localhost:8000/api/quiz/check \
   -d '{"quiz_id": "quiz-wres-01-1", "answer": "a"}'
 ```
 
-<<<<<<< HEAD
 ## 📚 Dokumentasi, Admin & Mode Dev/Prod
 
 Buka **`/docs`** (menu Dokumentasi) untuk panduan penggunaan per peran
@@ -326,8 +308,6 @@ Endpoint lengkap: `GET/POST /api/manage/lessons`, `GET/PUT/DELETE /api/manage/le
 `GET/POST /api/manage/dictionary`, `DELETE /api/manage/dictionary/{latin}`,
 `GET /api/manage/aksara`.
 
-=======
->>>>>>> origin/main
 ## 🎨 Branding
 
 - **Name:** Aksara
