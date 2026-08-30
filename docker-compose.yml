@@ -1,22 +1,33 @@
-version: "3.8"
+# Satu service, satu origin (UI + API di port 8000) — cocok untuk Coolify,
+# Fly, Render, atau server VPS. Build memakai Dockerfile di root repo.
+#
+#   docker compose up --build
+#   # buka http://localhost:8000
+#
+# Token produksi (WAJIB diganti):
+#   AKSARA_ADMIN_TOKEN / AKSARA_GURU_TOKEN — set lewat environment di bawah
+#   atau file .env di samping compose ini.
 
 services:
-  backend:
-    build: ./backend
+  aksara:
+    build: .
+    image: aksara:latest
     ports:
       - "8000:8000"
     environment:
-      - PORT=8000
+      AKSARA_MODE: prod
+      AKSARA_ADMIN_TOKEN: ${AKSARA_ADMIN_TOKEN:-aksara-admin}
+      AKSARA_GURU_TOKEN: ${AKSARA_GURU_TOKEN:-aksara-guru}
     volumes:
-      - ./backend/app:/app/app
+      # persistensi: konten Panel Guru + engagement (kunjungan/twibbon/sekolah)
+      - aksara-data:/app/backend/app/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/api/health', timeout=4)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
 
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
-    depends_on:
-      - backend
-    restart: unless-stopped
+volumes:
+  aksara-data:

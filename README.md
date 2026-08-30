@@ -65,7 +65,7 @@ Platform edukasi interaktif untuk mempelajari Aksara Bali (Hanacaraka) dengan pe
 - **Frontend:** Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Zustand, Framer Motion
 - **Transliteration:** Custom rule engine + dictionary, state machine, Unicode U+1B00-U+1B7F
 - **Testing:** Pytest, Vitest, Playwright
-- **Deployment:** Docker Compose, Vercel (frontend), Render/Fly (backend)
+- **Deployment:** Satu container (Docker) — UI statis disajikan FastAPI; siap untuk Coolify, Fly, Render, atau VPS
 
 ## 📁 Struktur Repo
 
@@ -119,7 +119,9 @@ Aksara/
 │   ├── public/screenshots/ - Screenshot halaman (untuk dokumentasi)
 │   └── public/sample/ - Foto contoh untuk Studio Twibbon
 ├── branding/ - Logo, colors, etc
-└── docker-compose.yml
+├── Dockerfile - Multi-stage (build UI statis → runtime FastAPI menyajikan UI+API di :8000)
+├── .dockerignore
+└── docker-compose.yml - single-service + volume persistensi
 ```
 
 ## 🚀 Quick Start (tanpa Docker)
@@ -189,13 +191,44 @@ npm install
 npm run dev
 ```
 
-### Docker (opsional)
+### Docker (satu container, satu origin)
+
+UI statis (hasil build Next.js) disajikan **oleh FastAPI** di port yang sama, jadi
+browser selalu memanggil `/api` pada origin yang sama — tanpa CORS, tanpa host yang
+terkunci. Ini juga bentuk yang paling mudah di-deploy (Coolify, Fly, Render, VPS).
 
 ```bash
-docker-compose up --build
-# Frontend: http://localhost:3000
-# Backend: http://localhost:8000
+docker compose up --build
+# Buka http://localhost:8000  (UI + API di satu port)
 ```
+
+Variabel lingkungan:
+
+| Var | Default | Keterangan |
+| --- | --- | --- |
+| `AKSARA_MODE` | `prod` | `prod` = hanya docs publik + admin/guru butuh token; `dev` = semua terbuka |
+| `AKSARA_ADMIN_TOKEN` | `aksara-admin` | **Wajib diganti** di produksi (panel `/admin`) |
+| `AKSARA_GURU_TOKEN` | `aksara-guru` | **Wajib diganti** di produksi (panel `/guru`) |
+
+Persistensi: mount volume di `/app/backend/app/data` agar perubahan Panel Guru dan
+engagement (kunjungan/twibbon/sekolah) tidak hilang saat redeploy.
+
+#### Deploy ke Coolify
+
+1. Buat **Project** → **Add Resource** → pilih **Dockerfile** (bukan Docker Compose,
+   karena sudah single-service).
+2. Sumber: repo ini; Coolify otomatis memakai `Dockerfile` di root dan `.dockerignore`.
+3. **Port / domain**: set port internal **`8000`** (bukan 3000). Tautkan domain
+   (mis. `aksara.id`) — Coolify menangani reverse-proxy & TLS.
+4. **Environment**: set `AKSARA_ADMIN_TOKEN` dan `AKSARA_GURU_TOKEN` (nilai acak kuat).
+   `AKSARA_MODE` default sudah `prod`.
+5. **Persistence** (opsional, disarankan): tambah volume/bind-mount ke
+   `/app/backend/app/data`.
+6. **Deploy**. Cek health di `https://aksara.id/api/health` (healthcheck terpasang
+   di image).
+
+> Catatan: build image mengambil beberapa menit (stage Node membangun static export,
+> lalu stage Python). Hasil akhirnya satu image kecil (python:3.11-slim + UI statis).
 
 ## 🧪 Testing
 
