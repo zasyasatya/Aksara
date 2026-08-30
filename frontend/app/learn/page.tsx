@@ -139,7 +139,7 @@ export default function LearnPage() {
           <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div>
               <h3 className="font-display text-2xl font-bold mb-2">Butuh bantuan guru?</h3>
-              <p className="text-cream/70 max-w-xl">Aksara Platform juga menyediakan dashboard guru untuk monitoring kelas dan pembuatan soal custom. Hubungi kami untuk akses sekolah.</p>
+              <p className="text-cream/70 max-w-xl">AKSA juga menyediakan dashboard guru untuk monitoring kelas dan pembuatan soal custom. Hubungi kami untuk akses sekolah.</p>
             </div>
             <Button variant="secondary" className="bg-cream text-deep-brown hover:bg-white">
               <BookOpen className="h-4 w-4 mr-2" />

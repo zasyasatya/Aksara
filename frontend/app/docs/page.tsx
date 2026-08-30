@@ -40,7 +40,7 @@ export default function DocsHubPage() {
                 Dokumentasi
               </h1>
               <p className="text-charcoal/60 mt-1">
-                Tata cara penggunaan & metodologi ilmiah platform Aksara
+                Tata cara penggunaan & metodologi ilmiah platform AKSA
               </p>
             </div>
           </div>

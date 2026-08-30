@@ -232,7 +232,7 @@ export default function LessonDetailPage() {
                   <ChevronRight className="h-4 w-4" />
                 </Link>
                 <Link href="/playground" className="flex items-center justify-between p-3 rounded-xl bg-sand/30 hover:bg-sand/50 transition-colors">
-                  <span>Playground Aksara</span>
+                  <span>Playground AKSA</span>
                   <ChevronRight className="h-4 w-4" />
                 </Link>
               </div>

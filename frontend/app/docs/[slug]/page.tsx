@@ -21,7 +21,7 @@ export async function generateMetadata({
   const slug = (await params).slug
   const fallback: Metadata = {
     title: `Dokumentasi: ${slug}`,
-    description: "Dokumentasi platform Aksara Bali.",
+    description: "Dokumentasi platform AKSA.",
     alternates: { canonical: `/docs/${slug}` },
   }
   try {
@@ -39,13 +39,13 @@ export async function generateMetadata({
       : ((raw as any)?.pages ?? [])
     const page = pages.find((p) => p?.slug === slug)
     if (!page) return fallback
-    const description = `${page.subtitle} — dokumentasi resmi platform Aksara Bali.`
+    const description = `${page.subtitle} — dokumentasi resmi platform AKSA.`
     return {
       title: page.title,
       description,
       alternates: { canonical: `/docs/${slug}` },
       openGraph: {
-        title: `${page.title} | Aksara Bali`,
+        title: `${page.title} | AKSA`,
         description,
         url: `/docs/${slug}`,
         type: "article",

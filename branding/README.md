@@ -1,11 +1,14 @@
-# Branding - Aksara
+# Branding — AKSA (Aksara Nusantara)
 
 See ../docs/BRANDING.md for full guide.
 
-## Logo
-- Primary: ᬅ (Akara) in Saffron gradient circle
-- Wordmark: AKSARA in Plus Jakarta Sans Bold
-- Icon only: ᬅ
+## Logo (final)
+- **Primary lockup:** `../frontend/public/logo.svg` — wordmark "AKSA" custom
+  lettering monoline: "A" saffron + titik pulau, "KSA" deep brown.
+- **Icon/monogram:** `../frontend/app/icon.svg` — monogram "A" + titik pulau
+  (dipakai sebagai favicon/app icon).
+- **Og image:** `../frontend/public/og-image.png` · **Apple icon:**
+  `../frontend/public/apple-icon.png`.
 
 ## Colors
 - Saffron #FF6B35 (primary CTA)
@@ -20,16 +23,18 @@ See ../docs/BRANDING.md for full guide.
 - UI: Plus Jakarta Sans
 - Aksara: Noto Sans Balinese
 - Display: Fraunces
+- Wordmark logo: custom lettering (vektor, bukan font umum)
 
 ## Assets
-- Logo SVG would be here
+- `../frontend/public/logo.svg`, `icon.svg`, `og-image.png`, `apple-icon.png`
 - Patra pattern
 - Illustrations
 
-## Kandidat logo baru (Aksara Nusantara)
-Lihat `kandidat/` — empat arah desain yang lebih merepresentasikan
-**Aksara Nusantara** (monogram, daun lontar, gunungan, stempel aksara).
-`kandidat/overview.html` menampilkan keempatnya berdampingan.
+## Kandidat & eksplorasi
+Lihat `kandidat/` — empat arah ikon awal (monogram, daun lontar, gunungan,
+stempel aksara) + kandidat nama & wordmark (AKSA/AKSARA/AKSALOKA).
+`kandidat/overview.html` dan `kandidat/overview-nama.html` menampilkannya
+berdampingan.
 
 ## Voice
 - Santai tapi hormat, encouraging, use Balinese words occasionally

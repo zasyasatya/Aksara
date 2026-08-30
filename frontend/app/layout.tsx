@@ -4,9 +4,9 @@ import "./globals.css";
 /** URL kanonik situs — dipakai Next untuk me-resolve canonical/OG relatif. */
 const SITE_URL = "https://aksara.id";
 
-const TITLE_DEFAULT = "Aksara Bali — Belajar, Translate & Tulis Aksara Bali Online";
+const TITLE_DEFAULT = "AKSA — Belajar, Translate & Tulis Aksara Bali Online";
 const DESCRIPTION =
-  "Platform interaktif belajar Aksara Bali: transliterasi Latin ↔ Aksara akurat, kuis menulis aksara, dan twibbon budaya. Melestarikan warisan, menulis masa depan.";
+  "AKSA (Aksara Nusantara): platform interaktif belajar aksara Bali — transliterasi Latin ↔ Aksara akurat, kuis menulis aksara, dan twibbon budaya. Melestarikan warisan, menulis masa depan.";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -19,10 +19,16 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: TITLE_DEFAULT,
-    template: "%s | Aksara Bali",
+    template: "%s | AKSA",
   },
   description: DESCRIPTION,
+  icons: {
+    icon: "/icon.svg",
+    apple: "/apple-icon.png",
+  },
   keywords: [
+    "aksa",
+    "aksa nusantara",
     "aksara",
     "aksara bali",
     "belajar aksara bali",
@@ -37,7 +43,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Zasya Satya", url: "https://zasya.id" }],
   creator: "Zasya Satya",
-  publisher: "Aksara",
+  publisher: "AKSA",
   category: "education",
   alternates: {
     canonical: "/",
@@ -47,7 +53,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "id_ID",
     url: SITE_URL,
-    siteName: "Aksara Bali",
+    siteName: "AKSA",
     title: TITLE_DEFAULT,
     description: DESCRIPTION,
     images: [
@@ -55,7 +61,7 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Aksara Bali — platform belajar, translate, dan tulis aksara Bali",
+        alt: "AKSA — platform belajar, translate, dan tulis aksara Bali",
       },
     ],
   },
@@ -74,7 +80,7 @@ export const metadata: Metadata = {
 
 /**
  * Data terstruktur global (JSON-LD):
- * - WebSite + Organization: mengikat merek "Aksara" ke aksara.id
+ * - WebSite + Organization: mengikat merek "AKSA" ke aksara.id
  * - Person: pengembang Zasya Satya (zasya.id) — membantu kaitan
  *   pencarian "zasya" → zasya.id.
  */
@@ -85,7 +91,7 @@ const JSONLD_GLOBAL = {
       "@type": "WebSite",
       "@id": `${SITE_URL}/#website`,
       url: SITE_URL,
-      name: "Aksara Bali",
+      name: "AKSA",
       description: DESCRIPTION,
       inLanguage: "id",
       publisher: { "@id": `${SITE_URL}/#org` },
@@ -98,7 +104,7 @@ const JSONLD_GLOBAL = {
     {
       "@type": "Organization",
       "@id": `${SITE_URL}/#org`,
-      name: "Aksara",
+      name: "AKSA",
       url: SITE_URL,
       logo: `${SITE_URL}/og-image.png`,
       sameAs: ["https://github.com/zasyasatya/Aksara"],
@@ -114,7 +120,7 @@ const JSONLD_GLOBAL = {
         "https://github.com/zasyasatya",
         "https://github.com/zasyasatya/Aksara",
       ],
-      jobTitle: "Developer & Pengembang Platform Aksara",
+      jobTitle: "Developer & Pengembang Platform AKSA",
       knowsAbout: ["Aksara Bali", "Hanacaraka", "Pelestarian Budaya Bali", "Web Development"],
     },
   ],

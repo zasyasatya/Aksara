@@ -427,4 +427,4 @@ export const api = {
 
 /** URL publik aplikasi (untuk teks share & meta). Bisa di-override via env. */
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aksara.id"
-export const SITE_HASHTAGS = "#AksaraBali #MelestarikanBudaya"
+export const SITE_HASHTAGS = "#AKSA #AksaraBali #MelestarikanBudaya"

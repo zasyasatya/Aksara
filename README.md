@@ -1,10 +1,10 @@
-# Aksara - Platform Belajar Aksara Bali
+# AKSA — Platform Belajar Aksara Nusantara
 
 > **"Melestarikan Warisan, Menulis Masa Depan"**  
 > **"Ngajegang Warisan, Nyurat Masa Depan"**  
 > ᬅᬓ᭄ᬱᬭ - ᬧ᭄ᬮᬢ᭄ᬨᭀᬃᬫ᭄ ᬩᭂᬮᬚᬃ ᬅᬓ᭄ᬱᬭ ᬩᬮᬶ
 
-Platform edukasi interaktif untuk mempelajari Aksara Bali (Hanacaraka) dengan pendekatan modern, gamified, dan transliterasi canggih yang menangani gantungan, gempelan, pangangge, dan aturan tumpuk telu.
+**AKSA** (dulu "Aksara") adalah platform edukasi interaktif untuk mempelajari Aksara Bali (Hanacaraka) dengan pendekatan modern, gamified, dan transliterasi canggih yang menangani gantungan, gempelan, pangangge, dan aturan tumpuk telu — dirancang modular agar siap diperluas ke aksara daerah lain se-Nusantara.
 
 ## ✨ Fitur Utama
 

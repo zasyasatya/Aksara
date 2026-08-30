@@ -1,15 +1,15 @@
-# BRANDING - Aksara Platform
+# BRANDING - AKSA (Aksara Nusantara)
 
 ## Brand Essence
 
-**Name:** Aksara  
-**Full:** Aksara - Platform Belajar Aksara Bali  
+**Name:** AKSA  
+**Full:** AKSA — Platform Belajar Aksara Nusantara  
 **Tagline ID:** "Melestarikan Warisan, Menulis Masa Depan"  
 **Tagline Bali:** "Ngajegang Warisan, Nyurat Masa Depan"  
 **Tagline EN:** "Preserve Heritage, Write Future"
 
 **Brand Story:**
-Aksara Bali adalah jantung identitas Bali. Dari lontar kuno hingga canang sehari-hari, aksara ini membawa doa, cerita, dan kebijaksanaan leluhur. Namun di era digital, ia terancam punah. Aksara hadir bukan sekadar aplikasi, tapi gerakan: membuat generasi muda jatuh cinta lagi pada hurufnya sendiri, dengan cara yang modern, menyenangkan, dan relevan.
+Aksara Bali adalah jantung identitas Bali. Dari lontar kuno hingga canang sehari-hari, aksara ini membawa doa, cerita, dan kebijaksanaan leluhur. Namun di era digital, ia terancam punah. AKSA hadir bukan sekadar aplikasi, tapi gerakan: membuat generasi muda jatuh cinta lagi pada hurufnya sendiri, dengan cara yang modern, menyenangkan, dan relevan — lalu memperluasnya ke aksara daerah lain se-Nusantara.
 
 **Personality:**
 - **Bijaksana tapi Gaul:** Seperti kakek yang jago TikTok
@@ -23,11 +23,15 @@ Aksara Bali adalah jantung identitas Bali. Dari lontar kuno hingga canang sehari
 
 ### Logo Concept
 
-**Primary Logo:** Wordmark "AKSARA" dengan aksen Aksara Bali ᬅᬓ᭄ᬱᬭ di atas atau sebagai ligature.
+**Primary Logo:** Wordmark "AKSA" dengan custom lettering monoline — huruf "A"
+awal berwarna saffron dengan **titik pulau** di bawahnya (simbol Nusantara),
+diikuti "KSA" berwarna deep brown. Aset vektor: `frontend/public/logo.svg`
+(lockup) dan `frontend/app/icon.svg` (ikon monogram untuk favicon).
 
-- **Logotype:** Custom sans-serif bold, rounded, dengan potongan terinspirasi ukiran
-- **Symbol:** ᬅ (Akara) stylized sebagai icon app - bentuknya seperti gunung + ombak
-- **Construction:** Grid 8px, clear space = height of ᬅ
+- **Logotype:** Custom lettering monoline (bukan font umum), huruf bulat dengan
+  terminal tidak rata yang terinspirasi sapuan aksara Bali/Jawa
+- **Symbol:** Monogram "A" (gunung/akara) + titik pulau Nusantara
+- **Construction:** Baseline sama untuk semua huruf; clear space = tinggi huruf
 
 **Variations:**
 - Horizontal: [Icon ᬅ] AKSARA

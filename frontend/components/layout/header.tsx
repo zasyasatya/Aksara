@@ -25,14 +25,9 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-sand bg-cream/80 backdrop-blur-xl">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 lg:px-8">
         <div className="flex min-w-0 items-center gap-8">
-          <Link href="/" className="flex shrink-0 items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-saffron to-terracotta text-cream font-bali text-xl font-bold shadow-soft">
-              ᬅ
-            </div>
-            <div className="hidden sm:block">
-              <div className="font-display font-bold text-lg leading-none">AKSARA</div>
-              <div className="hidden 2xl:block text-[10px] tracking-widest text-deep-brown/60 -mt-1">BALINESE SCRIPT</div>
-            </div>
+          <Link href="/" className="flex shrink-0 items-center" aria-label="AKSA — Aksara Nusantara">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.svg" alt="AKSA" className="h-9 w-auto" />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">

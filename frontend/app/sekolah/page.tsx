@@ -49,7 +49,7 @@ export default function SekolahPage() {
         contact: contact.trim(),
         note: note.trim() || undefined,
       })
-      setFlash({ kind: "ok", text: `Matur suksma! Pendaftaran ${school.trim()} diterima. Tim Aksara akan menghubungi Anda via ${contact.trim()}.` })
+      setFlash({ kind: "ok", text: `Matur suksma! Pendaftaran ${school.trim()} diterima. Tim AKSA akan menghubungi Anda via ${contact.trim()}.` })
       setSchool(""); setStudents(""); setContact(""); setNote("")
       const d = await api.getStats()
       setSchools(d.schools)
@@ -78,7 +78,7 @@ export default function SekolahPage() {
           <p className="mt-4 text-charcoal/70 leading-relaxed">
             Sejak <strong>Pergub Bali Nomor 7 Tahun 2026</strong>, Bahasa Bali (termasuk{" "}
             <strong>aksara</strong>) dan Kearifan Lokal Bali wajib diajarkan minimal 2 jam per
-            minggu di seluruh satuan pendidikan formal di Bali. Aksara hadir sebagai media
+            minggu di seluruh satuan pendidikan formal di Bali. AKSA hadir sebagai media
             digital yang selaras: <strong>11 pelajaran terstruktur</strong>, <strong>24 kuis
             tervalidasi otomatis</strong>, dan <strong>Panel Guru</strong> untuk menyesuaikan
             konten dengan silabus kelas Anda.

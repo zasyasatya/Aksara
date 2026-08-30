@@ -113,7 +113,7 @@ export function DocsShell({ meta, privateNotice, pages = [], children }: DocsShe
         )}
 
         <div className="mt-8 text-center text-xs text-charcoal/40">
-          Aksara — Melestarikan Warisan, Menulis Masa Depan · ᬅᬓᬱ
+          AKSA — Melestarikan Warisan, Menulis Masa Depan · ᬅᬓᬱ
         </div>
       </div>
     </div>

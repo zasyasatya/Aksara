@@ -50,13 +50,13 @@ export function ContentAdmin() {
         />
         <Screenshot
           src="/screenshots/login.png"
-          alt="Halaman login Aksara dengan pilihan peran Guru dan Admin"
+          alt="Halaman login AKSA dengan pilihan peran Guru dan Admin"
           caption="Halaman login: pilih peran (Guru/Admin) lalu masukkan username & password sesuai env backend."
           url="aksara.local/login"
         />
         <Screenshot
           src="/screenshots/admin.png"
-          alt="Panel admin Aksara dengan pengaturan publikasi dokumentasi"
+          alt="Panel admin AKSA dengan pengaturan publikasi dokumentasi"
           caption="Panel admin: status mode, pengatur publikasi halaman dokumentasi, dan informasi sistem."
           url="aksara.local/admin"
         />
