@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { api, Quiz } from "@/lib/api"
 import { useProgressStore } from "@/lib/store"
 import { AksaraKeyboard } from "@/components/aksara/aksara-keyboard"
-import { CheckCircle2, XCircle, Trophy, Sparkles, ArrowRight, RefreshCw, PenLine, Target, Keyboard } from "lucide-react"
+import { CheckCircle2, XCircle, Trophy, Sparkles, ArrowRight, RefreshCw, PenLine, Target, Keyboard, Loader2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 const TYPE_LABELS: Record<string, string> = {
@@ -62,8 +62,9 @@ function QuizContent() {
   }, [quizzes])
 
   const handleAnswer = async (answerId: string) => {
-    if (result || !currentQuiz) return
+    if (result || !currentQuiz || checking) return
     setSelected(answerId)
+    setChecking(true)
     try {
       const res = await api.checkQuiz(currentQuiz.id, answerId)
       setResult(res)
@@ -74,6 +75,8 @@ function QuizContent() {
       }
     } catch (e) {
       console.error(e)
+    } finally {
+      setChecking(false)
     }
   }
 
@@ -301,8 +304,8 @@ function QuizContent() {
                 {!result && (
                   <div className="mt-5 flex justify-end">
                     <Button onClick={handleCheckWriting} disabled={checking || !writeText.trim()}>
+                      {checking ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
                       {checking ? "Memeriksa…" : "Cek Jawaban"}
-                      <CheckCircle2 className="h-4 w-4 ml-2" />
                     </Button>
                   </div>
                 )}
@@ -327,8 +330,8 @@ function QuizContent() {
                     <button
                       key={opt.id}
                       onClick={() => handleAnswer(opt.id)}
-                      disabled={!!result}
-                      className={`p-4 rounded-2xl border-2 text-left transition-all flex items-center justify-between group ${stateClass}`}
+                      disabled={!!result || checking}
+                      className={`p-4 rounded-2xl border-2 text-left transition-all flex items-center justify-between group ${stateClass} ${checking && isSelected ? "opacity-80" : ""}`}
                     >
                       <div className="flex items-center gap-4">
                         <div className={`h-10 w-10 rounded-xl flex items-center justify-center font-bold border-2 transition-all ${isSelected ? "bg-saffron text-cream border-saffron" : "bg-sand border-sand group-hover:border-saffron"}`}>
@@ -340,6 +343,7 @@ function QuizContent() {
                           {opt.latin && opt.bali && <div className="text-xs opacity-70">{opt.latin}</div>}
                         </div>
                       </div>
+                      {checking && isSelected && <Loader2 className="h-6 w-6 animate-spin text-saffron" />}
                       {result && isCorrect && <CheckCircle2 className="h-6 w-6 text-sage" />}
                       {result && isWrongSelected && <XCircle className="h-6 w-6 text-red-500" />}
                     </button>

@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { api } from "@/lib/api"
-import { Copy, Check, Trash2, Keyboard, PenLine, Undo2, Shuffle, Sparkles } from "lucide-react"
+import { Copy, Check, Trash2, Keyboard, PenLine, Undo2, Shuffle, Sparkles, Loader2 } from "lucide-react"
 import { AksaraKeyboard, WRESATRA } from "@/components/aksara/aksara-keyboard"
 import { HandwritingCanvas, HandwritingCanvasHandle } from "@/components/aksara/handwriting-canvas"
 import { classifyTracing, TraceResult } from "@/lib/aksara-recognition"
@@ -35,23 +35,33 @@ export default function PlaygroundPage() {
     setBaliText(prev => prev.slice(0, -1))
   }
 
+  const [translating, setTranslating] = useState(false)
+  const [validating, setValidating] = useState(false)
+
   const handleTranslate = async () => {
-    if (!baliText) return
+    if (!baliText || translating) return
+    setTranslating(true)
     try {
       const res = await api.translate(baliText, "bali-to-latin")
       setLatinResult(res.result)
     } catch (e) {
       setLatinResult("Error")
+    } finally {
+      setTranslating(false)
     }
   }
 
   const handleValidate = async () => {
     // Contoh validasi: cek apakah baliText cocok dengan "bali"
+    if (!baliText || validating) return
+    setValidating(true)
     try {
       const res = await api.validatePair("bali", "ᬩᬮᬶ", baliText, "exact")
       setValidation(res)
     } catch (e) {
       console.error(e)
+    } finally {
+      setValidating(false)
     }
   }
 
@@ -137,8 +147,9 @@ export default function PlaygroundPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-2 mt-4">
-                <Button onClick={handleTranslate} className="sm:flex-1">
-                  Translate ke Latin
+                <Button onClick={handleTranslate} disabled={translating} className="sm:flex-1">
+                  {translating && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                  {translating ? "Menerjemahkan…" : "Translate ke Latin"}
                 </Button>
                 {/* Dua baris eksplisit (flex-col): label kecil di atas, aksara
                     di bawah - hindari overlap karena mixed inline dengan
@@ -146,10 +157,12 @@ export default function PlaygroundPage() {
                 <Button
                   variant="outline"
                   onClick={handleValidate}
+                  disabled={validating}
                   className="sm:flex-1 flex-col h-auto min-h-12 gap-0.5 py-2 leading-none"
                 >
-                  <span className="text-[10px] uppercase tracking-wider text-deep-brown/60 font-bold">
-                    Validasi
+                  <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-deep-brown/60 font-bold">
+                    {validating && <Loader2 className="h-3 w-3 animate-spin" />}
+                    {validating ? "Memeriksa…" : "Validasi"}
                   </span>
                   <span className="font-bali text-base leading-tight">
                     Apakah ini ᬩᬮᬶ?

@@ -153,21 +153,76 @@ export function normalizeToMask(src: HTMLCanvasElement, size = NORM_SIZE): Mask 
   return toBinaryMask(out, size)
 }
 
-/** Skor kemiripan dua maska (F1 coverage dua arah), 0..1. */
-export function compareMasks(a: Mask, b: Mask): number {
-  const s = a.size
-  let inter = 0, onlyA = 0, onlyB = 0
-  for (let i = 0; i < s * s; i++) {
-    const A = a.data[i]
-    const B = b.data[i]
-    if (A && B) inter++
-    else if (A) onlyA++
-    else if (B) onlyB++
+/**
+ * Skor kemiripan dua maska via chamfer distance dua arah (px → 0..1).
+ *
+ * Berbeda dengan IoU/F1 (peka terhadap tebal stroke), chamfer mengukur jarak
+ * rata-rata tiap piksel tinta ke bentuk terdekat pada maska lawan — sehingga
+ * tulisan tangan dengan pena tebal tetap cocok dengan template font tipis,
+ * selama bentuknya sama. Ini metrik standar untuk matching siluet/sketsa.
+ */
+function distanceTransform(mask: Mask): Float32Array {
+  const s = mask.size
+  const n = s * s
+  const dist = new Float32Array(n).fill(1e9)
+  const queue = new Int32Array(n)
+  let head = 0
+  let tail = 0
+  for (let i = 0; i < n; i++) {
+    if (mask.data[i]) {
+      dist[i] = 0
+      queue[tail++] = i
+    }
   }
-  if (inter + onlyA + onlyB === 0) return 0
-  const coverUser = inter / (inter + onlyA) // bagian tinta pengguna yang tepat
-  const coverTemplate = inter / (inter + onlyB) // bagian bentuk yang terlengkapi
-  return (2 * coverUser * coverTemplate) / (coverUser + coverTemplate || 1)
+  while (head < tail) {
+    const i = queue[head++]
+    const x = i % s
+    const y = (i / s) | 0
+    const d = dist[i]
+    // 8 tetangga (diagonal ≈ 1.414) — aproksimasi Euclidean
+    for (let dy = -1; dy <= 1; dy++) {
+      const ny = y + dy
+      if (ny < 0 || ny >= s) continue
+      for (let dx = -1; dx <= 1; dx++) {
+        if (!dx && !dy) continue
+        const nx = x + dx
+        if (nx < 0 || nx >= s) continue
+        const ni = ny * s + nx
+        const nd = d + (dx !== 0 && dy !== 0 ? 1.4142 : 1)
+        if (nd < dist[ni]) {
+          dist[ni] = nd
+          queue[tail++] = ni
+        }
+      }
+    }
+  }
+  return dist
+}
+
+export function compareMasks(a: Mask, b: Mask): number {
+  if (a.size !== b.size) return 0
+  const da = distanceTransform(a)
+  const db = distanceTransform(b)
+  const n = a.size * a.size
+  let sumA = 0
+  let cntA = 0
+  let sumB = 0
+  let cntB = 0
+  for (let i = 0; i < n; i++) {
+    if (a.data[i]) {
+      sumA += db[i]
+      cntA++
+    }
+    if (b.data[i]) {
+      sumB += da[i]
+      cntB++
+    }
+  }
+  if (!cntA || !cntB) return 0
+  const avgPx = (sumA / cntA + sumB / cntB) / 2
+  // Kalibrasi: 0px → 1.0; ~14% sisi maska → 0.0
+  const scale = a.size * 0.14
+  return Math.max(0, Math.min(1, 1 - avgPx / scale))
 }
 
 export interface TraceResult {
@@ -190,6 +245,17 @@ export async function classifyTracing(inkCanvas: HTMLCanvasElement, targetGlyph:
   return { score, correct: score >= 0.55, close: score >= 0.35 }
 }
 
+/** Cache maska template per glyph — template konstan per sesi, jangan render ulang. */
+const templateMaskCache = new Map<string, Mask | null>()
+
+async function getTemplateMask(ch: string): Promise<Mask | null> {
+  if (templateMaskCache.has(ch)) return templateMaskCache.get(ch) ?? null
+  const t = await renderGlyphToCanvas(ch, 320)
+  const m = normalizeToMask(t)
+  templateMaskCache.set(ch, m)
+  return m
+}
+
 export interface RecognitionResult {
   char: string
   score: number
@@ -210,8 +276,7 @@ export async function recognizeAksara(
 
   const scored: { char: string; score: number }[] = []
   for (const ch of candidates) {
-    const t = await renderGlyphToCanvas(ch, 320)
-    const b = normalizeToMask(t)
+    const b = await getTemplateMask(ch)
     if (!b) continue
     scored.push({ char: ch, score: compareMasks(a, b) })
   }
@@ -219,9 +284,9 @@ export async function recognizeAksara(
   const best = scored[0]
   const second = scored[1] ?? null
   if (!best) return { char: "", score: 0, second: null, confident: false }
-  // confident = skor memadai DAN unggul jelas dari kandidat kedua
-  // (ambang ketat agar klasifikasi tidak salah menebak).
-  const confident = best.score >= 0.5 && (!second || best.score - second.score >= 0.08)
+  // confident = skor memadai DAN unggul jelas dari kandidat kedua.
+  // Chamfer: jejak baik ≈ 0.75-0.95; bukan-aksara ≈ < 0.5.
+  const confident = best.score >= 0.55 && (!second || best.score - second.score >= 0.07)
   return { char: best.char, score: best.score, second, confident }
 }
 

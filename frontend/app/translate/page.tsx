@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { api } from "@/lib/api"
 import { useTranslateStore } from "@/lib/store"
 import { AksaraKeyboard } from "@/components/aksara/aksara-keyboard"
-import { ArrowLeftRight, Copy, Check, Sparkles, Info, BookOpen, AlertTriangle, Keyboard, PenLine, Trash2, Undo2 } from "lucide-react"
+import { ArrowLeftRight, Copy, Check, Sparkles, Info, BookOpen, AlertTriangle, Keyboard, PenLine, Trash2, Undo2, Loader2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { HandwritingCanvas, HandwritingCanvasHandle } from "@/components/aksara/handwriting-canvas"
 import { recognizeAksara, buildCandidateSet } from "@/lib/aksara-recognition"
@@ -213,7 +213,11 @@ export default function TranslatePage() {
                     <HandwritingCanvas ref={hwRef} width={560} height={320} />
                     <div className="flex gap-2">
                       <Button onClick={handleHandwrite} disabled={hwBusy} className="flex-1">
-                        <Sparkles className="h-4 w-4 mr-1.5" />
+                        {hwBusy ? (
+                          <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-4 w-4 mr-1.5" />
+                        )}
                         {hwBusy ? "Mengenali..." : "Kenali & Tambah"}
                       </Button>
                       <Button
@@ -279,9 +283,15 @@ export default function TranslatePage() {
                   </div>
                 </div>
                 
-                <div className={`w-full min-h-40 p-4 rounded-2xl bg-white border border-sand shadow-soft ${direction === "latin-to-bali" ? "font-bali text-2xl leading-relaxed" : "text-base"}`}>
+                <div className={`relative w-full min-h-40 p-4 rounded-2xl bg-white border border-sand shadow-soft ${direction === "latin-to-bali" ? "font-bali text-2xl leading-relaxed" : "text-base"}`}>
+                  {isLoading && (
+                    <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 rounded-2xl bg-white/70 backdrop-blur-[1px]">
+                      <Loader2 className="h-5 w-5 animate-spin text-saffron" />
+                      <span className="text-sm font-semibold text-charcoal/60">Menerjemahkan…</span>
+                    </div>
+                  )}
                   {output ? (
-                    <div className="break-words">{output}</div>
+                    <div className="break-words" style={{ opacity: isLoading ? 0.35 : 1 }}>{output}</div>
                   ) : (
                     <div className="text-charcoal/30 italic">
                       {direction === "latin-to-bali" ? "Hasil aksara akan muncul di sini..." : "Hasil latin akan muncul di sini..."}
