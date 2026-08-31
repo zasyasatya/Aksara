@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query
-from ..schemas.lessons import LessonListResponse, LessonDetailResponse, LessonSummary, AksaraDetail
+from ..schemas.lessons import LessonListResponse, LessonDetailResponse, LessonSummary, AksaraDetail, PanganggeDetail
 from ..services import data_store
 from typing import List, Optional
 
@@ -80,6 +80,20 @@ async def get_lesson(lesson_id: str):
                 examples=item.get("examples", [])
             ))
 
+    pangangge_details = []
+    for p_id in lesson.get("pangangge_ids", []):
+        if p_id in lookup:
+            item = lookup[p_id]
+            pangangge_details.append(PanganggeDetail(
+                id=item.get("id", p_id),
+                bali=item.get("bali", ""),
+                name=item.get("name", ""),
+                latin_effect=item.get("latin_effect", ""),
+                mark=item.get("mark", ""),
+                position=item.get("position"),
+                description=item.get("description", "")
+            ))
+
     # Find next lesson
     all_lessons = data_store.get_lessons()
     sorted_lessons = sorted(all_lessons, key=lambda x: x.get("order", 0))
@@ -105,6 +119,7 @@ async def get_lesson(lesson_id: str):
             "learning_points": lesson.get("content", {}).get("learning_points", []) if isinstance(lesson.get("content"), dict) else []
         },
         aksara_details=aksara_details,
+        pangangge_details=pangangge_details,
         estimated_minutes=lesson.get("estimated_minutes", 10),
         xp_reward=lesson.get("xp_reward", 50),
         prerequisites=lesson.get("prerequisites", []),

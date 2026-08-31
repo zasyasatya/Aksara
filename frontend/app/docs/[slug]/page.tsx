@@ -9,6 +9,7 @@ export function generateStaticParams() {
     "penggunaan-guru",
     "penggunaan-admin",
     "metode-scientific",
+    "dataset-dan-model",
   ].map((slug) => ({ slug }))
 }
 

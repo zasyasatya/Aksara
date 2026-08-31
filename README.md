@@ -47,7 +47,7 @@
 - **Penghitung jujur** (`GET /api/stats`): kunjungan + twibbon dibuat, rate-limited per IP (20 dtk) agar angka kredibel
 
 ### 📚 Dokumentasi, Panel Guru & Panel Admin
-- **`/docs`** — pusat dokumentasi: tata cara penggunaan untuk **murid, guru, admin**, plus halaman khusus **Metode Scientific & Referensi** (metodologi transliterasi + sumber akademik) — lengkap dengan screenshot halaman
+- **`/docs`** — pusat dokumentasi: tata cara penggunaan untuk **murid, guru, admin**, plus halaman khusus **Metode Scientific & Referensi** (metodologi transliterasi + sumber akademik) dan **Dataset & Model** (dataset + classifier tulisan tangan, evaluasi 90%+) — lengkap dengan screenshot halaman
 - **`/guru`** — panel guru: kelola konten (materi/kuis/kamus) secara real-time
 - **`/admin`** — panel admin: atur halaman dokumentasi mana yang **go public**
 - **Mode DEV** (`AKSARA_MODE=dev`): semua halaman dokumentasi selalu tampil, akses admin & guru otomatis
@@ -80,8 +80,12 @@ Aksara/
 │   ├── DATABASE_DESIGN.md - Data model
 │   ├── TEST_PLAN.md - Testing strategy
 │   ├── PAPER.md - Draft paper .id DeveloperDay 2026 (8 bagian wajib, Inggris)
+│   ├── DATASET_MODEL.md - Dataset & model classifier tulisan tangan (detail + evaluasi 90%+)
 │   ├── DEMO_SCRIPT.md - Skrip video demo 5 menit
 │   └── slides/ - Deck slide (HTML 16:9, navigasi keyboard + speaker notes)
+├── eval/
+│   ├── evaluate_handwriting.py - Harness evaluasi classifier template-matching (reproducible)
+│   └── README.md - Cara menjalankan evaluasi
 ├── backend/
 │   ├── app/
 │   │   ├── main.py - FastAPI app
@@ -397,6 +401,7 @@ Full branding di `docs/BRANDING.md`
 Semua docs SDLC ada di `/docs`:
 - PRD.md, ARCHITECTURE.md, API_SPEC.md, DATABASE_DESIGN.md, TEST_PLAN.md, BRANDING.md, SDLC.md
 - **PAPER.md** — draft paper .id DeveloperDay 2026 (8 bagian wajib; bahasa Inggris; data background pelestarian budaya)
+- **DATASET_MODEL.md** — dataset & model classifier pengenalan tulisan tangan (detail + evaluasi, akurasi 90%+)
 - **DEMO_SCRIPT.md** + **slides/** — skrip & deck video demo 5 menit (buka `docs/slides/index.html` di browser)
 
 ## 🤝 Kontribusi

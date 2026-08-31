@@ -11,6 +11,7 @@ import { ContentMurid } from "@/components/docs/content-murid"
 import { ContentGuru } from "@/components/docs/content-guru"
 import { ContentAdmin } from "@/components/docs/content-admin"
 import { ContentScientific } from "@/components/docs/content-scientific"
+import { ContentDatasetModel } from "@/components/docs/content-dataset-model"
 import { Lock, Loader2, FileQuestion } from "lucide-react"
 
 const CONTENTS: Record<string, () => React.JSX.Element> = {
@@ -18,6 +19,7 @@ const CONTENTS: Record<string, () => React.JSX.Element> = {
   "penggunaan-guru": ContentGuru,
   "penggunaan-admin": ContentAdmin,
   "metode-scientific": ContentScientific,
+  "dataset-dan-model": ContentDatasetModel,
 }
 
 export function DocsArticleClient() {

@@ -9,8 +9,9 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { api } from "@/lib/api"
 import { useProgressStore } from "@/lib/store"
+import { PanganggeFormula, PanganggeItem } from "@/components/aksara/pangangge-formula"
 import Link from "next/link"
-import { ArrowLeft, Clock, Trophy, CheckCircle2, Play, BookOpen, Volume2, ChevronRight } from "lucide-react"
+import { ArrowLeft, Clock, Trophy, CheckCircle2, Play, BookOpen, Volume2, ChevronRight, Check } from "lucide-react"
 
 export default function LessonDetailPage() {
   const params = useParams()
@@ -19,7 +20,8 @@ export default function LessonDetailPage() {
   const [lesson, setLesson] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const { completeLesson, completedLessons } = useProgressStore()
-  
+  const [copiedGlyph, setCopiedGlyph] = useState("")
+
   useEffect(() => {
     if (!id) return
     api.getLesson(id).then(res => {
@@ -52,6 +54,12 @@ export default function LessonDetailPage() {
   }
   
   const isCompleted = completedLessons.includes(lesson.id)
+
+  const insertPangangge = (text: string) => {
+    navigator.clipboard?.writeText(text).catch(() => {})
+    setCopiedGlyph(text)
+    setTimeout(() => setCopiedGlyph(""), 1500)
+  }
   
   return (
     <div className="min-h-screen bg-cream pb-20 lg:pb-0">
@@ -141,6 +149,27 @@ export default function LessonDetailPage() {
                   </Card>
                 ))}
               </div>
+
+              {lesson.pangangge_details && lesson.pangangge_details.length > 0 && (
+                <div className="mt-8 pt-6 border-t border-sand/60">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="font-semibold text-lg">Pangangge dalam pelajaran ini</h3>
+                    {copiedGlyph && (
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-sage">
+                        <Check className="h-3.5 w-3.5" /> Tersalin <span className="font-bali">{copiedGlyph}</span>
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-charcoal/50 mb-4">
+                    Titik bulat (◌) adalah posisi aksara dasar. Pilih aksara di bawah untuk{" "}
+                    <em>mengisi</em>-nya — seperti mengisi angka ke formula pangkat/kurung.
+                  </p>
+                  <PanganggeFormula
+                    items={lesson.pangangge_details as PanganggeItem[]}
+                    onInsert={insertPangangge}
+                  />
+                </div>
+              )}
             </Card>
             
             {lesson.content?.learning_points && (
