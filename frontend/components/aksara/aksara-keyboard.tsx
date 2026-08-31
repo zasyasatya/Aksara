@@ -33,58 +33,70 @@ interface AksaraKeyboardProps {
 /**
  * Keyboard virtual Aksara Bali — dipakai Playground, kuis menulis aksara,
  * halaman Translate, dan form Guru.
+ *
+ * Disusun seperti keyboard sungguhan: dua baris Wresastra rapat + baris
+ * pangangge, dengan umpan balik tekan (active) agar terasa interaktif.
  */
 export function AksaraKeyboard({ onInsert, onBackspace, compact = false }: AksaraKeyboardProps) {
-  const keySize = compact ? "h-12" : "h-16"
-  const pangSize = compact ? "h-14" : "h-20"
+  const keySize = compact ? "h-11" : "h-14"
+  const pangSize = compact ? "h-12" : "h-16"
+
+  const wresastraKey = (item: { bali: string; latin: string }) => (
+    <button
+      key={item.latin}
+      type="button"
+      onClick={() => onInsert(item.bali)}
+      title={`${item.latin} (${item.bali})`}
+      className={`${keySize} select-none touch-manipulation rounded-lg bg-white border border-sand shadow-sm hover:border-saffron hover:bg-saffron/10 hover:text-saffron active:scale-95 active:bg-saffron/20 active:border-saffron transition-all duration-100 flex flex-col items-center justify-center cursor-pointer group`}
+    >
+      <span className={`font-bali ${compact ? "text-base" : "text-lg"} leading-none group-hover:scale-110 transition-transform`}>{item.bali}</span>
+      <span className="text-[9px] font-medium leading-none mt-0.5 opacity-70">{item.latin}</span>
+    </button>
+  )
+
+  const backspaceKey = (
+    <button
+      type="button"
+      onClick={onBackspace}
+      title="Hapus satu karakter"
+      className={`${keySize} select-none touch-manipulation rounded-lg bg-terracotta/10 border border-terracotta/30 text-terracotta hover:bg-terracotta/20 active:scale-95 active:bg-terracotta/25 transition-all duration-100 flex items-center justify-center cursor-pointer`}
+    >
+      <Delete className="h-4 w-4" />
+    </button>
+  )
 
   return (
-    <div className="space-y-4">
-      <div>
-        <div className="mb-2 text-xs font-semibold text-charcoal/50">Wresastra 18</div>
-        <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-9">
-          {WRESATRA.map((item) => (
-            <button
-              key={item.latin}
-              type="button"
-              onClick={() => onInsert(item.bali)}
-              className={`${keySize} rounded-xl bg-sand/30 border border-sand hover:border-saffron hover:bg-saffron/10 hover:text-saffron transition-all flex flex-col items-center justify-center group`}
-            >
-              <div className={`font-bali ${compact ? "text-base" : "text-xl"} group-hover:scale-110 transition-transform`}>{item.bali}</div>
-              <div className="text-[9px] font-medium">{item.latin}</div>
-            </button>
-          ))}
-          {onBackspace && (
-            <button
-              type="button"
-              onClick={onBackspace}
-              title="Hapus satu karakter"
-              className={`${keySize} rounded-xl bg-terracotta/10 border border-terracotta/30 text-terracotta hover:bg-terracotta/20 transition-all flex items-center justify-center`}
-            >
-              <Delete className="h-5 w-5" />
-            </button>
-          )}
+    <div className="space-y-2">
+      <div className="rounded-2xl bg-sand/40 border border-sand p-2 space-y-1">
+        <div className="mb-0.5 text-[10px] font-semibold uppercase tracking-wide text-charcoal/50 px-1">Wresastra 18</div>
+        <div className="grid grid-cols-6 gap-1 sm:grid-cols-9">
+          {WRESATRA.slice(0, 9).map(wresastraKey)}
+        </div>
+        <div className="grid grid-cols-6 gap-1 sm:grid-cols-10">
+          {WRESATRA.slice(9).map(wresastraKey)}
+          {onBackspace && backspaceKey}
         </div>
       </div>
 
-      <div>
-        <div className="mb-2 text-xs font-semibold text-charcoal/50">Pangangge (tanda)</div>
-        <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-6">
+      <div className="rounded-2xl bg-cream/70 border border-sand p-2 space-y-1">
+        <div className="mb-0.5 text-[10px] font-semibold uppercase tracking-wide text-charcoal/50 px-1">Pangangge (tanda)</div>
+        <div className="grid grid-cols-4 gap-1 sm:grid-cols-6">
           {PANGANGGE.map((item) => (
             <button
               key={item.name}
               type="button"
               onClick={() => onInsert(item.bali)}
-              className={`${pangSize} rounded-xl bg-cream border border-sand hover:border-saffron hover:bg-saffron/5 transition-all flex flex-col items-center justify-center p-1`}
+              title={item.name}
+              className={`${pangSize} select-none touch-manipulation rounded-lg bg-white border border-sand shadow-sm hover:border-saffron hover:bg-saffron/5 active:scale-95 active:bg-saffron/15 active:border-saffron transition-all duration-100 flex flex-col items-center justify-center p-0.5 cursor-pointer`}
             >
-              <div className="font-bali text-base">{item.bali}</div>
-              <div className="text-[9px] text-center leading-tight mt-0.5">{item.name}</div>
+              <span className="font-bali text-base leading-none">{item.mark}</span>
+              <span className="text-[8px] text-center leading-tight mt-0.5 opacity-70">{item.name}</span>
             </button>
           ))}
         </div>
       </div>
 
-      <div className="p-2.5 rounded-xl bg-ocean/5 border border-ocean/10 text-xs text-charcoal/70 flex items-start gap-1.5">
+      <div className="px-1.5 py-2 rounded-xl bg-ocean/5 border border-ocean/10 text-[11px] text-charcoal/70 flex items-start gap-1.5">
         <Sparkles className="h-3.5 w-3.5 text-ocean shrink-0 mt-0.5" />
         <span>
           Klik aksara dasar dulu, lalu panganggenya. Contoh: Ka + Ulu = Ki (ᬓ + ᬶ = ᬓᬶ).
