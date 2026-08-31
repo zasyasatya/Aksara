@@ -294,13 +294,70 @@ export async function recognizeAksara(
  * Kandidat untuk pengenalan satu aksara: 18 Wresastra + vokal i/u tiap basis.
  * Urutan wesa: ha na ca ra ka da ta sa wa la ma ga ba nga pa ja ya nya.
  */
+/**
+ * Semua bentuk yang memang diajarkan engine, bukan hanya 18 wianjana.
+ * Versi lama hanya menguji i/u sehingga bentuk seperti ma + pepet, angka,
+ * swalalita, dan tengenan selalu dipaksa ke kandidat yang salah (contoh:
+ * tulisan MA sering jatuh ke NA). Kandidat dibuat dari codepoint Unicode agar
+ * tidak bergantung pada keyboard/font tertentu.
+ */
 export function buildCandidateSet(): string[] {
-  const order = ["ha", "na", "ca", "ra", "ka", "da", "ta", "sa", "wa", "la", "ma", "ga", "ba", "nga", "pa", "ja", "ya", "nya"]
-  const bases = order.map((n) => baliGlyph(n as keyof typeof BALI_CP))
-  const set = [...bases]
-  for (const b of bases) {
-    set.push(b + baliGlyph("ulu"))
-    set.push(b + baliGlyph("suku"))
+  const order: (keyof typeof BALI_CP)[] = ["ha", "na", "ca", "ra", "ka", "da", "ta", "sa", "wa", "la", "ma", "ga", "ba", "nga", "pa", "ja", "ya", "nya"]
+  const bases = order.map((n) => baliGlyph(n))
+  const marks = [
+    0x1b36, 0x1b37, 0x1b38, 0x1b39, 0x1b3e, 0x1b3f, 0x1b40, 0x1b42,
+    0x1b02, 0x1b03, 0x1b04,
+  ].map((codePoint) => String.fromCodePoint(codePoint))
+  const extras = Array.from({ length: 0x1b59 - 0x1b05 + 1 }, (_, i) => String.fromCodePoint(0x1b05 + i))
+  const clusters = bases.flatMap((base) => [
+    ...marks.map((mark) => base + mark),
+    ...bases.filter((other) => other !== base).map((other) => String.fromCodePoint(0x1b44) + other),
+  ])
+  return [...new Set([...bases, ...marks, ...extras, ...clusters])]
+}
+
+export interface SequenceRecognitionResult {
+  items: RecognitionResult[]
+  text: string
+  confident: boolean
+}
+
+/**
+ * Pengenalan batch untuk lembar kalimat. Segmentation konservatif: tiap
+ * komponen terhubung dipertahankan sebagai satu glyph; pengguna tetap dapat
+ * memeriksa hasil per glyph dan mengoreksi sebelum transliterasi.
+ */
+export async function recognizeAksaraSequence(
+  inkCanvas: HTMLCanvasElement,
+  candidates: string[] = buildCandidateSet(),
+): Promise<SequenceRecognitionResult> {
+  const ctx = inkCanvas.getContext("2d")
+  if (!ctx) return { items: [], text: "", confident: false }
+  const image = ctx.getImageData(0, 0, inkCanvas.width, inkCanvas.height)
+  const inkColumns: number[] = []
+  for (let x = 0; x < inkCanvas.width; x++) {
+    let found = false
+    for (let y = 0; y < inkCanvas.height; y++) {
+      const i = (y * inkCanvas.width + x) * 4
+      if (image.data[i + 3] > 10 && image.data[i] < 220) { found = true; break }
+    }
+    if (found) inkColumns.push(x)
   }
-  return set
+  if (!inkColumns.length) return { items: [], text: "", confident: false }
+  const groups: [number, number][] = []
+  let start = inkColumns[0], previous = start
+  for (const x of inkColumns.slice(1)) {
+    if (x - previous > Math.max(10, inkCanvas.width * 0.025)) { groups.push([start, previous]); start = x }
+    previous = x
+  }
+  groups.push([start, previous])
+  const results: RecognitionResult[] = []
+  for (const [left, right] of groups) {
+    const crop = document.createElement("canvas")
+    crop.width = Math.max(1, right - left + 1)
+    crop.height = inkCanvas.height
+    crop.getContext("2d")!.drawImage(inkCanvas, left, 0, crop.width, crop.height, 0, 0, crop.width, crop.height)
+    results.push(await recognizeAksara(crop, candidates))
+  }
+  return { items: results, text: results.map((result) => result.char).join(""), confident: results.length > 0 && results.every((result) => result.confident) }
 }

@@ -12,7 +12,7 @@ import { AksaraKeyboard } from "@/components/aksara/aksara-keyboard"
 import { ArrowLeftRight, Copy, Check, Sparkles, Info, BookOpen, AlertTriangle, Keyboard, PenLine, Trash2, Undo2, Loader2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { HandwritingCanvas, HandwritingCanvasHandle } from "@/components/aksara/handwriting-canvas"
-import { recognizeAksara, buildCandidateSet } from "@/lib/aksara-recognition"
+import { recognizeAksara, recognizeAksaraSequence, buildCandidateSet } from "@/lib/aksara-recognition"
 
 /** Kandidat pengenalan tulis tangan (18 Wresastra + vokal i/u) — dibangun sekali. */
 const HW_CANDIDATES = buildCandidateSet()
@@ -56,6 +56,30 @@ export default function TranslatePage() {
           ? `terdekat: ${res.char} (${Math.round(res.score * 100)}%)`
           : "tidak ada kecocokan"
         setHwMsg({ ok: false, text: `Tidak yakin — ${best}. Tulis lebih besar & jelas, lalu coba lagi.` })
+      }
+    } finally {
+      setHwBusy(false)
+    }
+  }
+
+  /** Kenali beberapa glyph pada satu canvas dan masukkan sebagai kalimat Bali. */
+  const handleHandwriteSentence = async () => {
+    const canvas = hwRef.current?.getInkCanvas()
+    if (!canvas || hwRef.current?.isEmpty()) {
+      setHwMsg({ ok: false, text: "Tulis satu kalimat di kanvas dulu." })
+      return
+    }
+    setHwBusy(true)
+    setHwMsg(null)
+    try {
+      const res = await recognizeAksaraSequence(canvas, HW_CANDIDATES)
+      if (res.text && res.confident) {
+        setInput(input + res.text)
+        hwRef.current?.clear()
+        setHwMsg({ ok: true, text: `Kalimat dikenali: ${res.text} (${res.items.length} glyph)` })
+      } else {
+        const uncertain = res.items.filter((item) => !item.confident).length
+        setHwMsg({ ok: false, text: `Periksa ulang ${uncertain || "hasil"} glyph: tulis terpisah dengan jarak jelas.` })
       }
     } finally {
       setHwBusy(false)
@@ -207,18 +231,17 @@ export default function TranslatePage() {
                 {tool === "tulis" && isBaliInput && (
                   <div className="mt-3 rounded-2xl border border-sand bg-cream/60 p-3 space-y-3">
                     <p className="text-xs text-charcoal/60">
-                      Tulis <b>satu aksara</b> (misal k, ki, ku) di kotak putih — AI on-device
-                      mengenali lalu menambahkannya ke input. Tidak perlu internet.
+                      Tulis satu aksara atau beberapa glyph berjarak (kalimat) di kotak putih —
+                      model on-device mengenali lalu menambahkannya ke input. Tidak perlu internet.
                     </p>
                     <HandwritingCanvas ref={hwRef} width={560} height={320} />
                     <div className="flex gap-2">
                       <Button onClick={handleHandwrite} disabled={hwBusy} className="flex-1">
-                        {hwBusy ? (
-                          <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
-                        ) : (
-                          <Sparkles className="h-4 w-4 mr-1.5" />
-                        )}
-                        {hwBusy ? "Mengenali..." : "Kenali & Tambah"}
+                        {hwBusy ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1.5" />}
+                        {hwBusy ? "Mengenali..." : "Kenali glyph"}
+                      </Button>
+                      <Button onClick={handleHandwriteSentence} disabled={hwBusy} variant="secondary" title="Kenali beberapa glyph menjadi satu kalimat">
+                        Kenali kalimat
                       </Button>
                       <Button
                         variant="outline"
