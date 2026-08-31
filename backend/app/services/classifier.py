@@ -127,9 +127,20 @@ def classify_char(char: str) -> Dict:
 def classify_text(text: str) -> Dict:
     """Classify entire text"""
     classifications = []
-    for char in text:
-        if char.strip() == "":
+    # Preserve virama + following consonant as one logical grapheme. Iterating
+    # Python codepoints used to split ᭄ᬭ into two unrelated predictions, which
+    # made pangangge/gantungan disappear in sentence-level results.
+    i = 0
+    while i < len(text):
+        char = text[i]
+        if char.isspace():
+            i += 1
             continue
+        if char == "᭄" and i + 1 < len(text) and not text[i + 1].isspace():
+            char = text[i:i + 2]
+            i += 2
+        else:
+            i += 1
         classifications.append(classify_char(char))
     
     # Overall type detection

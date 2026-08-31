@@ -128,7 +128,7 @@
         <span class="chip on">Live: aksara.id</span>
         <span class="chip">11 pelajaran · 6 level</span>
         <span class="chip">24 kuis</span>
-        <span class="chip">Engine ≥95%</span>
+        <span class="chip">Unicode + ML-ready</span>
       </div>
     </section>
 
@@ -158,7 +158,7 @@
     </section>
 
     <!-- 4 -->
-    <section class="slide stack" data-title="Translate" data-note="Demo translate (±35 dtk). Tunjukkan 'matur suksma' → aksara + breakdown. Tekankan akurasi <b>≥95% vs 68%</b> penelitian 2018. Ini bukti teknis yang membedakan.">
+    <section class="slide stack" data-title="Translate" data-note="Demo translate (±35 dtk). Tunjukkan 'matur suksma' → aksara + breakdown. Akurasi transliterasi deterministik harus dibedakan dari pengenalan tulisan tangan: yang terakhir ditampilkan dengan confidence dan abstain bila ragu.">
       <div class="row flex1">
         <div class="stack" style="flex:1.05">
           <span class="kicker"><span class="dot"></span> Pilar 1 · Translate</span>
@@ -308,6 +308,39 @@
     </section>
 
     <!-- 12 -->
+    <section class="slide stack" data-title="Evaluasi recognition" data-note="Evaluasi (±45 dtk). Ini benchmark sintetis untuk regresi engine, bukan klaim akurasi lapangan. 2.304 sampel dihasilkan dari 48 kelas Unicode, dengan variasi rotasi, posisi, skala, dan noise. Untuk rilis produksi, tambah ribuan tulisan tangan berlabel dari banyak penulis dan laporkan split per-penulis.">
+      <span class="kicker"><span class="dot"></span> Evaluasi · baseline reproducible</span>
+      <h2>Baseline dapat diuji — tidak mengarang angka</h2>
+      <div class="grid cols-3" style="margin-top:10px">
+        <div class="card center"><div class="big-num">2.304</div><p>contoh sintetis · 48 kelas<br/>48 × 48 augmentasi</p></div>
+        <div class="card center"><div class="big-num" style="color:var(--sage)">Top-1</div><p>ukur prediksi utama, plus top-3<br/>dan tingkat abstain</p></div>
+        <div class="card center"><div class="big-num" style="color:var(--terracotta)">Wajib</div><p>benchmark tulisan tangan asli<br/>sebelum klaim akurasi produksi</p></div>
+      </div>
+      <div class="card" style="margin-top:14px"><p><b style="color:var(--ink)">Kontrak evaluasi:</b> train/validation/test dipisah per penulis; laporkan macro-F1 per kelas (wianjana, suara, pangangge, tengenan, angka, gantungan), confusion matrix, latency p95, dan abstain rate. Model tidak menebak jika confidence rendah.</p></div>
+    </section>
+
+    <!-- 13 -->
+    <section class="slide stack" data-title="Data citra" data-note="Data citra (±40 dtk). Panel ini menunjukkan bentuk data yang benar-benar dipakai: kanvas putih, tinta gelap, bounding box, dan augmentasi terkontrol. Simbol di sini adalah preview inline SVG, bukan dataset palsu yang disamarkan sebagai foto.">
+      <span class="kicker"><span class="dot"></span> Evaluasi · data citra</span>
+      <h2>Contoh input &amp; augmentasi yang dapat diaudit</h2>
+      <div class="row flex1" style="margin-top:8px">
+        <div class="card" style="flex:1"><h3>Sample asli</h3><svg viewBox="0 0 320 180" style="width:100%;height:auto;background:#fff;border-radius:10px"><rect x="28" y="20" width="264" height="140" fill="none" stroke="#ff6b35" stroke-dasharray="5 4"/><path d="M95 133 160 45l65 88M119 105h82" fill="none" stroke="#21170f" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><text x="12" y="174" fill="#7b6751" font-size="11">ink · bbox · 560×320</text></svg><p class="small">Kontras tinggi, transparansi dikomposit putih sebelum mask.</p></div>
+        <div class="card" style="flex:1"><h3>Augmentasi</h3><svg viewBox="0 0 320 180" style="width:100%;height:auto;background:#fff;border-radius:10"><g fill="none" stroke="#21170f" stroke-width="7" stroke-linecap="round" opacity=".78"><path d="M62 132 106 72l44 60M77 113h59"/><path d="M166 132 210 68l44 64M181 112h58"/></g><rect x="44" y="53" width="116" height="91" fill="none" stroke="#e8890c"/><rect x="148" y="50" width="120" height="98" fill="none" stroke="#7f9b6e"/></svg><p class="small">Rotasi ±8°, scale 0,85–1,15, translasi, stroke width &amp; noise.</p></div>
+      </div>
+    </section>
+
+    <!-- 14 -->
+    <section class="slide stack" data-title="Guardrail & roadmap ML" data-note="Penutup evaluasi (±35 dtk). Model saat ini adalah baseline on-device yang transparan; bukan klaim model mutakhir. Jalur produksi: kumpulkan consented dataset, latih CNN/ViT ringan dengan augmentasi, uji per penulis, lalu canary release.">
+      <span class="kicker"><span class="dot"></span> Evaluasi · keputusan rilis</span>
+      <h2>Kepercayaan lebih penting daripada tebakan</h2>
+      <div class="grid cols-2" style="margin-top:10px">
+        <div class="card"><h3>Sudah diperbaiki</h3><ul class="pts"><li>Kandidat diperluas ke Unicode, vokal, pangangge, angka, swalalita, dan gantungan.</li><li>Mode <b>Kenali kalimat</b> dengan segmentasi konservatif dan hasil per-glyph.</li><li>Confidence + abstain; MA tidak lagi dipaksa menjadi kelas yang tidak tersedia.</li></ul></div>
+        <div class="card"><h3>Belum boleh diklaim</h3><ul class="pts"><li>“Model AI paling mutakhir” tanpa dataset berlabel dan benchmark nyata.</li><li>100% klasifikasi kalimat dari satu goresan tanpa segmentasi/ground truth.</li><li>Akurasi lapangan dari synthetic samples saja.</li></ul></div>
+      </div>
+      <p class="lead mt-auto"><b style="color:var(--ink)">Exit criteria:</b> ≥5.000 sampel tulisan tangan nyata · ≥50 penulis · macro-F1 ≥0,95 per kelompok · test set terkunci · audit confusion matrix.</p>
+    </section>
+
+    <!-- 15 -->
     <section class="slide center stack" data-title="Penutup" data-note="Penutup (±15 dtk). Ulangi tagline, tunjukkan link, minta juri coba. Akhiri dengan 'Matur suksma'. Biarkan 2 dtk jeda sebelum video berakhir.">
       <span class="kicker"><span class="dot"></span> Penutup</span>
       <div class="aksara accent" style="font-size:clamp(40px,7vw,80px); line-height:1.1">ᬫᬸᬃ ᬸᬱ᭄</div>
@@ -328,7 +361,7 @@
 
   <div class="footer-hud">
     <div class="hud-l">
-      <span id="counter">01 / 12</span>
+      <span id="counter">01 / 15</span>
       <span id="title" style="color:var(--muted)"></span>
     </div>
     <div id="progress"><div id="bar"></div></div>

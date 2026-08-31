@@ -26,6 +26,13 @@ def test_classify_text():
     assert len(result["classifications"]) > 0
     assert result["overall_type"] != ""
 
+
+def test_classify_text_preserves_gantungan_grapheme():
+    result = classify_text("ᬓ᭄ᬭ")
+    assert any(item["char"] == "᭄ᬭ" for item in result["classifications"])
+    assert result["has_gantungan"] is True
+    assert result["has_pangangge"] is True
+
 def test_get_all_types():
     types = get_all_types()
     assert len(types) >= 5
