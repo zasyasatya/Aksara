@@ -12,7 +12,7 @@ export const WRESATRA = [
 export const PANGANGGE = [
   { bali: "ᬶ", name: "ulu (i)", mark: "◌ᬶ" },
   { bali: "ᬸ", name: "suku (u)", mark: "◌ᬸ" },
-  { bali: "ᬾ", name: "taleng (e)", mark: "ᬾ◌" },
+  { bali: "ᬾ", name: "taleng (e)", mark: "◌ᬾ" },
   { bali: "ᭂ", name: "pepet (ě)", mark: "◌ᭂ" },
   { bali: "ᭀ", name: "tedong (ā/o)", mark: "◌ᭀ" },
   { bali: "ᬄ", name: "bisah (h)", mark: "◌ᬄ" },

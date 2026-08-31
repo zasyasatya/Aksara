@@ -5,6 +5,7 @@ import {
   Presentation,
   ShieldCheck,
   Microscope,
+  Database,
   BookOpen,
   type LucideIcon,
 } from "lucide-react"
@@ -15,6 +16,7 @@ export const IconByName: Record<string, LucideIcon> = {
   Presentation,
   ShieldCheck,
   Microscope,
+  Database,
   BookOpen,
 }
 

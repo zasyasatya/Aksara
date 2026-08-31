@@ -39,6 +39,16 @@
       "is_public": true,
       "order": 4,
       "updated_at": "2026-08-30"
+    },
+    {
+      "slug": "dataset-dan-model",
+      "title": "Dataset & Model — Pengenalan Tulisan Tangan",
+      "subtitle": "Dataset, arsitektur classifier template-matching, dan hasil evaluasi (akurasi 90%+)",
+      "role": "metodologi",
+      "icon": "Database",
+      "is_public": true,
+      "order": 5,
+      "updated_at": "2026-08-31"
     }
   ]
 }

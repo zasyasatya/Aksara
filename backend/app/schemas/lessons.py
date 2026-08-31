@@ -33,6 +33,17 @@ class AksaraDetail(BaseModel):
     gantungan: Optional[str] = None
     examples: Optional[List[dict]] = None
 
+class PanganggeDetail(BaseModel):
+    id: str
+    bali: str
+    name: str
+    latin_effect: str = ""
+    # Template tampilan: ◌ (dotted circle) menandai posisi aksara dasar yang
+    # bisa "diisi" — mis. ulu = "◌ᬶ", taleng = "◌ᬾ", taleng tedong = "◌ᭀ".
+    mark: str = ""
+    position: Optional[str] = None
+    description: Optional[str] = None
+
 class LessonDetailResponse(BaseModel):
     id: str
     title: str
@@ -44,6 +55,7 @@ class LessonDetailResponse(BaseModel):
     category: Optional[str] = None
     content: Optional[dict] = None
     aksara_details: Optional[List[AksaraDetail]] = None
+    pangangge_details: Optional[List[PanganggeDetail]] = None
     estimated_minutes: int
     xp_reward: int
     prerequisites: List[str] = []
