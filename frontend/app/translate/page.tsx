@@ -143,7 +143,8 @@ export default function TranslatePage() {
     { latin: "bali", bali: "ᬩᬮᬶ" },
     { latin: "om swastyastu", bali: "ᬑᬁ ᬲ᭄ᬯᬲ᭄ᬢ᭄ᬬᬲ᭄ᬢᬸ" },
     { latin: "matur suksma", bali: "ᬫᬢᬸᬃ ᬲᬸᬓ᭄ᬱ᭄ᬫ" },
-    { latin: "rahajeng", bali: "ᬭᬳᬚᭂᬂ" },
+    { latin: "sěnang", bali: "ᬲᭂᬦᬂ" },
+    { latin: "saté", bali: "ᬲᬢᬾ" },
   ]
   
   return (
@@ -374,7 +375,7 @@ export default function TranslatePage() {
                     </h4>
                     <ul className="text-xs text-charcoal/70 space-y-1 list-disc list-inside">
                       <li>Gantungan untuk cluster konsonan (tumpuk telu dilarang)</li>
-                      <li>Pangangge suara: ulu (i), suku (u), taleng (e), pepet (ě)</li>
+                      <li>Pangangge suara: ulu (i), suku (u), taleng (é), pepet (ě)</li>
                       <li>Pangangge tengenan: bisah (h), surang (r), cecek (ng), adeg-adeg</li>
                       <li>Kombinasi La gantungan + pepet diperbolehkan (bleganjur), tapi Cakra + pepet dilarang</li>
                     </ul>
@@ -384,6 +385,74 @@ export default function TranslatePage() {
             )}
           </AnimatePresence>
           
+          {/* E Pepet vs E Taling */}
+          <Card className="mt-6 p-6 bg-white">
+            <h3 className="font-semibold flex items-center gap-2 mb-1">
+              <Info className="h-5 w-5 text-saffron" />
+              Bedakan E Pepet &amp; E Taling
+            </h3>
+            <p className="text-sm text-charcoal/60 mb-5">
+              Saat mengetik Latin, gunakan huruf bertanda supaya hasilnya tepat. Cek pedoman resmi lewat{" "}
+              <a
+                href="https://kbbi.kemdikbud.go.id/"
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-ocean hover:underline"
+              >
+                KBBI Daring
+              </a>
+              .
+            </p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="p-4 rounded-2xl bg-sand/30 border border-sand">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-bali text-2xl text-deep-brown">◌ᭂ</span>
+                  <div>
+                    <div className="font-semibold text-sm">E Pepet (<span className="font-bali">ê</span> / ě)</div>
+                    <div className="text-xs text-charcoal/60">bunyi lemah seperti “segar” → pepet</div>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {["běras", "kěras", "ěmpat", "pěndék", "sěnang"].map((w) => (
+                    <button
+                      key={w}
+                      type="button"
+                      onClick={() => direction === "latin-to-bali" && setInput(w)}
+                      className="text-xs px-2.5 py-1 rounded-full bg-white border border-sand hover:border-saffron hover:text-saffron transition-colors"
+                    >
+                      {w}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="p-4 rounded-2xl bg-ocean/5 border border-ocean/10">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-bali text-2xl text-deep-brown">◌ᬾ</span>
+                  <div>
+                    <div className="font-semibold text-sm">E Taling (é / è)</div>
+                    <div className="text-xs text-charcoal/60">bunyi jelas seperti “enak” → taleng</div>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {["énak", "saté", "lélé", "bébék", "méja"].map((w) => (
+                    <button
+                      key={w}
+                      type="button"
+                      onClick={() => direction === "latin-to-bali" && setInput(w)}
+                      className="text-xs px-2.5 py-1 rounded-full bg-white border border-sand hover:border-saffron hover:text-saffron transition-colors"
+                    >
+                      {w}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <p className="text-[11px] text-charcoal/50 mt-3">
+              Klik contoh untuk langsung menulis ke input. <span className="font-semibold">e</span> polos dibaca sebagai
+              taling (é); untuk pepet tulis <span className="font-semibold">ě</span> atau <span className="font-semibold">ê</span>.
+            </p>
+          </Card>
+
           {/* Info */}
           <Card className="mt-6 p-6 bg-gradient-to-br from-sand/50 to-cream border-sand">
             <h3 className="font-semibold mb-3">Kenapa translate Aksara Bali sulit?</h3>

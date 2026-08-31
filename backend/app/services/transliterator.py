@@ -117,7 +117,11 @@ SUARA_LATIN_TO_BALI = {
     "ī": "ᬇᬷ",     # ikara + ulu melik
     "u": "ᬉ",        # ukara
     "ū": "ᬉᬹ",    # ukara + suku ilut
-    "e": "ᬏ",        # ekara
+    "e": "ᬏ",        # ekara (e taling)
+    "é": "ᬏ",        # ekara (e taling)
+    "è": "ᬏ",        # ekara (e taling)
+    "ě": "ᬳᭂ",      # ha + pepet (e pepet / schwa, tak ada aksara suara khusus)
+    "ê": "ᬳᭂ",      # ha + pepet (e pepet / schwa)
     "ai": "ᬐ",      # aikara
     "o": "ᬑ",        # okara
     "au": "ᬐᬵ",       # aikara + tedung
@@ -153,6 +157,7 @@ PANGANGGE_SUARA = {
     "ū": {"mark": "ᬹ", "name": "suku ilut", "unicode": "U+1B39"},
     "e": {"mark": "ᬾ", "name": "taleng", "unicode": "U+1B3E", "position": "front"},  # é
     "é": {"mark": "ᬾ", "name": "taleng"},
+    "è": {"mark": "ᬾ", "name": "taleng"},
     "ai": {"mark": "ᬿ", "name": "taleng detya", "unicode": "U+1B3F"},
     "o": {"mark": "ᭀ", "name": "taleng tedong", "unicode": "U+1B40", "combined": True},  # actually taleng + tedong
     "au": {"mark": "ᭁ", "name": "taleng detya tedong", "unicode": "U+1B41", "combined": True},
@@ -168,11 +173,11 @@ VOWEL_TO_PANGANGGE = {
     "ī": "ᬷ",
     "u": "ᬸ",
     "ū": "ᬹ",
-    "e": "ᬾ",  # taleng for é
-    "é": "ᬾ",
-    "è": "ᭂ",  # pepet
-    "ě": "ᭂ",
-    "ê": "ᭂ",
+    "e": "ᬾ",  # taleng (e taling, default untuk 'e' polos)
+    "é": "ᬾ",  # taleng (e taling)
+    "è": "ᬾ",  # taleng (e taling)
+    "ě": "ᭂ",  # pepet (e pepet)
+    "ê": "ᭂ",  # pepet (e pepet)
     "ai": "ᬿ",
     "o": "ᭀ",  # will be handled as taleng+tedong combination
     "au": "ᭁ",
@@ -225,8 +230,10 @@ VOWELS = set(['a', 'i', 'u', 'e', 'o', 'ā', 'ī', 'ū', 'é', 'è', 'ě', 'ê',
 def normalize_latin(text: str) -> str:
     """Normalize latin input"""
     text = text.lower().strip()
-    # Replace common variants
-    text = text.replace("ö", "o").replace("é", "e").replace("è", "e")
+    # Replace common variants.
+    # NOTE: é/è/ě/ê sengaja DIPERTAHANKAN agar e taling (é/è) vs e pepet (ě/ê)
+    # dapat dibedakan saat transliterasi.
+    text = text.replace("ö", "o")
     return text
 
 @lru_cache(maxsize=2000)
@@ -331,7 +338,8 @@ def _build_stem_table():
 _CONSONANT_STEMS = _build_stem_table()
 
 # Unit vokal, terpanjang lebih dulu (diftong, vokal panjang, vokal pendek).
-_VOWEL_UNITS = ["ai", "au", "ā", "ī", "ū", "a", "i", "u", "e", "o"]
+# é/è = e taling, ě/ê = e pepet — dibedakan agar taleng vs pepet tepat.
+_VOWEL_UNITS = ["ai", "au", "ā", "ī", "ū", "é", "è", "ě", "ê", "a", "i", "u", "e", "o"]
 
 
 def _match_stem(word: str, pos: int):
@@ -371,6 +379,14 @@ def _apply_pangangge(base: str, vowel: str):
         return base + "ᬹ", "suku ilut (ū)"
     if vowel == "e":
         return base + "ᬾ", "taleng (e)"
+    if vowel == "é":
+        return base + "ᬾ", "taleng (é)"
+    if vowel == "è":
+        return base + "ᬾ", "taleng (è)"
+    if vowel == "ě":
+        return base + "ᭂ", "pepet (ě)"
+    if vowel == "ê":
+        return base + "ᭂ", "pepet (ê)"
     if vowel == "ai":
         return base + "ᬿ", "taling detya (ai)"
     if vowel == "o":

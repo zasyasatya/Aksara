@@ -160,6 +160,35 @@ def test_unmappable_letters_warn_but_no_leak():
         assert not [c for c in result if c.isascii() and c.isalpha()], w
         assert warnings, f"'{w}' seharusnya memberi warning pemekatan"
 
+def test_e_pepet_vs_e_taling():
+    # e pepet (ě/ê) -> pepet ᭂ, e taling (é/è) -> taleng ᬾ
+    pepet_cases = {
+        "běras": "ᬩᭂᬭᬲ᭄",
+        "kěras": "ᬓᭂᬭᬲ᭄",
+        "sěnang": "ᬲᭂᬦᬂ",
+        "ěmpat": "ᬳᭂᬫ᭄ᬧᬢ᭄",
+        "êmpat": "ᬳᭂᬫ᭄ᬧᬢ᭄",
+    }
+    taling_cases = {
+        "énak": "ᬏᬦᬓ᭄",
+        "ènak": "ᬏᬦᬓ᭄",
+        "saté": "ᬲᬢᬾ",
+        "lélé": "ᬮᬾᬮᬾ",
+        "bébék": "ᬩᬾᬩᬾᬓ᭄",
+        "méja": "ᬫᬾᬚ",
+    }
+    for latin, expected in pepet_cases.items():
+        result, _, _ = transliterate_latin_to_bali(latin)
+        assert result == expected, f"'{latin}' -> '{result}', harusnya '{expected}' (pepet)"
+    for latin, expected in taling_cases.items():
+        result, _, _ = transliterate_latin_to_bali(latin)
+        assert result == expected, f"'{latin}' -> '{result}', harusnya '{expected}' (taling)"
+
+    # round-trip: pepet harus kembali sebagai ě, bukan e taling
+    assert transliterate_bali_to_latin("ᬩᭂᬭᬲ᭄")[0] == "běras"
+    assert transliterate_bali_to_latin("ᬲᬢᬾ")[0] == "sate"
+
+
 def test_tumpuk_telu_warning_on_engine():
     result, _, warnings = transliterate_latin_to_bali("bkr")
     assert result == "ᬩ᭄ᬒ᭄ᬓ" or "" in result
