@@ -15,7 +15,7 @@ export interface PanganggeItem {
 }
 
 /** Isi placeholder ◌ pada template pangangge dengan aksara dasar `base`.
- *  Mirip "rumus": ulu "◌ᬶ" + "ᬓ" → "ᬓᬶ"; taleng "ᬾ◌" + "ᬓ" → "ᬾᬓ". */
+ *  Mirip "rumus": ulu "◌ᬶ" + "ᬓ" → "ᬓᬶ"; taleng "◌ᬾ" + "ᬓ" → "ᬓᬾ". */
 export function fillMark(mark: string, base: string): string {
   return mark.replace(/◌/g, base)
 }

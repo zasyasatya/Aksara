@@ -39,7 +39,7 @@ class PanganggeDetail(BaseModel):
     name: str
     latin_effect: str = ""
     # Template tampilan: ◌ (dotted circle) menandai posisi aksara dasar yang
-    # bisa "diisi" — mis. ulu = "◌ᬶ", taleng = "ᬾ◌", taleng tedong = "ᬾ◌ᭀ".
+    # bisa "diisi" — mis. ulu = "◌ᬶ", taleng = "◌ᬾ", taleng tedong = "◌ᭀ".
     mark: str = ""
     position: Optional[str] = None
     description: Optional[str] = None

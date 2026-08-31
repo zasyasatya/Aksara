@@ -95,7 +95,7 @@ Master data for all Balinese characters.
     {
       "id": "taleng",
       "bali": "ᬾ",
-      "mark": "ᬾ◌",
+      "mark": "◌ᬾ",
       "unicode": "U+1B3E",
       "name": "Taleng / Taling",
       "type": "pangangge_suara",
