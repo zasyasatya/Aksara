@@ -22,7 +22,7 @@ export function Header() {
   const { xp, streak, level } = useProgressStore()
   
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-sand bg-cream/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 w-full border-b border-sand bg-cream">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 lg:px-8">
         <div className="flex min-w-0 items-center gap-8">
           <Link href="/" className="flex shrink-0 items-center" aria-label="AKSA — Aksara Nusantara">

@@ -43,7 +43,7 @@ export default function LandingPage() {
                   <Sparkles className="h-4 w-4 mr-2" />
                   Platform #1 Belajar Aksara Bali
                 </Badge>
-                <h1 className="font-display text-5xl lg:text-7xl font-bold leading-[0.9] tracking-tight">
+                <h1 className="font-display text-5xl lg:text-7xl font-bold leading-tight lg:leading-tight tracking-tight">
                   <span className="block text-deep-brown">Melestarikan</span>
                   <span className="block text-saffron">Warisan,</span>
                   <span className="block text-deep-brown">Menulis</span>
@@ -156,7 +156,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <Badge variant="default" className="mb-4">Fitur Canggih</Badge>
-            <h2 className="font-display text-4xl font-bold mb-4">Belajar Aksara Jadi Mudah & Menyenangkan</h2>
+            <h2 className="font-display text-4xl font-bold leading-tight mb-4">Belajar Aksara Jadi Mudah & Menyenangkan</h2>
             <p className="text-charcoal/70">Teknologi transliterasi paling akurat dengan pendekatan gamifikasi modern</p>
           </div>
           
@@ -315,7 +315,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 lg:px-8 text-center relative">
           <div className="max-w-3xl mx-auto space-y-6">
             <div className="font-bali text-6xl opacity-20">ᬅᬓ᭄ᬱᬭᬩᬮᬶ</div>
-            <h2 className="font-display text-4xl lg:text-5xl font-bold leading-tight">
+            <h2 className="font-display text-4xl lg:text-5xl font-bold leading-tight lg:leading-tight">
               Siap Jadi Penjaga<br />Aksara Bali?
             </h2>
             <p className="text-cream/80 text-lg">
