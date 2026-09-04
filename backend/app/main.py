@@ -7,7 +7,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from .core.config import settings
-from .routers import health, translate, classify, lessons, quiz, docs, manage, engagement, auth, ml
+from .routers import health, translate, classify, lessons, quiz, docs, manage, engagement, auth, ml, settings as settings_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -39,6 +39,7 @@ app.include_router(docs.router, prefix=settings.api_prefix)
 app.include_router(manage.router, prefix=settings.api_prefix)
 app.include_router(engagement.router, prefix=settings.api_prefix)
 app.include_router(ml.router, prefix=settings.api_prefix)
+app.include_router(settings_router.router, prefix=settings.api_prefix)
 app.include_router(auth.router)
 app.include_router(auth.router, prefix=settings.api_prefix)
 
@@ -66,6 +67,7 @@ async def api_root():
             "/api/ml/models",
             "/api/ml/dataset/samples",
             "/api/ml/train",
+            "/api/settings/theme",
         ]
     }
 

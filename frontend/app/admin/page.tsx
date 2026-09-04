@@ -10,6 +10,7 @@ import {
   setSession,
 } from "@/lib/api"
 import { MetricsRow } from "@/components/admin/ml-ui"
+import { ThemePicker } from "@/components/admin/theme-picker"
 import { Header } from "@/components/layout/header"
 import { BottomNav } from "@/components/layout/bottom-nav"
 import { docRoleMeta, IconByName } from "@/components/docs/meta"
@@ -213,6 +214,12 @@ export default function AdminPage() {
                 })}
               </div>
             </div>
+
+            {/* Palet warna aplikasi */}
+            <ThemePicker
+              onMessage={(m) => { setFlash(m); setTimeout(() => setFlash(null), 2500) }}
+              onError={(m) => setError(m)}
+            />
 
             {/* Publikasi dokumentasi */}
             <div className="mt-6 rounded-3xl border border-sand bg-white shadow-soft overflow-hidden">

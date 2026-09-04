@@ -8,17 +8,20 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      // Semua warna merek memakai CSS variable (lihat app/globals.css) agar
+      // palet dapat diganti Admin lewat atribut data-theme di <html>.
+      // Nilai default variabel = palet "native" (identik dengan warna asli).
       colors: {
-        saffron: "#FF6B35",
-        "deep-brown": "#2C1810",
-        cream: "#FFF8E7",
-        terracotta: "#C45A3C",
-        sage: "#7A9E7E",
-        ocean: "#2A6F8E",
-        sand: "#F4E4BC",
-        charcoal: "#1A1A1A",
-        "saffron-light": "#FF8C61",
-        "saffron-dark": "#E55A2B",
+        saffron: "rgb(var(--c-saffron) / <alpha-value>)",
+        "deep-brown": "rgb(var(--c-deep-brown) / <alpha-value>)",
+        cream: "rgb(var(--c-cream) / <alpha-value>)",
+        terracotta: "rgb(var(--c-terracotta) / <alpha-value>)",
+        sage: "rgb(var(--c-sage) / <alpha-value>)",
+        ocean: "rgb(var(--c-ocean) / <alpha-value>)",
+        sand: "rgb(var(--c-sand) / <alpha-value>)",
+        charcoal: "rgb(var(--c-charcoal) / <alpha-value>)",
+        "saffron-light": "rgb(var(--c-saffron-light) / <alpha-value>)",
+        "saffron-dark": "rgb(var(--c-saffron-dark) / <alpha-value>)",
       },
       fontFamily: {
         sans: ["var(--font-jakarta)", "Inter", "system-ui", "sans-serif"],

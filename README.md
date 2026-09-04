@@ -351,6 +351,13 @@ curl -X PATCH http://localhost:8000/api/docs/pages/metode-scientific/visibility 
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $SESSION" \
   -d '{"is_public": false}'
+
+# Palet warna aplikasi (publik: baca; admin: ubah). Default "native".
+curl http://localhost:8000/api/settings/theme
+curl -X PUT http://localhost:8000/api/settings/theme \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $SESSION" \
+  -d '{"theme": "lontar"}'   # native | lontar | segara | pura | sawah | candi
 ```
 
 ### Variabel lingkungan
