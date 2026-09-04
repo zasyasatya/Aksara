@@ -11,7 +11,7 @@
 #   AKSARA_GURU_PASSWORD    password login guru — wajib diganti di produksi
 #
 # Persistensi: mount volume di /app/backend/app/data
-# (lessons.json, quiz.json, dictionary.json, docs.json, engagement.json)
+# (lessons.json, quiz.json, dictionary.json, docs.json, engagement.json, ml/)
 
 # ── Stage 1: build UI — Next.js static export ──────────────────────────────
 FROM node:22-slim AS ui
@@ -40,6 +40,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/app ./app
 COPY --from=ui /build/out ./app/static
+# Paket dataset gambar (dataset/<name>/manifest.json + PNG) untuk impor satu-klik
+# di Panel Admin → Model ML. Lokasi fallback dibaca app/ml/bundled.py.
+COPY dataset /app/dataset
+ENV AKSARA_DATASET_DIR=/app/dataset
 
 # Store konten — persist via volume agar perubahan Panel Guru & engagement
 # tidak hilang saat redeploy.

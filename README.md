@@ -50,7 +50,7 @@
 - **`/docs`** — pusat dokumentasi: tata cara penggunaan untuk **murid, guru, admin**, plus halaman khusus **Metode Scientific & Referensi** (metodologi transliterasi + sumber akademik) dan **Dataset & Model** (dataset + classifier tulisan tangan, evaluasi 90%+) — lengkap dengan screenshot halaman
 - **`/guru`** — panel guru: kelola konten (materi/kuis/kamus) secara real-time
 - **`/admin`** — panel admin: atur halaman dokumentasi mana yang **go public**, plus panel **Model ML** (`/admin/ml`)
-- **`/admin/ml`** — retraining classifier aksara Bali: **manajemen dataset & labeling** (sintetis dari font, unggah, kanvas), **pilih arsitektur** (template · centroid · k-NN · regresi logistik · MLP · CNN, murni NumPy), job training live, **laporan evaluasi lengkap** (accuracy, precision, recall, F1, top-3, log-loss, confusion matrix, per kelas), **pilih model produksi** untuk `POST /api/ml/predict`, dan tab **Percobaan** (uji tulisan, bandingkan model, koreksi → dataset). Hasil eksperimen: `docs/ML_RETRAINING.md`
+- **`/admin/ml`** — retraining classifier aksara Bali: **manajemen dataset & labeling** (sintetis dari font, unggah, kanvas), **pilih arsitektur** (template · centroid · k-NN · regresi logistik · MLP · CNN, murni NumPy), job training live, **laporan evaluasi lengkap** (accuracy, precision, recall, F1, top-3, log-loss, confusion matrix, per kelas), **pilih model produksi** untuk `POST /api/ml/predict`, dan tab **Percobaan** (uji tulisan, bandingkan model, koreksi → dataset). Dataset gambar dikomit di `dataset/aksara-bali-handwriting-v1/` (impor sekali klik). Panduan bergambar: [`docs/PANDUAN_RETRAINING.md`](docs/PANDUAN_RETRAINING.md) / `/docs/panduan-retraining`; hasil eksperimen: `docs/ML_RETRAINING.md`
 - **Mode DEV** (`AKSARA_MODE=dev`): semua halaman dokumentasi selalu tampil, akses admin & guru otomatis
 - **Mode PROD** (`AKSARA_MODE=prod`): hanya halaman publik yang tampil; admin & guru login via username + password (`AKSARA_ADMIN_USERNAME`/`AKSARA_ADMIN_PASSWORD` dan `AKSARA_GURU_USERNAME`/`AKSARA_GURU_PASSWORD`)
 
@@ -83,11 +83,15 @@ Aksara/
 │   ├── PAPER.md - Draft paper .id DeveloperDay 2026 (8 bagian wajib, Inggris)
 │   ├── DATASET_MODEL.md - Dataset & model classifier tulisan tangan (detail + evaluasi 90%+)
 │   ├── ML_RETRAINING.md - Panel Model ML: dataset, labeling, retraining, evaluasi, hasil percobaan 6 arsitektur
+│   ├── PANDUAN_RETRAINING.md - Panduan admin langkah demi langkah retraining (23 screenshot panel)
 │   ├── DEMO_SCRIPT.md - Skrip video demo 5 menit
 │   └── slides/ - Deck slide (HTML 16:9, navigasi keyboard + speaker notes)
+├── dataset/
+│   └── aksara-bali-handwriting-v1/ - Paket dataset gambar (1.080 PNG 64×64, 18 kelas, manifest label+split, CC0) — diimpor sekali klik dari /admin/ml
 ├── eval/
 │   ├── evaluate_handwriting.py - Harness evaluasi classifier template-matching (reproducible)
 │   ├── ml_experiments.py - Percobaan retraining (benchmark 6 arsitektur + ablasi ukuran data)
+│   ├── build_dataset.py - Bangun paket dataset dataset/<nama> (manifest + PNG) secara deterministik
 │   ├── results/ - Laporan percobaan terakhir (markdown + JSON)
 │   └── README.md - Cara menjalankan evaluasi
 ├── backend/
@@ -403,7 +407,12 @@ PyTorch/TensorFlow). Artefak (dataset PNG, `model.npz`, registry) tersimpan di
 # Status (publik): dataset, model produksi, job aktif
 curl http://localhost:8000/api/ml/status
 
-# Bangkitkan dataset sintetis 60 sampel/kelas (18 kelas Wresastra) → 1080 sampel
+# Impor paket dataset yang dikomit di repo (dataset/aksara-bali-handwriting-v1: 1080 PNG berlabel + split)
+curl -X POST http://localhost:8000/api/ml/dataset/import-bundled \
+  -H "Content-Type: application/json" -H "Authorization: Bearer $SESSION" \
+  -d '{"name":"aksara-bali-handwriting-v1"}'
+
+# …atau bangkitkan dataset sintetis baru 60 sampel/kelas (18 kelas Wresastra) → 1080 sampel
 curl -X POST http://localhost:8000/api/ml/dataset/generate-synthetic \
   -H "Content-Type: application/json" -H "Authorization: Bearer $SESSION" \
   -d '{"per_class":60,"seed":20260904,"strength":1.0}'
@@ -428,7 +437,9 @@ curl -X POST http://localhost:8000/api/ml/predict -H "Content-Type: application/
 Hasil percobaan 6 arsitektur (dataset sintetis, 18 kelas): template 74.7% →
 regresi logistik 91.4% → MLP 93.2% → **CNN 98.2%** accuracy/F1 makro.
 Reproduksi: `.venv/bin/python eval/ml_experiments.py --ablation`. Detail:
-[`docs/ML_RETRAINING.md`](docs/ML_RETRAINING.md).
+[`docs/ML_RETRAINING.md`](docs/ML_RETRAINING.md); panduan operasional bergambar
+(impor dataset → labeling → training → evaluasi → produksi → uji):
+[`docs/PANDUAN_RETRAINING.md`](docs/PANDUAN_RETRAINING.md).
 
 ## 🎨 Branding
 
@@ -446,6 +457,7 @@ Semua docs SDLC ada di `/docs`:
 - PRD.md, ARCHITECTURE.md, API_SPEC.md, DATABASE_DESIGN.md, TEST_PLAN.md, BRANDING.md, SDLC.md
 - **PAPER.md** — draft paper .id DeveloperDay 2026 (8 bagian wajib; bahasa Inggris; data background pelestarian budaya)
 - **DATASET_MODEL.md** — dataset & model classifier pengenalan tulisan tangan (detail + evaluasi, akurasi 90%+)
+- **PANDUAN_RETRAINING.md** — panduan admin retraining model langkah demi langkah dengan screenshot panel
 - **DEMO_SCRIPT.md** + **slides/** — skrip & deck video demo 5 menit (buka `docs/slides/index.html` di browser)
 
 ## 🤝 Kontribusi

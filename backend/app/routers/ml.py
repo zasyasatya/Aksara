@@ -19,6 +19,8 @@ Struktur endpoint:
     /ml/dataset/bulk-label              POST
     /ml/dataset/bulk-delete             POST
     /ml/dataset/generate-synthetic      POST
+    /ml/dataset/bundled                 GET   (paket dataset di repo)
+    /ml/dataset/import-bundled          POST
     /ml/dataset/rebalance               POST
     /ml/dataset/clear                   POST  (?source=)
     /ml/train                           POST  → job
@@ -41,10 +43,11 @@ from fastapi import APIRouter, Header, HTTPException, Query, Response
 
 from ..core import security
 from ..core.config import settings
-from ..ml import features, inference, models as ml_models, store, synthetic, training
+from ..ml import bundled, features, inference, models as ml_models, store, synthetic, training
 from ..schemas.ml import (
-    BulkDeleteIn, BulkLabelIn, ClassesUpdate, CompareIn, GenerateSyntheticIn, MessageResponse,
-    ModelUpdate, PredictIn, PromoteIn, RebalanceIn, SampleBulkIn, SampleIn, SampleUpdate, TrainIn,
+    BulkDeleteIn, BulkLabelIn, ClassesUpdate, CompareIn, GenerateSyntheticIn, ImportBundledIn,
+    MessageResponse, ModelUpdate, PredictIn, PromoteIn, RebalanceIn, SampleBulkIn, SampleIn,
+    SampleUpdate, TrainIn,
 )
 
 router = APIRouter(prefix="/ml", tags=["ml"])
@@ -291,6 +294,35 @@ async def generate_synthetic(body: GenerateSyntheticIn, authorization: Optional[
         "stats": stats,
         "message": f"{len(entries)} sampel sintetis ditambahkan ({len(classes)} kelas × {body.per_class}).",
     }
+
+
+@router.get("/dataset/bundled")
+async def list_bundled_datasets(authorization: Optional[str] = Header(default=None)):
+    """Paket dataset gambar yang dikomit ke repo (``dataset/<name>/manifest.json``)."""
+    _require_admin(authorization)
+    root = bundled.datasets_root()
+    return {"root": str(root) if root else None, "datasets": bundled.list_bundled()}
+
+
+@router.post("/dataset/import-bundled")
+async def import_bundled_dataset(body: ImportBundledIn, authorization: Optional[str] = Header(default=None)):
+    _require_admin(authorization)
+    t0 = time.time()
+    try:
+        result = bundled.import_bundled(body.name, body.activate_classes, body.replace_existing, body.keep_split)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    inference.invalidate()
+    result["seconds"] = round(time.time() - t0, 2)
+    result["message"] = (
+        f"{result['added']} gambar diimpor dari dataset '{body.name}'"
+        + (f" ({result['removed']} impor lama diganti)" if result["removed"] else "")
+        + (f", {result['skipped']} dilewati" if result["skipped"] else "")
+        + "."
+    )
+    return result
 
 
 @router.post("/dataset/rebalance")

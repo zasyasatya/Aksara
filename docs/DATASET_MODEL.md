@@ -204,6 +204,13 @@ terbaik (63.6%), yang sekaligus mengingatkan bahwa validasi akhir harus memakai
 tulisan tangan nyata. Detail metodologi, ablasi ukuran data, dan kesimpulan ada
 di `ML_RETRAINING.md` §5 dan `eval/results/ml_experiments.md`.
 
+Dataset gambar yang dipakai percobaan ini **dikomit di repo** sebagai paket
+[`dataset/aksara-bali-handwriting-v1/`](../dataset/aksara-bali-handwriting-v1/)
+(1.080 PNG 64×64, `manifest.json` berisi label, split, sha256, lisensi CC0) dan
+bisa diimpor sekali klik dari Panel Admin (**Impor dataset repo**). Panduan
+operasional langkah demi langkah dengan screenshot: [`PANDUAN_RETRAINING.md`](PANDUAN_RETRAINING.md)
+(in-app: `/docs/panduan-retraining`).
+
 ---
 
 ## 6. Reproduksi
@@ -217,6 +224,9 @@ python -m venv .venv && .venv/bin/pip install Pillow numpy
 
 # Percobaan retraining (6 arsitektur + ablasi) — memakai venv backend
 cd .. && .venv/bin/python eval/ml_experiments.py --ablation
+
+# Bangun ulang paket dataset dataset/aksara-bali-handwriting-v1 (deterministik per seed)
+.venv/bin/python eval/build_dataset.py --name aksara-bali-handwriting-v1 --per-class 60 --seed 20260904
 ```
 
 ---

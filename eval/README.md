@@ -45,3 +45,20 @@ Semua artefak ditulis ke direktori sementara, tidak menyentuh
 
 Hasil terakhir tersimpan di `results/ml_experiments.md` (+ JSON) dan dirangkum
 di `docs/ML_RETRAINING.md` §5.
+
+## Paket dataset yang dikomit (`build_dataset.py`)
+
+`build_dataset.py` membangun **paket dataset gambar** yang dikomit di
+`dataset/<nama>/` — `manifest.json` (kelas, label, split, sha256, seed,
+lisensi) + `images/<label>/<label>_NNN.png` (64×64) — dengan generator sintetis
+yang sama dengan Panel Admin. Paket ini yang muncul di tombol **Impor dataset
+repo** (`GET/POST /api/ml/dataset/bundled|import-bundled`) dan dipakai di
+panduan bergambar `docs/PANDUAN_RETRAINING.md`.
+
+```bash
+# identik dengan dataset/aksara-bali-handwriting-v1 (seed sama → berkas sama)
+.venv/bin/python eval/build_dataset.py --name aksara-bali-handwriting-v1 --per-class 60 --seed 20260904
+# varian: kelas lain / lebih banyak sampel / split berbeda
+.venv/bin/python eval/build_dataset.py --name aksara-bali-angka-v1 --groups angka --per-class 80 --seed 7 --out dataset
+.venv/bin/python eval/build_dataset.py --help
+```

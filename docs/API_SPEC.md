@@ -401,7 +401,8 @@ Response:
 
 Prefix `/ml`. Semua endpoint **admin-only** (Bearer token admin; mode `dev`
 otomatis admin) kecuali `GET /ml/status`, `POST /ml/predict`, dan
-`GET /ml/dataset/samples/{id}/image`. Dokumentasi lengkap: `docs/ML_RETRAINING.md`.
+`GET /ml/dataset/samples/{id}/image`. Dokumentasi lengkap: `docs/ML_RETRAINING.md`;
+panduan langkah demi langkah dengan screenshot: `docs/PANDUAN_RETRAINING.md`.
 
 **GET /ml/status** — ringkasan untuk dashboard admin.
 ```json
@@ -433,6 +434,8 @@ otomatis admin) kecuali `GET /ml/status`, `POST /ml/predict`, dan
 | GET | `/ml/dataset/samples/{id}/image` | — | PNG 64×64 sampel (publik, untuk thumbnail) |
 | POST | `/ml/dataset/bulk-label` | `{ "ids": [...], "label"?, "split"?, "status"? }` | aksi massal |
 | POST | `/ml/dataset/bulk-delete` | `{ "ids": [...] }` | hapus massal |
+| GET | `/ml/dataset/bundled` | — | paket dataset yang ikut repo (`dataset/*/manifest.json`): nama, versi, jumlah gambar, kelas, split, lisensi |
+| POST | `/ml/dataset/import-bundled` | `{ "name": "aksara-bali-handwriting-v1", "activate_classes": true, "replace_existing": true, "keep_split": true }` | impor paket ke dataset (idempoten; 404 bila nama tidak ada) → `{ added, removed, skipped, classes, seconds, stats }` |
 | POST | `/ml/dataset/generate-synthetic` | `{ "per_class": 60, "seed": 20260904, "strength": 1.0 }` | bangkitkan sampel sintetis dari font Noto Sans Balinese |
 | POST | `/ml/dataset/rebalance` | `{ "val_ratio": 0.15, "test_ratio": 0.15, "seed": 0 }` | acak ulang split stratified |
 | POST | `/ml/dataset/clear` | query `source?` (`synthetic\|upload\|canvas\|import`), `label?` | kosongkan dataset (opsional per sumber/label) |

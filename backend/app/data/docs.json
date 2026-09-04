@@ -49,6 +49,16 @@
       "is_public": true,
       "order": 5,
       "updated_at": "2026-09-04"
+    },
+    {
+      "slug": "panduan-retraining",
+      "title": "Panduan Retraining Model — Panel Admin",
+      "subtitle": "Langkah demi langkah (dengan screenshot): impor dataset, labeling, pilih arsitektur, latih, baca evaluasi, tetapkan model produksi, uji",
+      "role": "admin",
+      "icon": "Brain",
+      "is_public": true,
+      "order": 6,
+      "updated_at": "2026-09-04"
     }
   ]
 }

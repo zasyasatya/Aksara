@@ -57,6 +57,13 @@ class BulkDeleteIn(BaseModel):
     ids: List[str] = Field(..., min_length=1, max_length=2000)
 
 
+class ImportBundledIn(BaseModel):
+    name: str = Field(..., min_length=1, max_length=80, description="Nama folder paket di <repo>/dataset/")
+    activate_classes: bool = Field(True, description="Jadikan kelas paket sebagai kelas aktif")
+    replace_existing: bool = Field(True, description="Hapus impor paket yang sama sebelumnya (idempoten)")
+    keep_split: bool = Field(True, description="Pakai split train/val/test dari manifest")
+
+
 class RebalanceIn(BaseModel):
     val_ratio: float = Field(0.15, ge=0.0, le=0.5)
     test_ratio: float = Field(0.15, ge=0.0, le=0.5)

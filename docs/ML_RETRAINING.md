@@ -33,6 +33,12 @@
 
 ## 2. Alur kerja admin
 
+> Versi bergambar dari bagian ini — 23 screenshot alur nyata dari impor dataset sampai
+> model produksi — ada di [`PANDUAN_RETRAINING.md`](PANDUAN_RETRAINING.md) dan in-app di
+> `/docs/panduan-retraining`. Dataset gambar yang dipakai dikomit di
+> [`dataset/aksara-bali-handwriting-v1/`](../dataset/aksara-bali-handwriting-v1/) (1.080 PNG,
+> 18 kelas, manifest berlabel + split) dan bisa diimpor sekali klik lewat tombol **Impor dataset repo**.
+
 ```
 Dataset & Labeling ──► Training ──► Model & Evaluasi ──► Percobaan
  (kumpulkan, label,     (pilih arsitektur,   (bandingkan metrik,    (uji tulisan nyata,
@@ -201,7 +207,13 @@ sejumlah aksara nyaris identik.
 .venv/bin/python eval/ml_experiments.py --groups wresastra,angka --per-class 80 --archs logreg,cnn
 ```
 
-Unit test fitur (16 test, store sementara): `cd backend && ../.venv/bin/python -m pytest app/tests/test_ml.py -q`.
+Bangun ulang paket dataset yang dikomit (sama persis bila seed sama):
+
+```bash
+.venv/bin/python eval/build_dataset.py --name aksara-bali-handwriting-v1 --per-class 60 --seed 20260904
+```
+
+Unit test fitur (20 test, store sementara): `cd backend && ../.venv/bin/python -m pytest app/tests/test_ml.py -q`.
 
 ---
 
@@ -217,6 +229,7 @@ Unit test fitur (16 test, store sementara): `cd backend && ../.venv/bin/python -
 | `GET /ml/dataset/samples/{id}`, `PATCH /ml/dataset/samples/{id}`, `DELETE /ml/dataset/samples/{id}` | admin | detail / labeling, pindah split, status / hapus |
 | `POST /ml/dataset/bulk-label`, `POST /ml/dataset/bulk-delete` | admin | aksi massal pada banyak sampel |
 | `GET /ml/dataset/samples/{id}/image` | publik | PNG sampel (untuk thumbnail) |
+| `GET /ml/dataset/bundled`, `POST /ml/dataset/import-bundled` | admin | daftar / impor paket dataset yang dikomit di `dataset/` (`{name, activate_classes, replace_existing, keep_split}`) |
 | `POST /ml/dataset/generate-synthetic` | admin | bangkitkan sampel sintetis `{per_class, seed, strength}` |
 | `POST /ml/dataset/rebalance`, `POST /ml/dataset/clear?source=` | admin | acak ulang split stratified / kosongkan (per sumber/label) |
 | `POST /ml/train` → 202 | admin | mulai job retraining `{arch, hyperparams, name, notes, auto_promote}` |

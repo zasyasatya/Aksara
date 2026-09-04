@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { api, MlClass, MlDatasetStats, MlSample, MlSource, MlSplit } from "@/lib/api"
+import { api, MlBundledDataset, MlClass, MlDatasetStats, MlSample, MlSource, MlSplit } from "@/lib/api"
 import { Field, TextInput, Select, Flash } from "@/components/guru/ui"
 import { HandwritingCanvas, HandwritingCanvasHandle } from "@/components/aksara/handwriting-canvas"
 import {
@@ -9,7 +9,7 @@ import {
 } from "@/components/admin/ml-ui"
 import {
   Database, Sparkles, Upload, PenLine, Tag, Trash2, RefreshCw, Loader2, CheckCircle2, ChevronLeft, ChevronRight,
-  Shuffle, Layers, X, Eraser, Undo2, Check, AlertTriangle, ListChecks,
+  Shuffle, Layers, X, Eraser, Undo2, Check, AlertTriangle, ListChecks, PackageOpen, FolderGit2,
 } from "lucide-react"
 
 type Flash = { kind: "ok" | "err"; text: string } | null
@@ -28,7 +28,7 @@ export function TabDataset() {
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState<string | null>(null)
   const [flash, setFlash] = useState<Flash>(null)
-  const [panel, setPanel] = useState<"none" | "synthetic" | "upload" | "canvas" | "classes">("none")
+  const [panel, setPanel] = useState<"none" | "bundled" | "synthetic" | "upload" | "canvas" | "classes">("none")
   const [detail, setDetail] = useState<MlSample | null>(null)
 
   const glyphOf = useMemo(() => {
@@ -124,6 +124,7 @@ export function TabDataset() {
           <button onClick={() => refresh()} className="inline-flex items-center gap-1.5 text-xs font-semibold text-charcoal/50 hover:text-saffron-dark"><RefreshCw className="h-3.5 w-3.5" /> Muat ulang</button>
         </div>
         <div className="flex flex-wrap gap-2 px-6 py-4">
+          <ActionBtn active={panel === "bundled"} onClick={() => setPanel(panel === "bundled" ? "none" : "bundled")} icon={PackageOpen} label="Impor dataset repo" />
           <ActionBtn active={panel === "synthetic"} onClick={() => setPanel(panel === "synthetic" ? "none" : "synthetic")} icon={Sparkles} label="Generate sintetis" />
           <ActionBtn active={panel === "upload"} onClick={() => setPanel(panel === "upload" ? "none" : "upload")} icon={Upload} label="Unggah gambar" />
           <ActionBtn active={panel === "canvas"} onClick={() => setPanel(panel === "canvas" ? "none" : "canvas")} icon={PenLine} label="Tulis di kanvas" />
@@ -137,6 +138,7 @@ export function TabDataset() {
           </button>
         </div>
 
+        {panel === "bundled" && <BundledPanel busy={busy === "bundled"} onRun={(b) => run("bundled", async () => (await api.ml.importBundled(b)).message)} onClose={() => setPanel("none")} />}
         {panel === "synthetic" && <SyntheticPanel busy={busy === "synthetic"} nClasses={activeLabels.length} onRun={(b) => run("synthetic", async () => (await api.ml.generateSynthetic(b)).message)} onClose={() => setPanel("none")} />}
         {panel === "upload" && <UploadPanel classes={activeLabels} busy={busy === "upload"} onRun={(items) => run("upload", async () => { const r = await api.ml.addSamplesBulk(items); return `${r.added} gambar ditambahkan${r.skipped ? `, ${r.skipped} dilewati (kosong/tidak valid)` : ""}.` })} onClose={() => setPanel("none")} />}
         {panel === "canvas" && <CanvasPanel classes={activeLabels} busy={busy === "canvas"} onRun={(b) => run("canvas", async () => { const s = await api.ml.addSample(b); return s.label ? `Sampel “${s.label}” disimpan ke split ${SPLIT_LABEL[s.split]}.` : "Sampel masuk antrean labeling." })} onClose={() => setPanel("none")} />}
@@ -232,8 +234,8 @@ export function TabDataset() {
             <EmptyState
               icon={Database}
               title={total === 0 && stats?.total === 0 ? "Dataset masih kosong" : "Tidak ada sampel yang cocok"}
-              body={stats?.total === 0 ? "Mulai dengan “Generate sintetis” untuk membuat ribuan sampel dari font Noto Sans Balinese dalam hitungan detik, lalu tambahkan tulisan tangan asli lewat unggah/kanvas." : "Ubah filter atau kosongkan pencarian."}
-              action={stats?.total === 0 ? <button onClick={() => setPanel("synthetic")} className={btnPrimary}><Sparkles className="h-4 w-4" /> Generate sintetis</button> : undefined}
+              body={stats?.total === 0 ? "Mulai dengan “Impor dataset repo” (1.080 gambar berlabel siap pakai dari folder dataset/) atau “Generate sintetis” untuk membuat sampel baru dari font Noto Sans Balinese, lalu tambahkan tulisan tangan asli lewat unggah/kanvas." : "Ubah filter atau kosongkan pencarian."}
+              action={stats?.total === 0 ? <div className="flex flex-wrap justify-center gap-2"><button onClick={() => setPanel("bundled")} className={btnPrimary}><PackageOpen className="h-4 w-4" /> Impor dataset repo</button><button onClick={() => setPanel("synthetic")} className={btnSecondary}><Sparkles className="h-4 w-4" /> Generate sintetis</button></div> : undefined}
             />
           </div>
         ) : (
@@ -300,6 +302,67 @@ function PanelShell({ title, desc, onClose, children }: { title: string; desc: s
       </div>
       {children}
     </div>
+  )
+}
+
+function BundledPanel({ busy, onRun, onClose }: { busy: boolean; onRun: (b: { name: string; activate_classes: boolean; replace_existing: boolean; keep_split: boolean }) => void; onClose: () => void }) {
+  const [packs, setPacks] = useState<MlBundledDataset[] | null>(null)
+  const [root, setRoot] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [name, setName] = useState("")
+  const [activate, setActivate] = useState(true)
+  const [replace, setReplace] = useState(true)
+  const [keepSplit, setKeepSplit] = useState(true)
+  useEffect(() => {
+    api.ml.bundledDatasets().then((r) => { setPacks(r.datasets); setRoot(r.root); if (r.datasets[0]) setName(r.datasets[0].name) }).catch((e) => setError((e as Error).message))
+  }, [])
+  const pack = packs?.find((p) => p.name === name) ?? null
+  return (
+    <PanelShell title="Impor dataset dari repo" desc="Paket gambar berlabel yang dikomit di folder dataset/ (manifest.json + PNG 64×64). Cara tercepat mendapatkan data awal untuk retraining — label & split ikut manifest, impor ulang tidak menggandakan data." onClose={onClose}>
+      {error && <div className="rounded-xl border border-terracotta/40 bg-terracotta/10 px-4 py-3 text-sm text-terracotta">{error}</div>}
+      {packs && packs.length === 0 && (
+        <EmptyState icon={FolderGit2} title="Tidak ada paket dataset" body={`Folder dataset/ tidak ditemukan atau kosong${root ? ` (dicari di ${root})` : ""}. Bangun dengan: .venv/bin/python eval/build_dataset.py`} />
+      )}
+      {packs && packs.length > 0 && (
+        <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+          <div className="space-y-2">
+            {packs.map((p) => (
+              <button key={p.name} onClick={() => setName(p.name)} className={`w-full rounded-2xl border p-4 text-left transition-all ${name === p.name ? "border-deep-brown bg-white shadow-soft ring-1 ring-deep-brown/20" : "border-sand bg-white/60 hover:border-deep-brown/40"}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 font-semibold text-deep-brown"><FolderGit2 className="h-4 w-4 text-ocean" /> {p.name}</div>
+                    <p className="mt-1 line-clamp-2 text-xs text-charcoal/60">{p.description}</p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-cream px-2.5 py-1 text-xs font-bold text-deep-brown">{p.total.toLocaleString("id-ID")} gambar</span>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] text-charcoal/55">
+                  <span className="rounded-full bg-sand/60 px-2 py-0.5">{p.n_classes} kelas</span>
+                  <span className="rounded-full bg-sand/60 px-2 py-0.5">train {p.per_split.train} · val {p.per_split.val} · test {p.per_split.test}</span>
+                  {p.generator?.seed !== undefined && <span className="rounded-full bg-sand/60 px-2 py-0.5">seed {p.generator.seed}</span>}
+                  {p.license?.images && <span className="rounded-full bg-sand/60 px-2 py-0.5">{p.license.images.split(" ")[0]}</span>}
+                </div>
+                {name === p.name && (
+                  <div className="mt-3 flex flex-wrap gap-1">
+                    {p.classes.slice(0, 24).map((c) => <span key={c.label} className="rounded-md border border-sand bg-cream px-1.5 py-0.5 text-xs text-deep-brown"><span className="font-bali">{c.glyph}</span> <span className="text-charcoal/50">{c.label}</span></span>)}
+                    {p.classes.length > 24 && <span className="text-xs text-charcoal/50">+{p.classes.length - 24} lagi</span>}
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+          <div className="space-y-3 rounded-2xl border border-sand bg-white p-4">
+            <div className="text-xs font-semibold uppercase tracking-wide text-charcoal/50">Opsi impor</div>
+            <label className="flex items-start gap-2 text-sm text-charcoal/75"><input type="checkbox" checked={activate} onChange={(e) => setActivate(e.target.checked)} className="mt-0.5 accent-saffron" /><span><strong>Aktifkan kelas paket</strong> — kelas aktif diganti mengikuti manifest ({pack?.n_classes ?? "–"} kelas).</span></label>
+            <label className="flex items-start gap-2 text-sm text-charcoal/75"><input type="checkbox" checked={replace} onChange={(e) => setReplace(e.target.checked)} className="mt-0.5 accent-saffron" /><span><strong>Ganti impor sebelumnya</strong> — hapus sampel impor paket ini yang sudah ada (idempoten).</span></label>
+            <label className="flex items-start gap-2 text-sm text-charcoal/75"><input type="checkbox" checked={keepSplit} onChange={(e) => setKeepSplit(e.target.checked)} className="mt-0.5 accent-saffron" /><span><strong>Pakai split manifest</strong> — train/val/test persis seperti percobaan di dokumentasi; matikan untuk acak ulang 70/15/15.</span></label>
+            <p className="text-[11px] text-charcoal/45">Sumber sampel akan tercatat sebagai <em>impor</em>; catatan menyimpan nama paket & file asal.</p>
+            <div className="flex justify-end pt-1">
+              <button disabled={busy || !pack} onClick={() => pack && onRun({ name: pack.name, activate_classes: activate, replace_existing: replace, keep_split: keepSplit })} className={btnPrimary}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <PackageOpen className="h-4 w-4" />} Impor {pack ? `${pack.total.toLocaleString("id-ID")} gambar` : ""}</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </PanelShell>
   )
 }
 

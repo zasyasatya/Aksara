@@ -202,6 +202,22 @@ export interface MlSample {
   feature_preview?: string | null
 }
 
+export interface MlBundledDataset {
+  name: string
+  folder: string
+  description: string
+  version: number | null
+  created_at: string | null
+  license: { images?: string; font?: string } | null
+  generator: { seed?: number; strength?: number; per_class?: number; groups?: string[] } | null
+  total: number
+  per_split: Record<MlSplit, number>
+  n_classes: number
+  labels: string[]
+  classes: MlClass[]
+  readme: boolean
+}
+
 export interface MlDatasetStats {
   total: number
   labeled: number
@@ -637,6 +653,12 @@ export const api = {
       fetchAPI<{ added: number; removed: number; seconds: number; stats: MlDatasetStats; message: string }>("/ml/dataset/generate-synthetic", {
         method: "POST", body: JSON.stringify(body), headers: authHeaders(),
       }),
+    bundledDatasets: () =>
+      fetchAPI<{ root: string | null; datasets: MlBundledDataset[] }>("/ml/dataset/bundled", { headers: authHeaders() }),
+    importBundled: (body: { name: string; activate_classes?: boolean; replace_existing?: boolean; keep_split?: boolean }) =>
+      fetchAPI<{ name: string; added: number; removed: number; skipped: number; classes: string[]; seconds: number; stats: MlDatasetStats; message: string }>(
+        "/ml/dataset/import-bundled", { method: "POST", body: JSON.stringify(body), headers: authHeaders() },
+      ),
     rebalance: (body: { val_ratio: number; test_ratio: number; seed?: number }) =>
       fetchAPI<{ per_split: Record<MlSplit, number>; message: string }>("/ml/dataset/rebalance", { method: "POST", body: JSON.stringify(body), headers: authHeaders() }),
     clearDataset: (source?: MlSource) =>

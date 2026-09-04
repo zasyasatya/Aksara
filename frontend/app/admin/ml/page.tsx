@@ -12,7 +12,7 @@ import { TabTraining } from "./tab-training"
 import { TabModels } from "./tab-models"
 import { TabExperiment } from "./tab-experiment"
 import { MetricsRow, Pill } from "@/components/admin/ml-ui"
-import { Brain, Database, Boxes, FlaskConical, Globe, KeyRound, Loader2, LogOut, Rocket, ArrowLeft, Cpu } from "lucide-react"
+import { Brain, Database, Boxes, FlaskConical, Globe, KeyRound, Loader2, LogOut, Rocket, ArrowLeft, Cpu, BookOpen } from "lucide-react"
 
 type TabKey = "dataset" | "training" | "models" | "experiment"
 
@@ -143,7 +143,10 @@ function AdminMlInner() {
                   </button>
                 )
               })}
-              <Link href="/docs/dataset-dan-model" className="ml-auto text-xs font-semibold text-charcoal/50 hover:text-saffron-dark">Dokumentasi Dataset & Model →</Link>
+              <div className="ml-auto flex items-center gap-1 text-xs font-semibold text-charcoal/50">
+                <Link href="/docs/panduan-retraining" className="flex items-center gap-1.5 rounded-xl border border-saffron/40 bg-saffron/10 px-3 py-1.5 text-saffron-dark hover:bg-saffron/20" title="Langkah demi langkah dengan screenshot"><BookOpen className="h-3.5 w-3.5" />Panduan retraining</Link>
+                <Link href="/docs/dataset-dan-model" className="px-2 hover:text-saffron-dark" title="Dataset, arsitektur, metrik, hasil percobaan">Dataset & Model →</Link>
+              </div>
             </div>
 
             <div className="mt-5">

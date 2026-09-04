@@ -5,6 +5,7 @@ agar tidak menyentuh artefak nyata di ``backend/app/data/ml``.
 """
 
 import base64
+import json
 import io
 import time
 
@@ -325,3 +326,67 @@ def test_prod_mode_requires_admin(prod_mode):
     h = _admin_headers()
     assert client.get("/api/ml/dataset/stats", headers=h).status_code == 200
     assert client.get("/api/ml/status", headers=h).json()["is_admin"] is True
+
+
+# ── dataset yang dikomit ke repo (dataset/<name>) ──────────────────────────
+
+def test_bundled_dataset_listed_and_imported(tmp_path, monkeypatch):
+    """Paket dataset di repo (manifest + PNG) terdaftar dan bisa diimpor idempoten."""
+    from app.ml import bundled
+
+    # paket kecil buatan: 3 kelas × 4 gambar, split dari manifest
+    pack = tmp_path / "packs" / "mini-pack"
+    (pack / "images").mkdir(parents=True)
+    classes = store.all_available_classes()[:3]
+    samples = []
+    for c in classes:
+        for i in range(4):
+            img = Image.new("L", (64, 64), 255)
+            d = ImageDraw.Draw(img)
+            d.ellipse([10 + i, 10, 50, 50 + i], outline=0, width=6)
+            rel = f"images/{c.label}_{i}.png"
+            img.save(pack / rel)
+            samples.append({"file": rel, "label": c.label, "split": "test" if i == 3 else "train"})
+    (pack / "manifest.json").write_text(json.dumps({
+        "name": "mini-pack", "description": "uji", "classes": [c.__dict__ for c in classes], "samples": samples,
+    }), encoding="utf-8")
+    monkeypatch.setattr(bundled, "CANDIDATE_DIRS", [tmp_path / "packs"])
+
+    listing = client.get("/api/ml/dataset/bundled").json()
+    assert [d["name"] for d in listing["datasets"]] == ["mini-pack"]
+    assert listing["datasets"][0]["total"] == 12 and listing["datasets"][0]["n_classes"] == 3
+
+    r = client.post("/api/ml/dataset/import-bundled", json={"name": "mini-pack"})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["added"] == 12 and body["removed"] == 0
+    assert body["stats"]["labeled"] == 12 and body["stats"]["n_classes"] == 3   # kelas aktif diganti
+    assert body["stats"]["per_split"] == {"train": 9, "val": 0, "test": 3}     # split manifest dipakai
+
+    # impor ulang → data lama diganti, tidak menggandakan
+    r2 = client.post("/api/ml/dataset/import-bundled", json={"name": "mini-pack"}).json()
+    assert r2["removed"] == 12 and r2["stats"]["total"] == 12
+    assert all(s["source"] == "import" for s in client.get("/api/ml/dataset/samples").json()["samples"])
+
+    assert client.post("/api/ml/dataset/import-bundled", json={"name": "tidak-ada"}).status_code == 404
+    assert client.post("/api/ml/dataset/import-bundled", json={"name": "../etc"}).status_code == 404
+
+
+def test_repo_dataset_manifest_is_consistent():
+    """dataset/aksara-bali-handwriting-v1 (dikomit) — manifest cocok dengan file gambar & kelas store."""
+    from app.ml import bundled
+
+    root = bundled.datasets_root()
+    if root is None or not (root / "aksara-bali-handwriting-v1" / "manifest.json").is_file():
+        pytest.skip("paket dataset repo tidak tersedia di checkout ini")
+    m = bundled.get_bundled("aksara-bali-handwriting-v1")
+    assert m is not None
+    known = {c.label for c in store.all_available_classes()}
+    assert {c["label"] for c in m["classes"]} <= known
+    assert len(m["samples"]) == m["counts"]["total"] == 1080
+    per_label = {}
+    for s in m["samples"]:
+        assert (m["_folder"] / s["file"]).is_file()
+        assert s["split"] in store.SPLITS
+        per_label[s["label"]] = per_label.get(s["label"], 0) + 1
+    assert set(per_label.values()) == {60}
