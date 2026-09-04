@@ -8,7 +8,7 @@ from app.routers.docs import DOCS_DATA_PATH
 
 client = TestClient(app)
 
-ALL_SLUGS = {"penggunaan-murid", "penggunaan-guru", "penggunaan-admin", "metode-scientific", "dataset-dan-model"}
+ALL_SLUGS = {"penggunaan-murid", "penggunaan-guru", "penggunaan-admin", "metode-scientific", "dataset-dan-model", "panduan-retraining"}
 
 
 def test_mode_env_alias():
@@ -97,7 +97,7 @@ def test_prod_mode_hides_private_pages_from_regular_user(restore_docs_data, prod
     assert listing["mode"] == "prod"
     assert listing["is_admin"] is False
     assert "penggunaan-admin" not in {p["slug"] for p in listing["pages"]}
-    assert len(listing["pages"]) == 4
+    assert len(listing["pages"]) == len(ALL_SLUGS) - 1
 
 
 def test_prod_mode_admin_sees_all_pages(restore_docs_data, prod_mode):

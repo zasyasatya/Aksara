@@ -55,3 +55,8 @@ backend/app/static/
 # Font pihak ketiga untuk harness evaluasi (diunduh otomatis, lisensi OFL).
 eval/NotoSansBalinese.ttf
 eval/.venv/
+
+# Artefak ML runtime (dataset gambar, index, bobot model, registry) — dibuat dari
+# Panel Admin; persist via volume data. Hasil percobaan didokumentasikan di docs/.
+backend/app/data/ml/*
+!backend/app/data/ml/README.md

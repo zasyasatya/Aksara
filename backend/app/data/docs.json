@@ -23,12 +23,12 @@
     {
       "slug": "penggunaan-admin",
       "title": "Tata Cara Penggunaan — Admin",
-      "subtitle": "Akses panel admin dan pengaturan halaman dokumentasi",
+      "subtitle": "Akses panel admin, publikasi dokumentasi, dan panel Model ML (dataset, retraining, evaluasi, model produksi)",
       "role": "admin",
       "icon": "ShieldCheck",
       "is_public": true,
       "order": 3,
-      "updated_at": "2026-08-30"
+      "updated_at": "2026-09-04"
     },
     {
       "slug": "metode-scientific",
@@ -43,12 +43,22 @@
     {
       "slug": "dataset-dan-model",
       "title": "Dataset & Model — Pengenalan Tulisan Tangan",
-      "subtitle": "Dataset, arsitektur classifier template-matching, dan hasil evaluasi (akurasi 90%+)",
+      "subtitle": "Dataset, classifier template-matching (verifikasi ≈97%), dan model retraining di panel admin (CNN 98.2% pada 18 kelas)",
       "role": "metodologi",
       "icon": "Database",
       "is_public": true,
       "order": 5,
-      "updated_at": "2026-08-31"
+      "updated_at": "2026-09-04"
+    },
+    {
+      "slug": "panduan-retraining",
+      "title": "Panduan Retraining Model — Panel Admin",
+      "subtitle": "Langkah demi langkah (dengan screenshot): impor dataset, labeling, pilih arsitektur, latih, baca evaluasi, tetapkan model produksi, uji",
+      "role": "admin",
+      "icon": "Brain",
+      "is_public": true,
+      "order": 6,
+      "updated_at": "2026-09-04"
     }
   ]
 }

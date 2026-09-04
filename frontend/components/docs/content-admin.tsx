@@ -128,7 +128,98 @@ export function ContentAdmin() {
         </Callout>
       </DocSection>
 
-      <DocSection id="api" number="4." title="API & variabel lingkungan (ringkasan)">
+      <DocSection id="model-ml" number="4." title="Model ML — retraining classifier aksara">
+        <p>
+          Bagian <strong>“Model ML — Klasifikasi Aksara Bali”</strong> di panel admin (tombol{" "}
+          <em>Buka panel ML</em>, route{" "}
+          <Link href="/admin/ml" className="text-saffron-dark font-semibold hover:underline">/admin/ml</Link>)
+          adalah tempat mengelola <strong>dataset tulisan tangan</strong>, <strong>labeling</strong>,{" "}
+          <strong>retraining</strong> classifier, membaca <strong>laporan evaluasi</strong>, dan
+          memilih <strong>model produksi</strong>. Semua model berjalan murni NumPy di CPU server —
+          tidak butuh GPU atau dependensi berat.
+        </p>
+        <Steps
+          items={[
+            {
+              title: "Tab Dataset & Labeling — kumpulkan dan beri label",
+              body: (
+                <>
+                  Tambah sampel lewat <em>Generate sintetis</em> (glyph font Noto Sans Balinese +
+                  augmentasi), <em>Unggah gambar</em> (PNG/JPG, boleh tanpa label), atau{" "}
+                  <em>Tulis di kanvas</em>. Sampel tanpa label masuk <strong>antrean labeling</strong>;
+                  beri label satu-satu atau massal (pilih banyak → label / pindah split / hapus).
+                  Atur <em>kelas aktif</em> (default 18 Wresastra; bisa tambah Swalalita, Suara,
+                  Angka) dan <em>acak ulang split 70/15/15</em> (stratified) sebelum melatih.
+                </>
+              ),
+            },
+            {
+              title: "Tab Training — pilih arsitektur & jalankan retraining",
+              body: (
+                <>
+                  Pilih salah satu dari 6 arsitektur: <Code>template</Code> (chamfer, baseline),{" "}
+                  <Code>centroid</Code>, <Code>knn</Code>, <Code>logreg</Code>, <Code>mlp</Code>,{" "}
+                  <Code>cnn</Code>. Form hyperparameter (epoch, learning rate, batch, hidden units,
+                  dropout, …) menyesuaikan arsitektur. Klik <strong>Mulai Retraining</strong>: job
+                  berjalan di server, progress + kurva loss/akurasi tampil langsung, bisa dibatalkan.
+                  Centang <em>langsung jadikan model produksi</em> bila ingin otomatis dipromosikan.
+                </>
+              ),
+            },
+            {
+              title: "Tab Model & Evaluasi — baca metrik, pilih produksi",
+              body: (
+                <>
+                  Registry semua model dengan <strong>accuracy, precision, recall, F1 (makro)</strong>,
+                  train acc, durasi, ukuran. Klik baris untuk laporan lengkap: metrik makro &amp;
+                  berbobot, top-3, log-loss, tabel <strong>per kelas</strong>,{" "}
+                  <strong>confusion matrix</strong>, kurva pelatihan, dan galeri contoh salah
+                  klasifikasi. Tombol <strong>Jadikan produksi</strong> menetapkan model yang dipakai{" "}
+                  <Code>POST /api/ml/predict</Code>; tombol daya menonaktifkannya.
+                </>
+              ),
+            },
+            {
+              title: "Tab Percobaan — uji dan koreksi",
+              body: (
+                <>
+                  Tulis aksara di kanvas atau unggah gambar → prediksi dengan model pilihan, lihat
+                  top-k probabilitas dan fitur 28×28 yang “dilihat” model. <em>Bandingkan semua
+                  model</em> menjalankan input yang sama ke seluruh registry. Prediksi yang salah
+                  bisa langsung <strong>disimpan ke dataset</strong> dengan label benar, lalu
+                  retraining ulang (human-in-the-loop).
+                </>
+              ),
+            },
+          ]}
+        />
+        <DocTable
+          head={["Arsitektur", "Accuracy", "Precision", "Recall", "F1 (makro)", "Latih"]}
+          rows={[
+            ["Template matching (chamfer)", "74.7%", "81.2%", "74.7%", "75.1%", "0.5 s"],
+            ["Nearest centroid", "84.6%", "87.1%", "84.6%", "84.7%", "< 0.1 s"],
+            ["k-NN (k=5)", "84.6%", "85.6%", "84.6%", "84.4%", "< 0.1 s"],
+            ["Regresi logistik", "91.4%", "92.2%", "91.4%", "91.3%", "0.1 s"],
+            ["MLP (128 hidden)", "93.2%", "93.6%", "93.2%", "93.2%", "0.5 s"],
+            [<strong key="cnn">CNN</strong>, <strong key="a">98.2%</strong>, <strong key="p">98.4%</strong>, <strong key="r">98.2%</strong>, <strong key="f">98.2%</strong>, "5.7 s"],
+          ]}
+        />
+        <Callout variant="success" title="Hasil percobaan (eval/ml_experiments.py)">
+          Dataset sintetis 18 kelas Wresastra, 60 sampel/kelas (1080), split stratified
+          756/162/162, hyperparameter default, evaluasi pada split test, CPU 2 core. Angka ini
+          adalah metrik pada data sintetis — validasi akhir memakai tulisan tangan nyata yang
+          dikumpulkan lewat tab Dataset. Rincian, uji pergeseran distribusi, dan ablasi ukuran
+          data ada di <Code>docs/ML_RETRAINING.md</Code>.
+        </Callout>
+        <Callout variant="warning" title="Catatan operasional">
+          Artefak ML (PNG sampel, <Code>model.npz</Code>, registry) tersimpan di{" "}
+          <Code>backend/app/data/ml/</Code> — ikut volume data, tidak dikomit ke git. Hanya satu
+          job training berjalan pada satu waktu; model produksi tidak bisa dihapus sebelum
+          dinonaktifkan.
+        </Callout>
+      </DocSection>
+
+      <DocSection id="api" number="5." title="API & variabel lingkungan (ringkasan)">
         <CodeBlock>{`# Variabel lingkungan backend
 AKSARA_MODE=prod                          # dev | prod
 AKSARA_ADMIN_USERNAME=admin               # username admin
@@ -138,7 +229,17 @@ AKSARA_ADMIN_PASSWORD=ganti-password      # password admin (wajib diganti di pro
 POST /auth/login                           # body: {"role":"admin","username":"...","password":"..."}
 GET  /api/docs/pages                       # daftar halaman + mode + is_admin
 PATCH /api/docs/pages/:slug/visibility     # body: {"is_public": true|false}
-       Header: Authorization: Bearer <session>   # sesi dari /auth/login`}</CodeBlock>
+       Header: Authorization: Bearer <session>   # sesi dari /auth/login
+
+# Model ML (admin, kecuali status & predict)
+GET  /api/ml/status                        # dataset, model produksi, job aktif
+POST /api/ml/dataset/generate-synthetic    # {"per_class":60,"seed":20260904,"strength":1.0}
+POST /api/ml/dataset/samples               # {"image":"data:image/png;base64,...","label":"ha"|null}
+POST /api/ml/train  → 202                  # {"arch":"cnn","hyperparams":{"epochs":15},"auto_promote":false}
+GET  /api/ml/train/jobs                    # progress + kurva per epoch
+GET  /api/ml/models/:id                    # {model, report}: precision/recall/F1 per kelas, confusion matrix
+PUT  /api/ml/models/production             # {"model_id": "..."} | {"model_id": null}
+POST /api/ml/predict                       # publik: {"image": "...", "top_k": 5}`}</CodeBlock>
         <p>
           Endpoint <Code>GET /api/docs/pages</Code> membalas field <Code>mode</Code> (
           <Code>dev|prod</Code>) dan <Code>is_admin</Code> — frontend memakai keduanya untuk
