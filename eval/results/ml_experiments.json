@@ -1,0 +1,1743 @@
+{
+  "generated_at": "2026-09-04T14:22:21+00:00",
+  "python": "3.11.2",
+  "numpy": "2.4.6",
+  "machine": "x86_64",
+  "args": {
+    "archs": [
+      "template",
+      "centroid",
+      "knn",
+      "logreg",
+      "mlp",
+      "cnn"
+    ],
+    "groups": [
+      "wresastra"
+    ],
+    "per_class": 60,
+    "strength": 1.0,
+    "shift_per_class": 20,
+    "shift_strength": 1.6,
+    "seed": 20260904,
+    "ablation": true,
+    "ablation_sizes": [
+      10,
+      20,
+      40,
+      80
+    ],
+    "ablation_archs": [
+      "logreg",
+      "mlp",
+      "cnn"
+    ],
+    "out_md": "eval/results/ml_experiments.md",
+    "out_json": "eval/results/ml_experiments.json",
+    "keep_dir": null
+  },
+  "dataset": {
+    "groups": [
+      "wresastra"
+    ],
+    "per_class": 60,
+    "seed": 20260904,
+    "strength": 1.0,
+    "labeled": 1080,
+    "n_classes": 18,
+    "per_split": {
+      "train": 756,
+      "val": 162,
+      "test": 162
+    }
+  },
+  "benchmark": [
+    {
+      "arch": "template",
+      "arch_name": "Template Matching (Chamfer)",
+      "hyperparams": {},
+      "metrics": {
+        "accuracy": 0.7469,
+        "macro_precision": 0.8117,
+        "macro_recall": 0.7469,
+        "macro_f1": 0.7514,
+        "weighted_precision": 0.8117,
+        "weighted_recall": 0.7469,
+        "weighted_f1": 0.7514,
+        "top3_accuracy": 0.8519,
+        "log_loss": 2.0982,
+        "n_samples": 162,
+        "train_accuracy": 0.7037
+      },
+      "shift": {
+        "accuracy": 0.4,
+        "macro_f1": 0.4037,
+        "top3_accuracy": 0.5667
+      },
+      "train_seconds": 0.51,
+      "n_params": 14112,
+      "size_bytes": 19182,
+      "per_class": [
+        {
+          "label": "ha",
+          "precision": 0.8889,
+          "recall": 0.8889,
+          "f1": 0.8889,
+          "support": 9,
+          "predicted": 9,
+          "tp": 8,
+          "fp": 1,
+          "fn": 1
+        },
+        {
+          "label": "na",
+          "precision": 0.8889,
+          "recall": 0.8889,
+          "f1": 0.8889,
+          "support": 9,
+          "predicted": 9,
+          "tp": 8,
+          "fp": 1,
+          "fn": 1
+        },
+        {
+          "label": "ca",
+          "precision": 1.0,
+          "recall": 0.6667,
+          "f1": 0.8,
+          "support": 9,
+          "predicted": 6,
+          "tp": 6,
+          "fp": 0,
+          "fn": 3
+        },
+        {
+          "label": "ra",
+          "precision": 1.0,
+          "recall": 0.8889,
+          "f1": 0.9412,
+          "support": 9,
+          "predicted": 8,
+          "tp": 8,
+          "fp": 0,
+          "fn": 1
+        },
+        {
+          "label": "ka",
+          "precision": 0.5,
+          "recall": 0.8889,
+          "f1": 0.64,
+          "support": 9,
+          "predicted": 16,
+          "tp": 8,
+          "fp": 8,
+          "fn": 1
+        },
+        {
+          "label": "da",
+          "precision": 0.7778,
+          "recall": 0.7778,
+          "f1": 0.7778,
+          "support": 9,
+          "predicted": 9,
+          "tp": 7,
+          "fp": 2,
+          "fn": 2
+        },
+        {
+          "label": "ta",
+          "precision": 0.4615,
+          "recall": 0.6667,
+          "f1": 0.5455,
+          "support": 9,
+          "predicted": 13,
+          "tp": 6,
+          "fp": 7,
+          "fn": 3
+        },
+        {
+          "label": "sa",
+          "precision": 1.0,
+          "recall": 0.6667,
+          "f1": 0.8,
+          "support": 9,
+          "predicted": 6,
+          "tp": 6,
+          "fp": 0,
+          "fn": 3
+        },
+        {
+          "label": "wa",
+          "precision": 1.0,
+          "recall": 0.5556,
+          "f1": 0.7143,
+          "support": 9,
+          "predicted": 5,
+          "tp": 5,
+          "fp": 0,
+          "fn": 4
+        },
+        {
+          "label": "la",
+          "precision": 0.7778,
+          "recall": 0.7778,
+          "f1": 0.7778,
+          "support": 9,
+          "predicted": 9,
+          "tp": 7,
+          "fp": 2,
+          "fn": 2
+        },
+        {
+          "label": "ma",
+          "precision": 0.6429,
+          "recall": 1.0,
+          "f1": 0.7826,
+          "support": 9,
+          "predicted": 14,
+          "tp": 9,
+          "fp": 5,
+          "fn": 0
+        },
+        {
+          "label": "ga",
+          "precision": 0.8571,
+          "recall": 0.6667,
+          "f1": 0.75,
+          "support": 9,
+          "predicted": 7,
+          "tp": 6,
+          "fp": 1,
+          "fn": 3
+        },
+        {
+          "label": "ba",
+          "precision": 0.7273,
+          "recall": 0.8889,
+          "f1": 0.8,
+          "support": 9,
+          "predicted": 11,
+          "tp": 8,
+          "fp": 3,
+          "fn": 1
+        },
+        {
+          "label": "nga",
+          "precision": 1.0,
+          "recall": 0.5556,
+          "f1": 0.7143,
+          "support": 9,
+          "predicted": 5,
+          "tp": 5,
+          "fp": 0,
+          "fn": 4
+        },
+        {
+          "label": "pa",
+          "precision": 1.0,
+          "recall": 0.4444,
+          "f1": 0.6154,
+          "support": 9,
+          "predicted": 4,
+          "tp": 4,
+          "fp": 0,
+          "fn": 5
+        },
+        {
+          "label": "ja",
+          "precision": 0.7143,
+          "recall": 0.5556,
+          "f1": 0.625,
+          "support": 9,
+          "predicted": 7,
+          "tp": 5,
+          "fp": 2,
+          "fn": 4
+        },
+        {
+          "label": "ya",
+          "precision": 0.875,
+          "recall": 0.7778,
+          "f1": 0.8235,
+          "support": 9,
+          "predicted": 8,
+          "tp": 7,
+          "fp": 1,
+          "fn": 2
+        },
+        {
+          "label": "nya",
+          "precision": 0.5,
+          "recall": 0.8889,
+          "f1": 0.64,
+          "support": 9,
+          "predicted": 16,
+          "tp": 8,
+          "fp": 8,
+          "fn": 1
+        }
+      ],
+      "top_confusions": [
+        {
+          "true": "pa",
+          "pred": "ma",
+          "count": 3
+        },
+        {
+          "true": "ja",
+          "pred": "ta",
+          "count": 3
+        },
+        {
+          "true": "nga",
+          "pred": "ka",
+          "count": 2
+        },
+        {
+          "true": "ga",
+          "pred": "nya",
+          "count": 2
+        },
+        {
+          "true": "wa",
+          "pred": "da",
+          "count": 2
+        },
+        {
+          "true": "ta",
+          "pred": "nya",
+          "count": 2
+        },
+        {
+          "true": "sa",
+          "pred": "nya",
+          "count": 2
+        },
+        {
+          "true": "ra",
+          "pred": "ka",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "arch": "centroid",
+      "arch_name": "Nearest Centroid",
+      "hyperparams": {},
+      "metrics": {
+        "accuracy": 0.8457,
+        "macro_precision": 0.8706,
+        "macro_recall": 0.8457,
+        "macro_f1": 0.8472,
+        "weighted_precision": 0.8706,
+        "weighted_recall": 0.8457,
+        "weighted_f1": 0.8472,
+        "top3_accuracy": 0.9198,
+        "log_loss": 1.7689,
+        "n_samples": 162,
+        "train_accuracy": 0.8519
+      },
+      "shift": {
+        "accuracy": 0.45,
+        "macro_f1": 0.4819,
+        "top3_accuracy": 0.6417
+      },
+      "train_seconds": 0.045,
+      "n_params": 14112,
+      "size_bytes": 36679,
+      "per_class": [
+        {
+          "label": "ha",
+          "precision": 1.0,
+          "recall": 0.7778,
+          "f1": 0.875,
+          "support": 9,
+          "predicted": 7,
+          "tp": 7,
+          "fp": 0,
+          "fn": 2
+        },
+        {
+          "label": "na",
+          "precision": 1.0,
+          "recall": 0.8889,
+          "f1": 0.9412,
+          "support": 9,
+          "predicted": 8,
+          "tp": 8,
+          "fp": 0,
+          "fn": 1
+        },
+        {
+          "label": "ca",
+          "precision": 0.875,
+          "recall": 0.7778,
+          "f1": 0.8235,
+          "support": 9,
+          "predicted": 8,
+          "tp": 7,
+          "fp": 1,
+          "fn": 2
+        },
+        {
+          "label": "ra",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "ka",
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571,
+          "support": 9,
+          "predicted": 12,
+          "tp": 9,
+          "fp": 3,
+          "fn": 0
+        },
+        {
+          "label": "da",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "ta",
+          "precision": 0.875,
+          "recall": 0.7778,
+          "f1": 0.8235,
+          "support": 9,
+          "predicted": 8,
+          "tp": 7,
+          "fp": 1,
+          "fn": 2
+        },
+        {
+          "label": "sa",
+          "precision": 0.75,
+          "recall": 0.6667,
+          "f1": 0.7059,
+          "support": 9,
+          "predicted": 8,
+          "tp": 6,
+          "fp": 2,
+          "fn": 3
+        },
+        {
+          "label": "wa",
+          "precision": 1.0,
+          "recall": 0.7778,
+          "f1": 0.875,
+          "support": 9,
+          "predicted": 7,
+          "tp": 7,
+          "fp": 0,
+          "fn": 2
+        },
+        {
+          "label": "la",
+          "precision": 0.8889,
+          "recall": 0.8889,
+          "f1": 0.8889,
+          "support": 9,
+          "predicted": 9,
+          "tp": 8,
+          "fp": 1,
+          "fn": 1
+        },
+        {
+          "label": "ma",
+          "precision": 1.0,
+          "recall": 0.8889,
+          "f1": 0.9412,
+          "support": 9,
+          "predicted": 8,
+          "tp": 8,
+          "fp": 0,
+          "fn": 1
+        },
+        {
+          "label": "ga",
+          "precision": 0.8889,
+          "recall": 0.8889,
+          "f1": 0.8889,
+          "support": 9,
+          "predicted": 9,
+          "tp": 8,
+          "fp": 1,
+          "fn": 1
+        },
+        {
+          "label": "ba",
+          "precision": 0.7273,
+          "recall": 0.8889,
+          "f1": 0.8,
+          "support": 9,
+          "predicted": 11,
+          "tp": 8,
+          "fp": 3,
+          "fn": 1
+        },
+        {
+          "label": "nga",
+          "precision": 1.0,
+          "recall": 0.5556,
+          "f1": 0.7143,
+          "support": 9,
+          "predicted": 5,
+          "tp": 5,
+          "fp": 0,
+          "fn": 4
+        },
+        {
+          "label": "pa",
+          "precision": 0.7778,
+          "recall": 0.7778,
+          "f1": 0.7778,
+          "support": 9,
+          "predicted": 9,
+          "tp": 7,
+          "fp": 2,
+          "fn": 2
+        },
+        {
+          "label": "ja",
+          "precision": 0.875,
+          "recall": 0.7778,
+          "f1": 0.8235,
+          "support": 9,
+          "predicted": 8,
+          "tp": 7,
+          "fp": 1,
+          "fn": 2
+        },
+        {
+          "label": "ya",
+          "precision": 0.6923,
+          "recall": 1.0,
+          "f1": 0.8182,
+          "support": 9,
+          "predicted": 13,
+          "tp": 9,
+          "fp": 4,
+          "fn": 0
+        },
+        {
+          "label": "nya",
+          "precision": 0.5714,
+          "recall": 0.8889,
+          "f1": 0.6957,
+          "support": 9,
+          "predicted": 14,
+          "tp": 8,
+          "fp": 6,
+          "fn": 1
+        }
+      ],
+      "top_confusions": [
+        {
+          "true": "ca",
+          "pred": "sa",
+          "count": 2
+        },
+        {
+          "true": "nga",
+          "pred": "ka",
+          "count": 2
+        },
+        {
+          "true": "nga",
+          "pred": "nya",
+          "count": 2
+        },
+        {
+          "true": "ta",
+          "pred": "nya",
+          "count": 2
+        },
+        {
+          "true": "pa",
+          "pred": "ya",
+          "count": 1
+        },
+        {
+          "true": "ja",
+          "pred": "la",
+          "count": 1
+        },
+        {
+          "true": "ja",
+          "pred": "ba",
+          "count": 1
+        },
+        {
+          "true": "pa",
+          "pred": "ba",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "arch": "knn",
+      "arch_name": "k-Nearest Neighbours",
+      "hyperparams": {
+        "k": 5
+      },
+      "metrics": {
+        "accuracy": 0.8457,
+        "macro_precision": 0.8561,
+        "macro_recall": 0.8457,
+        "macro_f1": 0.8435,
+        "weighted_precision": 0.8561,
+        "weighted_recall": 0.8457,
+        "weighted_f1": 0.8435,
+        "top3_accuracy": 0.9753,
+        "log_loss": 1.0397,
+        "n_samples": 162,
+        "train_accuracy": 1.0
+      },
+      "shift": {
+        "accuracy": 0.5139,
+        "macro_f1": 0.5385,
+        "top3_accuracy": 0.6861
+      },
+      "train_seconds": 0.005,
+      "n_params": 592704,
+      "size_bytes": 294960,
+      "per_class": [
+        {
+          "label": "ha",
+          "precision": 0.8889,
+          "recall": 0.8889,
+          "f1": 0.8889,
+          "support": 9,
+          "predicted": 9,
+          "tp": 8,
+          "fp": 1,
+          "fn": 1
+        },
+        {
+          "label": "na",
+          "precision": 1.0,
+          "recall": 0.8889,
+          "f1": 0.9412,
+          "support": 9,
+          "predicted": 8,
+          "tp": 8,
+          "fp": 0,
+          "fn": 1
+        },
+        {
+          "label": "ca",
+          "precision": 0.5714,
+          "recall": 0.8889,
+          "f1": 0.6957,
+          "support": 9,
+          "predicted": 14,
+          "tp": 8,
+          "fp": 6,
+          "fn": 1
+        },
+        {
+          "label": "ra",
+          "precision": 0.9,
+          "recall": 1.0,
+          "f1": 0.9474,
+          "support": 9,
+          "predicted": 10,
+          "tp": 9,
+          "fp": 1,
+          "fn": 0
+        },
+        {
+          "label": "ka",
+          "precision": 0.9,
+          "recall": 1.0,
+          "f1": 0.9474,
+          "support": 9,
+          "predicted": 10,
+          "tp": 9,
+          "fp": 1,
+          "fn": 0
+        },
+        {
+          "label": "da",
+          "precision": 0.9,
+          "recall": 1.0,
+          "f1": 0.9474,
+          "support": 9,
+          "predicted": 10,
+          "tp": 9,
+          "fp": 1,
+          "fn": 0
+        },
+        {
+          "label": "ta",
+          "precision": 1.0,
+          "recall": 0.7778,
+          "f1": 0.875,
+          "support": 9,
+          "predicted": 7,
+          "tp": 7,
+          "fp": 0,
+          "fn": 2
+        },
+        {
+          "label": "sa",
+          "precision": 0.6667,
+          "recall": 0.4444,
+          "f1": 0.5333,
+          "support": 9,
+          "predicted": 6,
+          "tp": 4,
+          "fp": 2,
+          "fn": 5
+        },
+        {
+          "label": "wa",
+          "precision": 0.8889,
+          "recall": 0.8889,
+          "f1": 0.8889,
+          "support": 9,
+          "predicted": 9,
+          "tp": 8,
+          "fp": 1,
+          "fn": 1
+        },
+        {
+          "label": "la",
+          "precision": 0.8889,
+          "recall": 0.8889,
+          "f1": 0.8889,
+          "support": 9,
+          "predicted": 9,
+          "tp": 8,
+          "fp": 1,
+          "fn": 1
+        },
+        {
+          "label": "ma",
+          "precision": 0.8889,
+          "recall": 0.8889,
+          "f1": 0.8889,
+          "support": 9,
+          "predicted": 9,
+          "tp": 8,
+          "fp": 1,
+          "fn": 1
+        },
+        {
+          "label": "ga",
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571,
+          "support": 9,
+          "predicted": 12,
+          "tp": 9,
+          "fp": 3,
+          "fn": 0
+        },
+        {
+          "label": "ba",
+          "precision": 0.6667,
+          "recall": 0.6667,
+          "f1": 0.6667,
+          "support": 9,
+          "predicted": 9,
+          "tp": 6,
+          "fp": 3,
+          "fn": 3
+        },
+        {
+          "label": "nga",
+          "precision": 0.8333,
+          "recall": 0.5556,
+          "f1": 0.6667,
+          "support": 9,
+          "predicted": 6,
+          "tp": 5,
+          "fp": 1,
+          "fn": 4
+        },
+        {
+          "label": "pa",
+          "precision": 0.7778,
+          "recall": 0.7778,
+          "f1": 0.7778,
+          "support": 9,
+          "predicted": 9,
+          "tp": 7,
+          "fp": 2,
+          "fn": 2
+        },
+        {
+          "label": "ja",
+          "precision": 1.0,
+          "recall": 0.8889,
+          "f1": 0.9412,
+          "support": 9,
+          "predicted": 8,
+          "tp": 8,
+          "fp": 0,
+          "fn": 1
+        },
+        {
+          "label": "ya",
+          "precision": 1.0,
+          "recall": 0.8889,
+          "f1": 0.9412,
+          "support": 9,
+          "predicted": 8,
+          "tp": 8,
+          "fp": 0,
+          "fn": 1
+        },
+        {
+          "label": "nya",
+          "precision": 0.8889,
+          "recall": 0.8889,
+          "f1": 0.8889,
+          "support": 9,
+          "predicted": 9,
+          "tp": 8,
+          "fp": 1,
+          "fn": 1
+        }
+      ],
+      "top_confusions": [
+        {
+          "true": "sa",
+          "pred": "ca",
+          "count": 5
+        },
+        {
+          "true": "ba",
+          "pred": "ga",
+          "count": 3
+        },
+        {
+          "true": "pa",
+          "pred": "ma",
+          "count": 1
+        },
+        {
+          "true": "ca",
+          "pred": "sa",
+          "count": 1
+        },
+        {
+          "true": "ja",
+          "pred": "nga",
+          "count": 1
+        },
+        {
+          "true": "nga",
+          "pred": "ra",
+          "count": 1
+        },
+        {
+          "true": "nga",
+          "pred": "da",
+          "count": 1
+        },
+        {
+          "true": "pa",
+          "pred": "wa",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "arch": "logreg",
+      "arch_name": "Regresi Logistik (Softmax)",
+      "hyperparams": {
+        "epochs": 30,
+        "learning_rate": 0.005,
+        "batch_size": 64,
+        "weight_decay": 0.0005
+      },
+      "metrics": {
+        "accuracy": 0.9136,
+        "macro_precision": 0.9219,
+        "macro_recall": 0.9136,
+        "macro_f1": 0.9132,
+        "weighted_precision": 0.9219,
+        "weighted_recall": 0.9136,
+        "weighted_f1": 0.9132,
+        "top3_accuracy": 0.9815,
+        "log_loss": 0.305,
+        "n_samples": 162,
+        "train_accuracy": 1.0
+      },
+      "shift": {
+        "accuracy": 0.5667,
+        "macro_f1": 0.5724,
+        "top3_accuracy": 0.7333
+      },
+      "train_seconds": 0.122,
+      "n_params": 14130,
+      "size_bytes": 75160,
+      "per_class": [
+        {
+          "label": "ha",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "na",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "ca",
+          "precision": 1.0,
+          "recall": 0.6667,
+          "f1": 0.8,
+          "support": 9,
+          "predicted": 6,
+          "tp": 6,
+          "fp": 0,
+          "fn": 3
+        },
+        {
+          "label": "ra",
+          "precision": 0.9,
+          "recall": 1.0,
+          "f1": 0.9474,
+          "support": 9,
+          "predicted": 10,
+          "tp": 9,
+          "fp": 1,
+          "fn": 0
+        },
+        {
+          "label": "ka",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "da",
+          "precision": 1.0,
+          "recall": 0.8889,
+          "f1": 0.9412,
+          "support": 9,
+          "predicted": 8,
+          "tp": 8,
+          "fp": 0,
+          "fn": 1
+        },
+        {
+          "label": "ta",
+          "precision": 1.0,
+          "recall": 0.7778,
+          "f1": 0.875,
+          "support": 9,
+          "predicted": 7,
+          "tp": 7,
+          "fp": 0,
+          "fn": 2
+        },
+        {
+          "label": "sa",
+          "precision": 0.7,
+          "recall": 0.7778,
+          "f1": 0.7368,
+          "support": 9,
+          "predicted": 10,
+          "tp": 7,
+          "fp": 3,
+          "fn": 2
+        },
+        {
+          "label": "wa",
+          "precision": 1.0,
+          "recall": 0.8889,
+          "f1": 0.9412,
+          "support": 9,
+          "predicted": 8,
+          "tp": 8,
+          "fp": 0,
+          "fn": 1
+        },
+        {
+          "label": "la",
+          "precision": 0.9,
+          "recall": 1.0,
+          "f1": 0.9474,
+          "support": 9,
+          "predicted": 10,
+          "tp": 9,
+          "fp": 1,
+          "fn": 0
+        },
+        {
+          "label": "ma",
+          "precision": 0.8889,
+          "recall": 0.8889,
+          "f1": 0.8889,
+          "support": 9,
+          "predicted": 9,
+          "tp": 8,
+          "fp": 1,
+          "fn": 1
+        },
+        {
+          "label": "ga",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "ba",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "nga",
+          "precision": 0.7778,
+          "recall": 0.7778,
+          "f1": 0.7778,
+          "support": 9,
+          "predicted": 9,
+          "tp": 7,
+          "fp": 2,
+          "fn": 2
+        },
+        {
+          "label": "pa",
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571,
+          "support": 9,
+          "predicted": 12,
+          "tp": 9,
+          "fp": 3,
+          "fn": 0
+        },
+        {
+          "label": "ja",
+          "precision": 0.7778,
+          "recall": 0.7778,
+          "f1": 0.7778,
+          "support": 9,
+          "predicted": 9,
+          "tp": 7,
+          "fp": 2,
+          "fn": 2
+        },
+        {
+          "label": "ya",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "nya",
+          "precision": 0.9,
+          "recall": 1.0,
+          "f1": 0.9474,
+          "support": 9,
+          "predicted": 10,
+          "tp": 9,
+          "fp": 1,
+          "fn": 0
+        }
+      ],
+      "top_confusions": [
+        {
+          "true": "ca",
+          "pred": "sa",
+          "count": 3
+        },
+        {
+          "true": "ja",
+          "pred": "la",
+          "count": 1
+        },
+        {
+          "true": "ja",
+          "pred": "nga",
+          "count": 1
+        },
+        {
+          "true": "nga",
+          "pred": "ra",
+          "count": 1
+        },
+        {
+          "true": "nga",
+          "pred": "nya",
+          "count": 1
+        },
+        {
+          "true": "ma",
+          "pred": "pa",
+          "count": 1
+        },
+        {
+          "true": "sa",
+          "pred": "ma",
+          "count": 1
+        },
+        {
+          "true": "sa",
+          "pred": "pa",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "arch": "mlp",
+      "arch_name": "Multi-Layer Perceptron",
+      "hyperparams": {
+        "epochs": 40,
+        "learning_rate": 0.002,
+        "batch_size": 64,
+        "hidden_units": 128,
+        "dropout": 0.2,
+        "weight_decay": 0.0005
+      },
+      "metrics": {
+        "accuracy": 0.9321,
+        "macro_precision": 0.9359,
+        "macro_recall": 0.9321,
+        "macro_f1": 0.9315,
+        "weighted_precision": 0.9359,
+        "weighted_recall": 0.9321,
+        "weighted_f1": 0.9315,
+        "top3_accuracy": 0.9815,
+        "log_loss": 0.2562,
+        "n_samples": 162,
+        "train_accuracy": 1.0
+      },
+      "shift": {
+        "accuracy": 0.5861,
+        "macro_f1": 0.5968,
+        "top3_accuracy": 0.7667
+      },
+      "train_seconds": 0.521,
+      "n_params": 102802,
+      "size_bytes": 414797,
+      "per_class": [
+        {
+          "label": "ha",
+          "precision": 0.9,
+          "recall": 1.0,
+          "f1": 0.9474,
+          "support": 9,
+          "predicted": 10,
+          "tp": 9,
+          "fp": 1,
+          "fn": 0
+        },
+        {
+          "label": "na",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "ca",
+          "precision": 0.875,
+          "recall": 0.7778,
+          "f1": 0.8235,
+          "support": 9,
+          "predicted": 8,
+          "tp": 7,
+          "fp": 1,
+          "fn": 2
+        },
+        {
+          "label": "ra",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "ka",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "da",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "ta",
+          "precision": 1.0,
+          "recall": 0.7778,
+          "f1": 0.875,
+          "support": 9,
+          "predicted": 7,
+          "tp": 7,
+          "fp": 0,
+          "fn": 2
+        },
+        {
+          "label": "sa",
+          "precision": 0.8,
+          "recall": 0.8889,
+          "f1": 0.8421,
+          "support": 9,
+          "predicted": 10,
+          "tp": 8,
+          "fp": 2,
+          "fn": 1
+        },
+        {
+          "label": "wa",
+          "precision": 1.0,
+          "recall": 0.8889,
+          "f1": 0.9412,
+          "support": 9,
+          "predicted": 8,
+          "tp": 8,
+          "fp": 0,
+          "fn": 1
+        },
+        {
+          "label": "la",
+          "precision": 0.8889,
+          "recall": 0.8889,
+          "f1": 0.8889,
+          "support": 9,
+          "predicted": 9,
+          "tp": 8,
+          "fp": 1,
+          "fn": 1
+        },
+        {
+          "label": "ma",
+          "precision": 1.0,
+          "recall": 0.8889,
+          "f1": 0.9412,
+          "support": 9,
+          "predicted": 8,
+          "tp": 8,
+          "fp": 0,
+          "fn": 1
+        },
+        {
+          "label": "ga",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "ba",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "nga",
+          "precision": 0.8889,
+          "recall": 0.8889,
+          "f1": 0.8889,
+          "support": 9,
+          "predicted": 9,
+          "tp": 8,
+          "fp": 1,
+          "fn": 1
+        },
+        {
+          "label": "pa",
+          "precision": 0.8182,
+          "recall": 1.0,
+          "f1": 0.9,
+          "support": 9,
+          "predicted": 11,
+          "tp": 9,
+          "fp": 2,
+          "fn": 0
+        },
+        {
+          "label": "ja",
+          "precision": 0.875,
+          "recall": 0.7778,
+          "f1": 0.8235,
+          "support": 9,
+          "predicted": 8,
+          "tp": 7,
+          "fp": 1,
+          "fn": 2
+        },
+        {
+          "label": "ya",
+          "precision": 0.9,
+          "recall": 1.0,
+          "f1": 0.9474,
+          "support": 9,
+          "predicted": 10,
+          "tp": 9,
+          "fp": 1,
+          "fn": 0
+        },
+        {
+          "label": "nya",
+          "precision": 0.9,
+          "recall": 1.0,
+          "f1": 0.9474,
+          "support": 9,
+          "predicted": 10,
+          "tp": 9,
+          "fp": 1,
+          "fn": 0
+        }
+      ],
+      "top_confusions": [
+        {
+          "true": "ca",
+          "pred": "sa",
+          "count": 2
+        },
+        {
+          "true": "ja",
+          "pred": "la",
+          "count": 1
+        },
+        {
+          "true": "ja",
+          "pred": "nga",
+          "count": 1
+        },
+        {
+          "true": "nga",
+          "pred": "nya",
+          "count": 1
+        },
+        {
+          "true": "ma",
+          "pred": "pa",
+          "count": 1
+        },
+        {
+          "true": "la",
+          "pred": "ya",
+          "count": 1
+        },
+        {
+          "true": "sa",
+          "pred": "ca",
+          "count": 1
+        },
+        {
+          "true": "wa",
+          "pred": "pa",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "arch": "cnn",
+      "arch_name": "Convolutional Neural Network",
+      "hyperparams": {
+        "epochs": 15,
+        "learning_rate": 0.004,
+        "batch_size": 64,
+        "conv1_filters": 8,
+        "conv2_filters": 16,
+        "hidden_units": 64,
+        "dropout": 0.25
+      },
+      "metrics": {
+        "accuracy": 0.9815,
+        "macro_precision": 0.9843,
+        "macro_recall": 0.9815,
+        "macro_f1": 0.9817,
+        "weighted_precision": 0.9843,
+        "weighted_recall": 0.9815,
+        "weighted_f1": 0.9817,
+        "top3_accuracy": 0.9815,
+        "log_loss": 0.094,
+        "n_samples": 162,
+        "train_accuracy": 1.0
+      },
+      "shift": {
+        "accuracy": 0.6361,
+        "macro_f1": 0.6579,
+        "top3_accuracy": 0.7778
+      },
+      "train_seconds": 5.656,
+      "n_params": 52658,
+      "size_bytes": 214390,
+      "per_class": [
+        {
+          "label": "ha",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "na",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "ca",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "ra",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "ka",
+          "precision": 0.8182,
+          "recall": 1.0,
+          "f1": 0.9,
+          "support": 9,
+          "predicted": 11,
+          "tp": 9,
+          "fp": 2,
+          "fn": 0
+        },
+        {
+          "label": "da",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "ta",
+          "precision": 1.0,
+          "recall": 0.8889,
+          "f1": 0.9412,
+          "support": 9,
+          "predicted": 8,
+          "tp": 8,
+          "fp": 0,
+          "fn": 1
+        },
+        {
+          "label": "sa",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "wa",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "la",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "ma",
+          "precision": 1.0,
+          "recall": 0.8889,
+          "f1": 0.9412,
+          "support": 9,
+          "predicted": 8,
+          "tp": 8,
+          "fp": 0,
+          "fn": 1
+        },
+        {
+          "label": "ga",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "ba",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "nga",
+          "precision": 1.0,
+          "recall": 0.8889,
+          "f1": 0.9412,
+          "support": 9,
+          "predicted": 8,
+          "tp": 8,
+          "fp": 0,
+          "fn": 1
+        },
+        {
+          "label": "pa",
+          "precision": 0.9,
+          "recall": 1.0,
+          "f1": 0.9474,
+          "support": 9,
+          "predicted": 10,
+          "tp": 9,
+          "fp": 1,
+          "fn": 0
+        },
+        {
+          "label": "ja",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "ya",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        {
+          "label": "nya",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 9,
+          "predicted": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        }
+      ],
+      "top_confusions": [
+        {
+          "true": "nga",
+          "pred": "ka",
+          "count": 1
+        },
+        {
+          "true": "ma",
+          "pred": "pa",
+          "count": 1
+        },
+        {
+          "true": "ta",
+          "pred": "ka",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "ablation": {
+    "sizes": [
+      10,
+      20,
+      40,
+      80
+    ],
+    "archs": [
+      "logreg",
+      "mlp",
+      "cnn"
+    ],
+    "table": {
+      "logreg": {
+        "10": {
+          "accuracy": 0.6944,
+          "macro_f1": 0.6537,
+          "train_seconds": 0.018
+        },
+        "20": {
+          "accuracy": 0.8704,
+          "macro_f1": 0.8661,
+          "train_seconds": 0.035
+        },
+        "40": {
+          "accuracy": 0.9167,
+          "macro_f1": 0.9159,
+          "train_seconds": 0.077
+        },
+        "80": {
+          "accuracy": 0.963,
+          "macro_f1": 0.9627,
+          "train_seconds": 0.147
+        }
+      },
+      "mlp": {
+        "10": {
+          "accuracy": 0.6667,
+          "macro_f1": 0.6241,
+          "train_seconds": 0.105
+        },
+        "20": {
+          "accuracy": 0.8148,
+          "macro_f1": 0.8114,
+          "train_seconds": 0.203
+        },
+        "40": {
+          "accuracy": 0.8981,
+          "macro_f1": 0.8956,
+          "train_seconds": 0.382
+        },
+        "80": {
+          "accuracy": 0.963,
+          "macro_f1": 0.9629,
+          "train_seconds": 0.711
+        }
+      },
+      "cnn": {
+        "10": {
+          "accuracy": 0.6111,
+          "macro_f1": 0.6,
+          "train_seconds": 0.807
+        },
+        "20": {
+          "accuracy": 0.7593,
+          "macro_f1": 0.7554,
+          "train_seconds": 1.85
+        },
+        "40": {
+          "accuracy": 0.8704,
+          "macro_f1": 0.8656,
+          "train_seconds": 3.303
+        },
+        "80": {
+          "accuracy": 0.9444,
+          "macro_f1": 0.9455,
+          "train_seconds": 7.447
+        }
+      }
+    }
+  },
+  "total_seconds": 37.8
+}

@@ -170,10 +170,39 @@ untuk aplikasi edukasi: lebih baik tidak menjawab daripada salah mengajari.
 ### 5.3 Batasan & kejujuran
 
 - Angka di atas adalah **metrik algoritma pada dataset sintetis**; akurasi pada
-  tinta manusia sungguhan memerlukan korpus ink berlabel yang saat ini belum
-  tersedia (masuk rencana pengembangan).
-- Pengenalan terbuka masih terbatas; mode telusur (verifikasi) adalah jalur
-  pembelajaran utama dan sudah andal (≥ 95%).
+  tinta manusia sungguhan memerlukan korpus ink berlabel — pengumpulannya kini
+  difasilitasi Panel Admin → Model ML (§5.4).
+- Pengenalan terbuka dengan template matching masih terbatas; mode telusur
+  (verifikasi) adalah jalur pembelajaran utama dan sudah andal (≥ 95%).
+
+### 5.4 Model terlatih (retraining) untuk pengenalan terbuka — Panel Admin
+
+Keterbatasan §5.2 dijawab dengan pipeline **retraining** di Panel Admin
+(`/admin/ml`, dokumentasi lengkap: [`ML_RETRAINING.md`](ML_RETRAINING.md)):
+dataset tulisan tangan dikelola & dilabeli admin (sintetis, unggahan, kanvas,
+koreksi dari percobaan), lalu classifier **belajar dari data** — 6 arsitektur
+murni NumPy (template, centroid, k-NN, regresi logistik, MLP, CNN) — dan
+dievaluasi otomatis (accuracy, precision, recall, F1 makro/berbobot, top-3,
+log-loss, confusion matrix, per kelas). Admin memilih model **produksi** yang
+dilayani `POST /api/ml/predict`.
+
+Hasil percobaan (`eval/ml_experiments.py`; 18 kelas Wresastra, 60 sampel
+sintetis/kelas, split 70/15/15, evaluasi pada test):
+
+| Arsitektur | Accuracy | Precision | Recall | F1 (makro) | Acc pada set *shift* |
+| --- | --- | --- | --- | --- | --- |
+| Template matching (chamfer) | 74.7% | 81.2% | 74.7% | 75.1% | 40.0% |
+| Nearest centroid | 84.6% | 87.1% | 84.6% | 84.7% | 45.0% |
+| k-NN (k=5) | 84.6% | 85.6% | 84.6% | 84.4% | 51.4% |
+| Regresi logistik | 91.4% | 92.2% | 91.4% | 91.3% | 56.7% |
+| MLP | 93.2% | 93.6% | 93.2% | 93.2% | 58.6% |
+| **CNN** | **98.2%** | **98.4%** | **98.2%** | **98.2%** | **63.6%** |
+
+Pengenalan terbuka 18 kelas naik dari ≈ 75% (template) ke **98.2% (CNN)** pada
+data sintetis; pada set *shift* (augmentasi 1.6× lebih kuat) CNN tetap
+terbaik (63.6%), yang sekaligus mengingatkan bahwa validasi akhir harus memakai
+tulisan tangan nyata. Detail metodologi, ablasi ukuran data, dan kesimpulan ada
+di `ML_RETRAINING.md` §5 dan `eval/results/ml_experiments.md`.
 
 ---
 
@@ -185,6 +214,9 @@ cd eval
 python -m venv .venv && .venv/bin/pip install Pillow numpy
 .venv/bin/python evaluate_handwriting.py            # unduh font + jalankan
 .venv/bin/python evaluate_handwriting.py --font /path/NotoSansBalinese.ttf
+
+# Percobaan retraining (6 arsitektur + ablasi) — memakai venv backend
+cd .. && .venv/bin/python eval/ml_experiments.py --ablation
 ```
 
 ---

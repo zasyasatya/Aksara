@@ -397,6 +397,85 @@ Response:
 }
 ```
 
+### ML — Retraining classifier aksara (Panel Admin)
+
+Prefix `/ml`. Semua endpoint **admin-only** (Bearer token admin; mode `dev`
+otomatis admin) kecuali `GET /ml/status`, `POST /ml/predict`, dan
+`GET /ml/dataset/samples/{id}/image`. Dokumentasi lengkap: `docs/ML_RETRAINING.md`.
+
+**GET /ml/status** — ringkasan untuk dashboard admin.
+```json
+{
+  "mode": "dev",
+  "is_admin": true,
+  "production_model": { "id": "cnn-20260904-1422-ab12", "name": "CNN v1", "arch": "cnn",
+                        "metrics": { "accuracy": 0.9815, "macro_precision": 0.9838,
+                                     "macro_recall": 0.9815, "macro_f1": 0.9816 } },
+  "dataset": { "total": 1080, "labeled": 1080, "unlabeled": 0, "review": 0,
+               "per_split": { "train": 756, "val": 162, "test": 162 }, "n_classes": 18, "version": 3 },
+  "models_total": 4,
+  "active_job": null,
+  "font_available": true
+}
+```
+
+**Dataset & labeling**
+
+| Method | Path | Body / query | Keterangan |
+| --- | --- | --- | --- |
+| GET | `/ml/architectures` | — | daftar arsitektur + spesifikasi hyperparameter (dipakai form UI) |
+| GET / PUT | `/ml/classes` | `{ "labels": ["ha", …] }` | kelas tersedia & aktif / ganti kelas aktif |
+| GET | `/ml/dataset/stats` | — | jumlah per label × split, kelas kosong, versi dataset |
+| GET | `/ml/dataset/samples` | `label, split, source, status, q, limit (≤500), offset` | daftar sampel (paging) |
+| POST | `/ml/dataset/samples` | `{ "image": "<data URL>", "label"?: "ha", "source": "canvas\|upload\|import", "split"?, "note"? }` | tambah 1 sampel (tanpa label → antrean labeling) |
+| POST | `/ml/dataset/samples/bulk` | `{ "items": [SampleIn, …] }` | tambah banyak sampel |
+| GET / PATCH / DELETE | `/ml/dataset/samples/{id}` | PATCH: `{ "label"?, "clear_label"?, "split"?, "status"?, "note"? }` | detail / labeling / hapus |
+| GET | `/ml/dataset/samples/{id}/image` | — | PNG 64×64 sampel (publik, untuk thumbnail) |
+| POST | `/ml/dataset/bulk-label` | `{ "ids": [...], "label"?, "split"?, "status"? }` | aksi massal |
+| POST | `/ml/dataset/bulk-delete` | `{ "ids": [...] }` | hapus massal |
+| POST | `/ml/dataset/generate-synthetic` | `{ "per_class": 60, "seed": 20260904, "strength": 1.0 }` | bangkitkan sampel sintetis dari font Noto Sans Balinese |
+| POST | `/ml/dataset/rebalance` | `{ "val_ratio": 0.15, "test_ratio": 0.15, "seed": 0 }` | acak ulang split stratified |
+| POST | `/ml/dataset/clear` | query `source?` (`synthetic\|upload\|canvas\|import`), `label?` | kosongkan dataset (opsional per sumber/label) |
+
+**Training & model**
+
+| Method | Path | Body | Keterangan |
+| --- | --- | --- | --- |
+| POST | `/ml/train` → **202** | `{ "arch": "cnn", "hyperparams": { "epochs": 15 }, "name": "CNN v1", "notes": "", "auto_promote": false }` | mulai job retraining (400 bila dataset belum siap / job lain berjalan) |
+| GET | `/ml/train/jobs` | — | `{ "jobs": [...], "active": Job\|null }` |
+| GET | `/ml/train/jobs/{id}` | — | status job: `status`, `progress`, `epoch`, `history[]`, `message`, `model_id`, `metrics` |
+| DELETE | `/ml/train/jobs/{id}` | — | batalkan job |
+| GET | `/ml/models` | — | registry `{ "models": [...], "production_model_id" }` |
+| GET | `/ml/models/{id}` | — | `{ "model": entry, "report": laporan evaluasi lengkap }` |
+| PATCH / DELETE | `/ml/models/{id}` | `{ "name"?, "notes"? }` | ubah / hapus (model produksi tidak bisa dihapus) |
+| PUT | `/ml/models/production` | `{ "model_id": "…" \| null }` | pilih / nonaktifkan model produksi |
+
+Laporan evaluasi (`report`) berisi `accuracy`, `macro_precision`, `macro_recall`,
+`macro_f1`, `weighted_*`, `top3_accuracy`, `log_loss`, `mean_confidence`,
+`confident_rate`, `confident_accuracy`, `train_accuracy`, `per_class[]`
+(precision/recall/f1/support/tp/fp/fn), `confusion_matrix`, `top_confusions[]`,
+`history[]` (loss & akurasi per epoch), `misclassified[]`.
+
+**Prediksi**
+
+**POST /ml/predict** (publik)
+```json
+{ "image": "data:image/png;base64,…", "model_id": null, "top_k": 5 }
+```
+Response 200 (409 bila belum ada model produksi, 422 bila gambar tidak berisi tinta):
+```json
+{
+  "model_id": "cnn-20260904-1422-ab12", "model_name": "CNN v1", "arch": "cnn", "is_production": true,
+  "label": "ha", "glyph": "ᬳ", "name": "Ha", "latin": "ha",
+  "confidence": 0.93, "margin": 0.88, "confident": true,
+  "top": [ { "label": "ha", "glyph": "ᬳ", "probability": 0.93 }, { "label": "nga", "glyph": "ᬗ", "probability": 0.05 } ],
+  "preview": "data:image/png;base64,…"
+}
+```
+
+**POST /ml/predict/compare** (admin) — `{ "image", "model_ids": ["…", "…"] }` →
+`{ "results": [prediksi per model] }`.
+
 ### Dictionary (Future)
 
 **GET /dictionary?search=bali**

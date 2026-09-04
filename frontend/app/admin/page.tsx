@@ -6,8 +6,10 @@ import { useRouter } from "next/navigation"
 import {
   api,
   DocsPagesResponse,
+  MlStatus,
   setSession,
 } from "@/lib/api"
+import { MetricsRow } from "@/components/admin/ml-ui"
 import { Header } from "@/components/layout/header"
 import { BottomNav } from "@/components/layout/bottom-nav"
 import { docRoleMeta, IconByName } from "@/components/docs/meta"
@@ -21,10 +23,18 @@ import {
   ExternalLink,
   CheckCircle2,
   RefreshCw,
+  Brain,
+  Database,
+  Cpu,
+  Boxes,
+  FlaskConical,
+  Rocket,
+  ArrowRight,
 } from "lucide-react"
 
 export default function AdminPage() {
   const [data, setData] = useState<DocsPagesResponse | null>(null)
+  const [ml, setMl] = useState<MlStatus | null>(null)
   const [version, setVersion] = useState<string>("")
   const [error, setError] = useState<string | null>(null)
   const [savingSlug, setSavingSlug] = useState<string | null>(null)
@@ -49,6 +59,7 @@ export default function AdminPage() {
       if (!d?.is_admin) router.replace("/login?next=/admin")
     })
     api.health().then((h) => setVersion(h.version ?? "")).catch(() => {})
+    api.ml.status().then(setMl).catch(() => {})
   }, [load, router])
 
   const handleLogout = () => {
@@ -143,6 +154,64 @@ export default function AdminPage() {
                 value={String(data.pages.filter((p) => p.is_public).length)}
                 hint={`dari ${data.pages.length} halaman`}
               />
+            </div>
+
+            {/* Model ML — retraining classifier aksara */}
+            <div className="mt-6 overflow-hidden rounded-3xl border border-sand bg-white shadow-soft">
+              <div className="flex flex-col gap-3 border-b border-sand px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-ocean to-deep-brown text-cream">
+                    <Brain className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h2 className="font-display text-lg font-bold text-deep-brown">Model ML — Klasifikasi Aksara Bali</h2>
+                    <p className="text-xs text-charcoal/55">
+                      Manajemen dataset & labeling, retraining, evaluasi (accuracy / precision / recall / F1), pilih model produksi.
+                    </p>
+                  </div>
+                </div>
+                <Link href="/admin/ml" className="inline-flex items-center gap-2 rounded-full bg-deep-brown px-5 py-2 text-sm font-semibold text-cream shadow-soft transition-colors hover:bg-charcoal">
+                  Buka panel ML <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+              <div className="grid gap-3 px-6 py-4 md:grid-cols-[1fr_1fr_2fr]">
+                <div className="rounded-2xl border border-sand bg-cream/40 p-3">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-charcoal/50">Dataset</div>
+                  <div className="mt-0.5 font-display text-xl font-bold text-deep-brown">{ml ? ml.dataset.labeled.toLocaleString("id-ID") : "—"} <span className="text-xs font-normal text-charcoal/50">berlabel</span></div>
+                  <div className="text-[11px] text-charcoal/45">{ml ? `${ml.dataset.n_classes} kelas · ${ml.dataset.unlabeled} menunggu label` : "memuat…"}</div>
+                </div>
+                <div className="rounded-2xl border border-sand bg-cream/40 p-3">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-charcoal/50">Model terlatih</div>
+                  <div className="mt-0.5 font-display text-xl font-bold text-deep-brown">{ml ? ml.models_total : "—"}</div>
+                  <div className="text-[11px] text-charcoal/45">{ml?.active_job ? <span className="text-saffron-dark">● {ml.active_job.message}</span> : "tidak ada job berjalan"}</div>
+                </div>
+                <div className={`rounded-2xl border p-3 ${ml?.production_model ? "border-sage/50 bg-sage/10" : "border-sand bg-cream/40"}`}>
+                  <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-charcoal/50"><Rocket className="h-3 w-3" /> Model produksi</div>
+                  {ml?.production_model ? (
+                    <div className="mt-0.5 flex flex-wrap items-center gap-3">
+                      <div><div className="font-display text-base font-bold text-deep-brown">{ml.production_model.name}</div><div className="text-[11px] text-charcoal/50">{ml.production_model.arch_name}</div></div>
+                      <div className="min-w-[240px] flex-1"><MetricsRow m={ml.production_model.metrics} compact /></div>
+                    </div>
+                  ) : (
+                    <div className="mt-0.5 text-sm text-charcoal/60">Belum ada model produksi.</div>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 border-t border-sand bg-cream/60 px-6 py-3">
+                {[
+                  { href: "/admin/ml?tab=dataset", icon: Database, label: "Dataset & Labeling" },
+                  { href: "/admin/ml?tab=training", icon: Cpu, label: "Training" },
+                  { href: "/admin/ml?tab=models", icon: Boxes, label: "Model & Evaluasi" },
+                  { href: "/admin/ml?tab=experiment", icon: FlaskConical, label: "Percobaan" },
+                ].map((l) => {
+                  const Icon = l.icon
+                  return (
+                    <Link key={l.href} href={l.href} className="inline-flex items-center gap-1.5 rounded-full border border-sand bg-white px-3 py-1.5 text-xs font-semibold text-charcoal/70 hover:border-deep-brown/40 hover:text-deep-brown">
+                      <Icon className="h-3.5 w-3.5" /> {l.label}
+                    </Link>
+                  )
+                })}
+              </div>
             </div>
 
             {/* Publikasi dokumentasi */}

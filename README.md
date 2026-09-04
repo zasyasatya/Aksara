@@ -49,7 +49,8 @@
 ### 📚 Dokumentasi, Panel Guru & Panel Admin
 - **`/docs`** — pusat dokumentasi: tata cara penggunaan untuk **murid, guru, admin**, plus halaman khusus **Metode Scientific & Referensi** (metodologi transliterasi + sumber akademik) dan **Dataset & Model** (dataset + classifier tulisan tangan, evaluasi 90%+) — lengkap dengan screenshot halaman
 - **`/guru`** — panel guru: kelola konten (materi/kuis/kamus) secara real-time
-- **`/admin`** — panel admin: atur halaman dokumentasi mana yang **go public**
+- **`/admin`** — panel admin: atur halaman dokumentasi mana yang **go public**, plus panel **Model ML** (`/admin/ml`)
+- **`/admin/ml`** — retraining classifier aksara Bali: **manajemen dataset & labeling** (sintetis dari font, unggah, kanvas), **pilih arsitektur** (template · centroid · k-NN · regresi logistik · MLP · CNN, murni NumPy), job training live, **laporan evaluasi lengkap** (accuracy, precision, recall, F1, top-3, log-loss, confusion matrix, per kelas), **pilih model produksi** untuk `POST /api/ml/predict`, dan tab **Percobaan** (uji tulisan, bandingkan model, koreksi → dataset). Hasil eksperimen: `docs/ML_RETRAINING.md`
 - **Mode DEV** (`AKSARA_MODE=dev`): semua halaman dokumentasi selalu tampil, akses admin & guru otomatis
 - **Mode PROD** (`AKSARA_MODE=prod`): hanya halaman publik yang tampil; admin & guru login via username + password (`AKSARA_ADMIN_USERNAME`/`AKSARA_ADMIN_PASSWORD` dan `AKSARA_GURU_USERNAME`/`AKSARA_GURU_PASSWORD`)
 
@@ -81,22 +82,27 @@ Aksara/
 │   ├── TEST_PLAN.md - Testing strategy
 │   ├── PAPER.md - Draft paper .id DeveloperDay 2026 (8 bagian wajib, Inggris)
 │   ├── DATASET_MODEL.md - Dataset & model classifier tulisan tangan (detail + evaluasi 90%+)
+│   ├── ML_RETRAINING.md - Panel Model ML: dataset, labeling, retraining, evaluasi, hasil percobaan 6 arsitektur
 │   ├── DEMO_SCRIPT.md - Skrip video demo 5 menit
 │   └── slides/ - Deck slide (HTML 16:9, navigasi keyboard + speaker notes)
 ├── eval/
 │   ├── evaluate_handwriting.py - Harness evaluasi classifier template-matching (reproducible)
+│   ├── ml_experiments.py - Percobaan retraining (benchmark 6 arsitektur + ablasi ukuran data)
+│   ├── results/ - Laporan percobaan terakhir (markdown + JSON)
 │   └── README.md - Cara menjalankan evaluasi
 ├── backend/
 │   ├── app/
 │   │   ├── main.py - FastAPI app
 │   │   ├── core/config.py
 │   │   ├── data/ - aksara_master.json, lessons, quiz, dictionary, engagement.json
+│   │   ├── assets/fonts/ - Noto Sans Balinese (OFL) untuk dataset sintetis
+│   │   ├── ml/ - Stack ML murni NumPy: features, synthetic, models (6 arsitektur), training, metrics, store, inference
 │   │   ├── services/
 │   │   │   ├── transliterator.py - CORE advanced engine (800+ lines)
 │   │   │   ├── classifier.py
 │   │   │   ├── quiz_engine.py - check_answer + validate_pair (termasuk tipe write_aksara)
 │   │   │   └── data_store.py - store JSON terpusat (mampu ditulis ulang, reload per-request)
-│   │   ├── routers/ - translate, classify, lessons, quiz, docs, manage, engagement
+│   │   ├── routers/ - translate, classify, lessons, quiz, docs, manage, engagement, ml
 │   │   ├── schemas/ - Pydantic models (termasuk manage.py)
 │   │   └── tests/ - pytest
 │   └── requirements.txt
@@ -112,9 +118,10 @@ Aksara/
 │   │   ├── docs/ - Pusat dokumentasi (hub + [slug])
 │   │   ├── guru/ - Panel guru (Materi/Kuis/Kamus)
 │   │   ├── twibbon/ - Studio Twibbon (canvas + share medsos)
-│   │   └── admin/ - Panel admin (publikasi dokumentasi)
+│   │   └── admin/ - Panel admin (publikasi dokumentasi) + admin/ml (dataset, training, model, percobaan)
 │   ├── components/docs/ - Shell, konten per-role, screenshot
 │   ├── components/guru/ - Form & helper panel guru (BaliInput, dll)
+│   ├── components/admin/ - Primitif UI panel ML (metrik, kurva pelatihan, confusion matrix)
 │   ├── components/ui/ - Button, Card, Badge
 │   ├── components/layout/ - Header, BottomNav
 │   ├── components/aksara/ - AksaraCard, AksaraKeyboard (keyboard virtual bersama)
@@ -385,6 +392,43 @@ Endpoint lengkap: `GET/POST /api/manage/lessons`, `GET/PUT/DELETE /api/manage/le
 `GET/POST /api/manage/quizzes`, `GET/PUT/DELETE /api/manage/quizzes/{id}`,
 `GET/POST /api/manage/dictionary`, `DELETE /api/manage/dictionary/{latin}`,
 `GET /api/manage/aksara`.
+
+### ML API (Panel Admin → Model ML)
+
+Retraining classifier aksara Bali berjalan **murni NumPy di CPU** (tanpa
+PyTorch/TensorFlow). Artefak (dataset PNG, `model.npz`, registry) tersimpan di
+`backend/app/data/ml/` — ikut volume data, tidak dikomit ke git.
+
+```bash
+# Status (publik): dataset, model produksi, job aktif
+curl http://localhost:8000/api/ml/status
+
+# Bangkitkan dataset sintetis 60 sampel/kelas (18 kelas Wresastra) → 1080 sampel
+curl -X POST http://localhost:8000/api/ml/dataset/generate-synthetic \
+  -H "Content-Type: application/json" -H "Authorization: Bearer $SESSION" \
+  -d '{"per_class":60,"seed":20260904,"strength":1.0}'
+
+# Retraining CNN (202 → job id), lalu pantau
+curl -X POST http://localhost:8000/api/ml/train \
+  -H "Content-Type: application/json" -H "Authorization: Bearer $SESSION" \
+  -d '{"arch":"cnn","hyperparams":{"epochs":15},"name":"CNN v1","auto_promote":true}'
+curl -H "Authorization: Bearer $SESSION" http://localhost:8000/api/ml/train/jobs
+
+# Registry + laporan evaluasi lengkap (per kelas, confusion matrix, kurva)
+curl -H "Authorization: Bearer $SESSION" http://localhost:8000/api/ml/models
+curl -H "Authorization: Bearer $SESSION" http://localhost:8000/api/ml/models/<model_id>
+
+# Pilih model produksi, lalu prediksi (publik) dari gambar kanvas
+curl -X PUT http://localhost:8000/api/ml/models/production \
+  -H "Content-Type: application/json" -H "Authorization: Bearer $SESSION" -d '{"model_id":"<model_id>"}'
+curl -X POST http://localhost:8000/api/ml/predict -H "Content-Type: application/json" \
+  -d '{"image":"data:image/png;base64,...","top_k":5}'
+```
+
+Hasil percobaan 6 arsitektur (dataset sintetis, 18 kelas): template 74.7% →
+regresi logistik 91.4% → MLP 93.2% → **CNN 98.2%** accuracy/F1 makro.
+Reproduksi: `.venv/bin/python eval/ml_experiments.py --ablation`. Detail:
+[`docs/ML_RETRAINING.md`](docs/ML_RETRAINING.md).
 
 ## 🎨 Branding
 

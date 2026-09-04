@@ -152,6 +152,198 @@ export interface AksaraRefGroup {
   items: { id: string; bali: string; latin: string; name: string }[]
 }
 
+// ── Machine Learning (Panel Admin → Model ML) ───────────────────────────
+
+export type MlSplit = "train" | "val" | "test"
+export type MlSource = "synthetic" | "upload" | "canvas" | "import"
+export type MlSampleStatus = "labeled" | "unlabeled" | "review"
+export type MlJobStatus = "queued" | "running" | "done" | "failed" | "cancelled"
+
+export interface MlClass {
+  label: string
+  glyph: string
+  name: string
+  latin: string
+  group: string
+  active?: boolean
+}
+
+export interface MlHyperparamSpec {
+  key: string
+  label: string
+  type: "int" | "float"
+  default: number
+  min: number
+  max: number
+}
+
+export interface MlArchitecture {
+  id: string
+  name: string
+  family: string
+  trainable: boolean
+  description: string
+  pros: string[]
+  cons: string[]
+  hyperparams: MlHyperparamSpec[]
+}
+
+export interface MlSample {
+  id: string
+  label: string | null
+  status: MlSampleStatus
+  split: MlSplit
+  source: MlSource
+  note: string
+  meta: Record<string, any>
+  created_at: string
+  updated_at: string
+  bytes: number
+  feature_preview?: string | null
+}
+
+export interface MlDatasetStats {
+  total: number
+  labeled: number
+  unlabeled: number
+  review: number
+  per_split: Record<MlSplit, number>
+  per_source: Record<string, number>
+  per_label: Record<string, { train: number; val: number; test: number; total: number }>
+  n_classes: number
+  min_per_class: number
+  max_per_class: number
+  classes_without_data: string[]
+  updated_at?: string
+  version: number
+}
+
+export interface MlMetricsSummary {
+  accuracy: number
+  macro_precision: number
+  macro_recall: number
+  macro_f1: number
+  weighted_precision: number
+  weighted_recall: number
+  weighted_f1: number
+  top3_accuracy?: number
+  log_loss?: number
+  n_samples: number
+  train_accuracy?: number
+}
+
+export interface MlEpochRecord {
+  epoch: number
+  loss: number | null
+  train_acc: number | null
+  val_acc: number | null
+  seconds?: number
+}
+
+export interface MlModelEntry {
+  id: string
+  name: string
+  notes: string
+  arch: string
+  arch_name: string
+  hyperparams: Record<string, number>
+  classes: string[]
+  n_classes: number
+  n_params: number
+  size_bytes: number
+  created_at: string
+  promoted_at?: string
+  train_seconds: number
+  dataset_version?: number
+  dataset_size: { train: number; val: number; test: number }
+  eval_split: string
+  metrics: MlMetricsSummary
+  job_id?: string
+  is_production: boolean
+}
+
+export interface MlPerClass {
+  label: string
+  precision: number
+  recall: number
+  f1: number
+  support: number
+  predicted: number
+  tp: number
+  fp: number
+  fn: number
+}
+
+export interface MlReport extends MlMetricsSummary {
+  error_rate: number
+  n_classes_present: number
+  per_class: MlPerClass[]
+  confusion_matrix: number[][]
+  class_names: string[]
+  top_confusions: { true: string; pred: string; count: number }[]
+  mean_confidence?: number
+  confident_rate?: number
+  confident_accuracy?: number | null
+  eval_split: string
+  train_samples: number
+  val_samples: number
+  test_samples: number
+  train_seconds: number
+  history: MlEpochRecord[]
+  misclassified: { sample_id: string | null; true: string; pred: string; confidence: number }[]
+}
+
+export interface MlJob {
+  id: string
+  status: MlJobStatus
+  arch: string
+  arch_name: string
+  hyperparams: Record<string, number>
+  name: string
+  notes: string
+  auto_promote: boolean
+  created_at: number
+  started_at: number | null
+  finished_at: number | null
+  progress: number
+  epoch: number
+  total_epochs: number
+  history: MlEpochRecord[]
+  message: string
+  error: string | null
+  model_id: string | null
+  metrics: MlMetricsSummary | null
+  cancel_requested: boolean
+  dataset: { labeled: number; n_classes: number; per_split: Record<MlSplit, number> }
+}
+
+export interface MlPrediction {
+  model_id: string
+  model_name: string
+  arch: string
+  is_production: boolean
+  label: string
+  glyph: string
+  name: string
+  latin: string
+  confidence: number
+  margin: number
+  confident: boolean
+  top: { label: string; glyph: string; name: string; latin: string; probability: number }[]
+  preview: string
+  error?: string
+}
+
+export interface MlStatus {
+  mode: "dev" | "prod"
+  is_admin: boolean
+  production_model: MlModelEntry | null
+  dataset: { total: number; labeled: number; unlabeled: number; review: number; per_split: Record<MlSplit, number>; n_classes: number; version: number }
+  models_total: number
+  active_job: { id: string; status: MlJobStatus; arch: string; progress: number; message: string } | null
+  font_available: boolean
+}
+
 // ── Otentikasi (login username + password → sesi) ───────────────────────
 
 export type AuthRole = "admin" | "guru"
@@ -403,6 +595,76 @@ export const api = {
     // Referensi aksara untuk form
     aksaraReference: () =>
       fetchAPI<{ groups: AksaraRefGroup[] }>("/manage/aksara"),
+  },
+
+  // ── Machine Learning (retraining, dataset, labeling, registry) ──
+  ml: {
+    status: () => fetchAPI<MlStatus>("/ml/status", { headers: authHeaders() }),
+    architectures: () => fetchAPI<{ architectures: MlArchitecture[] }>("/ml/architectures"),
+    classes: () => fetchAPI<{ active: MlClass[]; available: MlClass[] }>("/ml/classes"),
+    setClasses: (labels: string[]) =>
+      fetchAPI<{ active: MlClass[]; message: string }>("/ml/classes", {
+        method: "PUT",
+        body: JSON.stringify({ labels }),
+        headers: authHeaders(),
+      }),
+
+    // Dataset
+    datasetStats: () => fetchAPI<MlDatasetStats>("/ml/dataset/stats", { headers: authHeaders() }),
+    listSamples: (params: { label?: string; split?: string; source?: string; status?: string; q?: string; limit?: number; offset?: number; order?: "newest" | "oldest" } = {}) => {
+      const sp = new URLSearchParams()
+      Object.entries(params).forEach(([k, v]) => { if (v !== undefined && v !== null && v !== "") sp.set(k, String(v)) })
+      const qs = sp.toString() ? `?${sp.toString()}` : ""
+      return fetchAPI<{ samples: MlSample[]; total: number; offset: number; limit: number }>(`/ml/dataset/samples${qs}`, { headers: authHeaders() })
+    },
+    getSample: (id: string) => fetchAPI<MlSample>(`/ml/dataset/samples/${id}`, { headers: authHeaders() }),
+    sampleImageUrl: (id: string) => `${API_BASE}/ml/dataset/samples/${id}/image`,
+    addSample: (body: { image: string; label?: string | null; source?: MlSource; split?: MlSplit; note?: string }) =>
+      fetchAPI<MlSample>("/ml/dataset/samples", { method: "POST", body: JSON.stringify(body), headers: authHeaders() }),
+    addSamplesBulk: (items: { image: string; label?: string | null; source?: MlSource; split?: MlSplit; note?: string }[]) =>
+      fetchAPI<{ added: number; skipped: number; samples: MlSample[] }>("/ml/dataset/samples/bulk", {
+        method: "POST", body: JSON.stringify({ items }), headers: authHeaders(),
+      }),
+    updateSample: (id: string, body: { label?: string; clear_label?: boolean; split?: MlSplit; status?: MlSampleStatus; note?: string }) =>
+      fetchAPI<MlSample>(`/ml/dataset/samples/${id}`, { method: "PATCH", body: JSON.stringify(body), headers: authHeaders() }),
+    deleteSample: (id: string) =>
+      fetchAPI<{ message: string }>(`/ml/dataset/samples/${id}`, { method: "DELETE", headers: authHeaders() }),
+    bulkLabel: (body: { ids: string[]; label?: string; split?: MlSplit; status?: MlSampleStatus }) =>
+      fetchAPI<{ updated: number; message: string }>("/ml/dataset/bulk-label", { method: "POST", body: JSON.stringify(body), headers: authHeaders() }),
+    bulkDelete: (ids: string[]) =>
+      fetchAPI<{ removed: number; message: string }>("/ml/dataset/bulk-delete", { method: "POST", body: JSON.stringify({ ids }), headers: authHeaders() }),
+    generateSynthetic: (body: { per_class: number; seed?: number; strength?: number; replace_existing?: boolean }) =>
+      fetchAPI<{ added: number; removed: number; seconds: number; stats: MlDatasetStats; message: string }>("/ml/dataset/generate-synthetic", {
+        method: "POST", body: JSON.stringify(body), headers: authHeaders(),
+      }),
+    rebalance: (body: { val_ratio: number; test_ratio: number; seed?: number }) =>
+      fetchAPI<{ per_split: Record<MlSplit, number>; message: string }>("/ml/dataset/rebalance", { method: "POST", body: JSON.stringify(body), headers: authHeaders() }),
+    clearDataset: (source?: MlSource) =>
+      fetchAPI<{ removed: number; message: string }>(`/ml/dataset/clear${source ? `?source=${source}` : ""}`, { method: "POST", headers: authHeaders() }),
+
+    // Training
+    train: (body: { arch: string; hyperparams?: Record<string, number>; name?: string; notes?: string; auto_promote?: boolean }) =>
+      fetchAPI<MlJob>("/ml/train", { method: "POST", body: JSON.stringify(body), headers: authHeaders() }),
+    jobs: () => fetchAPI<{ jobs: MlJob[]; active: MlJob | null }>("/ml/train/jobs", { headers: authHeaders() }),
+    job: (id: string) => fetchAPI<MlJob>(`/ml/train/jobs/${id}`, { headers: authHeaders() }),
+    cancelJob: (id: string) => fetchAPI<{ message: string }>(`/ml/train/jobs/${id}`, { method: "DELETE", headers: authHeaders() }),
+
+    // Registry
+    models: () => fetchAPI<{ models: MlModelEntry[]; production_model_id: string | null }>("/ml/models", { headers: authHeaders() }),
+    model: (id: string) => fetchAPI<{ model: MlModelEntry; report: MlReport | null }>(`/ml/models/${id}`, { headers: authHeaders() }),
+    updateModel: (id: string, body: { name?: string; notes?: string }) =>
+      fetchAPI<MlModelEntry>(`/ml/models/${id}`, { method: "PATCH", body: JSON.stringify(body), headers: authHeaders() }),
+    deleteModel: (id: string) => fetchAPI<{ message: string }>(`/ml/models/${id}`, { method: "DELETE", headers: authHeaders() }),
+    setProduction: (model_id: string | null) =>
+      fetchAPI<{ production_model_id: string | null; message: string }>("/ml/models/production", {
+        method: "PUT", body: JSON.stringify({ model_id }), headers: authHeaders(),
+      }),
+
+    // Prediksi
+    predict: (body: { image: string; model_id?: string | null; top_k?: number }) =>
+      fetchAPI<MlPrediction>("/ml/predict", { method: "POST", body: JSON.stringify(body) }),
+    compare: (image: string, model_ids: string[]) =>
+      fetchAPI<{ results: MlPrediction[] }>("/ml/predict/compare", { method: "POST", body: JSON.stringify({ image, model_ids }), headers: authHeaders() }),
   },
 
   // ── Engagement & sekolah mitra ──

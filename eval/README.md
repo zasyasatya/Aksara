@@ -24,3 +24,24 @@ python -m venv .venv
 
 Font `NotoSansBalinese.ttf` diunduh otomatis dari google/fonts (lisensi
 SIL OFL 1.1) bila belum ada, dan di-*ignore* oleh git.
+
+## Percobaan retraining (`ml_experiments.py`)
+
+`ml_experiments.py` menjalankan **percobaan retraining** classifier dengan kode
+pipeline yang sama persis dengan Panel Admin → Model ML (`backend/app/ml`):
+dataset sintetis → training 6 arsitektur (template, centroid, k-NN, regresi
+logistik, MLP, CNN) → laporan metrik (accuracy, precision, recall, F1, top-3,
+log-loss, per kelas) → uji pergeseran distribusi → ablasi ukuran data.
+Semua artefak ditulis ke direktori sementara, tidak menyentuh
+`backend/app/data/ml`.
+
+```bash
+# dari root repo, memakai venv backend (numpy, Pillow, fastapi)
+.venv/bin/python eval/ml_experiments.py
+.venv/bin/python eval/ml_experiments.py --ablation \
+    --out-md eval/results/ml_experiments.md --out-json eval/results/ml_experiments.json
+.venv/bin/python eval/ml_experiments.py --help   # opsi: --archs, --groups, --per-class, --seed, …
+```
+
+Hasil terakhir tersimpan di `results/ml_experiments.md` (+ JSON) dan dirangkum
+di `docs/ML_RETRAINING.md` §5.

@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { Callout, Code, CodeBlock, DocSection, DocTable, Steps } from "./primitives"
 
 export function ContentDatasetModel() {
@@ -146,15 +147,77 @@ skor = clamp(1 − avg / (0.14 × 128), 0, 1)`}</CodeBlock>
         </Callout>
       </DocSection>
 
-      <DocSection id="reproduksi" number="6." title="Reproduksi">
+      <DocSection id="retraining" number="6." title="Model terlatih (retraining) — Panel Admin">
+        <p>
+          Keterbatasan pengenalan terbuka di atas dijawab dengan pipeline <strong>retraining</strong>{" "}
+          di Panel Admin (<Link href="/admin/ml" className="text-saffron-dark font-semibold hover:underline">/admin/ml</Link>):
+          dataset tulisan tangan dikelola &amp; dilabeli admin, lalu classifier{" "}
+          <strong>belajar dari data</strong> dan dievaluasi otomatis. Model produksi yang dipilih
+          admin dilayani server lewat <Code>POST /api/ml/predict</Code>.
+        </p>
+        <DocTable
+          head={["Aspek", "Nilai"]}
+          rows={[
+            ["Fitur input", "Tinta dinormalisasi (crop → 20 px → pusat massa) pada 28×28 → vektor 784-d"],
+            ["Arsitektur", "template (chamfer) · nearest centroid · k-NN · regresi logistik · MLP · CNN — murni NumPy, CPU"],
+            ["Dataset", "Sintetis (font + augmentasi afinitas/elastis/tebal/noise), unggahan, kanvas, koreksi dari percobaan"],
+            ["Split", "train/val/test 70/15/15 · stratified per label"],
+            ["Evaluasi", "accuracy · precision/recall/F1 makro & berbobot · top-3 · log-loss · confusion matrix · per kelas · kurva pelatihan"],
+            ["Reproduksi", <Code key="c">.venv/bin/python eval/ml_experiments.py --ablation</Code>],
+          ]}
+        />
+        <p>
+          <strong>Percobaan</strong> (18 kelas Wresastra, 60 sampel sintetis/kelas = 1080, split
+          756/162/162, hyperparameter default, evaluasi pada test; kolom <em>shift</em> = 360 sampel
+          baru dengan augmentasi 1.6× lebih kuat):
+        </p>
+        <DocTable
+          head={["Arsitektur", "Accuracy", "Precision", "Recall", "F1 (makro)", "Top-3", "Acc (shift)", "Latih"]}
+          rows={[
+            ["Template matching", "74.7%", "81.2%", "74.7%", "75.1%", "85.2%", "40.0%", "0.5 s"],
+            ["Nearest centroid", "84.6%", "87.1%", "84.6%", "84.7%", "92.0%", "45.0%", "< 0.1 s"],
+            ["k-NN (k=5)", "84.6%", "85.6%", "84.6%", "84.4%", "97.5%", "51.4%", "< 0.1 s"],
+            ["Regresi logistik", "91.4%", "92.2%", "91.4%", "91.3%", "98.2%", "56.7%", "0.1 s"],
+            ["MLP (128 hidden)", "93.2%", "93.6%", "93.2%", "93.2%", "98.2%", "58.6%", "0.5 s"],
+            [<strong key="n">CNN</strong>, <strong key="a">98.2%</strong>, <strong key="p">98.4%</strong>, <strong key="r">98.2%</strong>, <strong key="f">98.2%</strong>, "98.2%", <strong key="s">63.6%</strong>, "5.7 s"],
+          ]}
+        />
+        <p>Ablasi ukuran data (akurasi test saat sampel per kelas bertambah):</p>
+        <DocTable
+          head={["Arsitektur", "10/kelas", "20/kelas", "40/kelas", "80/kelas"]}
+          rows={[
+            ["Regresi logistik", "69.4%", "87.0%", "91.7%", "96.3%"],
+            ["MLP", "66.7%", "81.5%", "89.8%", "96.3%"],
+            ["CNN", "61.1%", "75.9%", "87.0%", "94.4%"],
+          ]}
+        />
+        <Callout variant="success" title="Kesimpulan percobaan">
+          Pengenalan terbuka 18 kelas naik dari ≈ 75% (template) menjadi <strong>98.2% (CNN)</strong>{" "}
+          pada data sintetis, dan CNN paling tahan pergeseran distribusi. Untuk data sedikit
+          (≤ 20/kelas) regresi logistik lebih aman; CNN/MLP unggul mulai ≥ 40–80 sampel/kelas —
+          target pengumpulan tulisan nyata: <strong>≥ 80 per aksara</strong>.
+        </Callout>
+        <Callout variant="warning" title="Batas klaim">
+          Akurasi pada set <em>shift</em> (≤ 64%) menegaskan angka test sintetis bukan klaim performa
+          pada tulisan tangan manusia. Model produksi harus divalidasi ulang dengan sampel nyata yang
+          dikumpulkan lewat tab Dataset. Detail metodologi: <Code>docs/ML_RETRAINING.md</Code>,
+          laporan mentah: <Code>eval/results/ml_experiments.md</Code>.
+        </Callout>
+      </DocSection>
+
+      <DocSection id="reproduksi" number="7." title="Reproduksi">
         <CodeBlock>{`# Dependensi: Pillow + NumPy + font Noto Sans Balinese (diunduh otomatis)
 cd eval
 python -m venv .venv && .venv/bin/pip install Pillow numpy
 .venv/bin/python evaluate_handwriting.py            # unduh font + jalankan
-.venv/bin/python evaluate_handwriting.py --font /path/NotoSansBalinese.ttf`}</CodeBlock>
+.venv/bin/python evaluate_handwriting.py --font /path/NotoSansBalinese.ttf
+
+# Percobaan retraining (6 arsitektur + ablasi) — memakai venv backend dari root repo
+.venv/bin/python eval/ml_experiments.py --ablation \\
+    --out-md eval/results/ml_experiments.md --out-json eval/results/ml_experiments.json`}</CodeBlock>
         <p>
           Detail lengkap (termasuk formula &amp; referensi) tersedia di{" "}
-          <Code>docs/DATASET_MODEL.md</Code>.
+          <Code>docs/DATASET_MODEL.md</Code> dan <Code>docs/ML_RETRAINING.md</Code>.
         </p>
       </DocSection>
     </>
