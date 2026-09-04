@@ -72,7 +72,7 @@ export default function SekolahPage() {
           <Badge variant="saffron" className="mb-4">
             <GraduationCap className="h-4 w-4 mr-1.5" /> Program Kemitraan Sekolah & Sanggar
           </Badge>
-          <h1 className="font-display text-3xl lg:text-5xl font-bold leading-tight text-deep-brown">
+          <h1 className="font-display text-3xl lg:text-5xl font-bold leading-tight lg:leading-tight text-deep-brown">
             Bawa Aksara Bali ke kelas Anda — <span className="text-saffron">gratis</span>
           </h1>
           <p className="mt-4 text-charcoal/70 leading-relaxed">
