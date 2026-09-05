@@ -103,3 +103,18 @@ def bump_engagement(key: str) -> Dict[str, Any]:
             json.dump(data, f, ensure_ascii=False, indent=2)
         os.replace(tmp, DATA_DIR / "engagement.json")
         return data
+
+
+# ── Pengaturan aplikasi (tema/palet warna) ─────────────────────────────
+
+def get_app_settings() -> Dict[str, Any]:
+    path = DATA_DIR / "settings.json"
+    if not path.is_file():
+        return {"theme": "native"}
+    data = _read("settings.json")
+    data.setdefault("theme", "native")
+    return data
+
+
+def save_app_settings(data: Dict[str, Any]) -> None:
+    _write("settings.json", data)

@@ -24,7 +24,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-sand bg-cream">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 lg:px-8">
-        <div className="flex min-w-0 items-center gap-8">
+        <div className="flex min-w-0 items-center gap-4">
           <Link href="/" className="flex shrink-0 items-center" aria-label="AKSA — Aksara Nusantara">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="AKSA" className="h-9 w-auto" />
@@ -52,7 +52,7 @@ export function Header() {
           </nav>
         </div>
 
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2">
           <div className="hidden 2xl:flex items-center gap-2 rounded-full bg-white border border-sand px-3 py-1.5 shadow-soft">
             <div className="flex items-center gap-1.5">
               <Flame className="h-4 w-4 text-saffron" />

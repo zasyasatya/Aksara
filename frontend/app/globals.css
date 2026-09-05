@@ -8,6 +8,26 @@
   --font-jakarta: 'Plus Jakarta Sans', sans-serif;
   --font-bali: 'Noto Sans Balinese', sans-serif;
   --font-display: 'Fraunces', serif;
+
+  /* Palet warna — default = "native" (warna asli AKSA). Format "r g b" agar
+     Tailwind bisa memakai modifier opacity (bg-saffron/20). Diganti oleh
+     lib/themes.ts (applyTheme) saat Admin memilih palet lain. */
+  --c-saffron: 255 107 53;
+  --c-saffron-light: 255 140 97;
+  --c-saffron-dark: 229 90 43;
+  --c-deep-brown: 44 24 16;
+  --c-cream: 255 248 231;
+  --c-terracotta: 196 90 60;
+  --c-sage: 122 158 126;
+  --c-ocean: 42 111 142;
+  --c-sand: 244 228 188;
+  --c-charcoal: 26 26 26;
+  --c-saffron-hex: #FF6B35;
+  --c-terracotta-hex: #C45A3C;
+  --c-sage-hex: #7A9E7E;
+  --c-ocean-hex: #2A6F8E;
+  --c-cream-hex: #FFF8E7;
+  --c-sand-hex: #F4E4BC;
 }
 
 * {
@@ -29,16 +49,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #FFF8E7;
+  background: var(--c-cream-hex);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #F4E4BC;
+  background: var(--c-sand-hex);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #FF6B35;
+  background: var(--c-saffron-hex);
 }
 
 /* Aksara display */
@@ -77,13 +97,13 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #FF6B35 0%, #C45A3C 25%, #7A9E7E 50%, #2A6F8E 75%, #FF6B35 100%);
+  background: linear-gradient(90deg, var(--c-saffron-hex) 0%, var(--c-terracotta-hex) 25%, var(--c-sage-hex) 50%, var(--c-ocean-hex) 75%, var(--c-saffron-hex) 100%);
   border-radius: 2px;
 }
 
 /* Focus styles */
 *:focus-visible {
-  outline: 2px solid #FF6B35;
+  outline: 2px solid var(--c-saffron-hex);
   outline-offset: 2px;
 }
 
@@ -98,7 +118,7 @@
 }
 
 .shimmer {
-  background: linear-gradient(90deg, #FFF8E7 25%, #F4E4BC 50%, #FFF8E7 75%);
+  background: linear-gradient(90deg, var(--c-cream-hex) 25%, var(--c-sand-hex) 50%, var(--c-cream-hex) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }

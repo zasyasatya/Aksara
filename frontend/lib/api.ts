@@ -518,6 +518,18 @@ export const api = {
       headers: authHeaders(),
     }),
 
+  // ── Pengaturan tampilan (palet warna) ──
+  settings: {
+    getTheme: () =>
+      fetchAPI<{ theme: string; available: string[]; default: string }>("/settings/theme"),
+    setTheme: (theme: string) =>
+      fetchAPI<{ theme: string; message: string }>("/settings/theme", {
+        method: "PUT",
+        body: JSON.stringify({ theme }),
+        headers: authHeaders(),
+      }),
+  },
+
   // ── Otentikasi (Guru & Admin) ──
   auth: {
     info: () =>

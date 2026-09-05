@@ -59,6 +59,10 @@ const STYLES: TwibbonStyle[] = [
   { id: "rounded", name: "Sudut Bulat", inset: [0.06, 0.06], preview: "rounded" },
 ]
 
+/** Avatar ilustrasi AI (default) — bisa diganti pengguna dengan foto sendiri. */
+const AI_AVATAR_SRC = "/sample/avatar-ai.jpg"
+const AI_AVATAR_NAME = "avatar AI (default)"
+
 const C = {
   cream: "#FFF8E7",
   saffron: "#FF6B35",
@@ -503,11 +507,18 @@ export default function TwibbonPage() {
     reader.readAsDataURL(f)
   }
 
-  const loadSample = () => {
+  const loadSample = (src = "/sample/temple.jpg", name = "contoh: pura") => {
     const img = new Image()
-    img.onload = () => { setPhoto(img); setPhotoName("contoh: pura") }
-    img.src = "/sample/temple.jpg"
+    img.onload = () => { setPhoto(img); setPhotoName(name) }
+    img.src = src
   }
+
+  // Avatar AI dimuat otomatis sebagai foto default — pengguna tinggal ganti
+  // dengan foto sendiri lewat "Unggah Foto".
+  useEffect(() => {
+    loadSample(AI_AVATAR_SRC, AI_AVATAR_NAME)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // ── Ekspor & share ─────────────────────────────────────────────────
   const getBlob = () =>
@@ -659,10 +670,16 @@ export default function TwibbonPage() {
                   <Upload className="h-4 w-4" /> Unggah Foto
                 </button>
                 <button
-                  onClick={loadSample}
+                  onClick={() => loadSample(AI_AVATAR_SRC, AI_AVATAR_NAME)}
                   className="inline-flex items-center gap-2 rounded-full border border-sand bg-cream px-4 py-2 text-sm font-semibold text-charcoal/70 hover:border-saffron/50"
                 >
-                  <ImagePlus className="h-4 w-4" /> Pakai Contoh
+                  <Sparkles className="h-4 w-4" /> Avatar AI
+                </button>
+                <button
+                  onClick={() => loadSample()}
+                  className="inline-flex items-center gap-2 rounded-full border border-sand bg-cream px-4 py-2 text-sm font-semibold text-charcoal/70 hover:border-saffron/50"
+                >
+                  <ImagePlus className="h-4 w-4" /> Contoh Pura
                 </button>
                 {photo && (
                   <button
@@ -674,7 +691,11 @@ export default function TwibbonPage() {
                 )}
               </div>
               <p className="mt-2 text-[11px] text-charcoal/45">
-                {photo ? `Foto: ${photoName}` : "Belum ada foto — latar gradasi cokelat akan dipakai."}
+                {photo
+                  ? photoName === AI_AVATAR_NAME
+                    ? "Memakai avatar AI bawaan — unggah foto kamu sendiri untuk menggantinya."
+                    : `Foto: ${photoName}`
+                  : "Belum ada foto — latar gradasi cokelat akan dipakai."}
               </p>
             </Card>
 

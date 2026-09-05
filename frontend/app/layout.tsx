@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme/theme-provider";
+import { themeBootScript } from "@/lib/themes";
 
 /** URL kanonik situs — dipakai Next untuk me-resolve canonical/OG relatif. */
 const SITE_URL = "https://aksara.id";
@@ -136,12 +138,14 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript() }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(JSONLD_GLOBAL) }}
         />
       </head>
       <body className="min-h-screen overflow-x-hidden bg-cream text-deep-brown antialiased">
+        <ThemeProvider />
         {children}
       </body>
     </html>
