@@ -18,29 +18,95 @@ import { Header } from "@/components/layout/header"
 import { BottomNav } from "@/components/layout/bottom-nav"
 import { cn } from "@/lib/utils"
 import {
-  AlertTriangle, ArrowLeftRight, Camera, CameraOff, Check, Copy, Flashlight, Lightbulb, Loader2,
-  Pause, Play, Send, Settings2, Share2, Sparkles, Upload, Wand2, X, Zap,
+  AlertTriangle, ArrowLeftRight, Camera, CameraOff, Check, Copy, Crop, Flashlight, Lightbulb,
+  Loader2, Maximize2, Pause, Play, RotateCw, ScanLine, Send, Settings2, Share2, Sparkles,
+  Upload, Wand2, X, Zap,
 } from "lucide-react"
 
 type Mode = "auto" | "aksara" | "latin"
 type Status = "idle" | "starting" | "scanning" | "live" | "error"
+type Region = "frame" | "full"
 
 const MODE_LABEL: Record<Mode, string> = { auto: "Otomatis", aksara: "Aksara Bali", latin: "Latin" }
+const REGION_LABEL: Record<Region, string> = { frame: "Dalam bingkai", full: "Seluruh layar" }
 const CAPTURE_MS = 950
 
-/** Ambil data URL JPEG dari elemen video (dibatasi agar cepat dikirim). */
-function frameFromVideo(video: HTMLVideoElement, maxSide = 1280): string | null {
+/**
+ * Area baca (bidik) dalam satuan relatif ke kontainer pratinjau (0..1).
+ * Bentuk pita lanskap: teks Bali/Latin hampir selalu baris horizontal, jadi
+ * pita lebar-perpendek memberi resolusi paling tinggi per aksara dan — yang
+ * paling penting — **membuang tulisan di luar bingkai** (meja, papan lain,
+ * latar) yang dulu ikut terbaca karena seluruh frame kamera dikirim ke server.
+ */
+const SCAN_FRAME = { x: 0.035, y: 0.19, w: 0.93, h: 0.62 }
+const FULL_FRAME = { x: 0, y: 0, w: 1, h: 1 }
+
+type Rect = { x: number; y: number; w: number; h: number }
+/** Geometri object-cover: skala & offset video terhadap kontainer. */
+type Cover = { scale: number; ox: number; oy: number; cw: number; ch: number; vw: number; vh: number }
+/** Persepsi sumber pada koordinat video (px) yang benar-benar dikirim ke OCR. */
+type Source = { sx: number; sy: number; sw: number; sh: number; vw: number; vh: number }
+
+const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
+
+function coverOf(video: HTMLVideoElement, cw: number, ch: number): Cover | null {
   const vw = video.videoWidth
   const vh = video.videoHeight
-  if (!vw || !vh) return null
-  const scale = Math.min(1, maxSide / Math.max(vw, vh))
+  if (!vw || !vh || !cw || !ch) return null
+  const scale = Math.max(cw / vw, ch / vh)
+  return { scale, ox: (cw - vw * scale) / 2, oy: (ch - vh * scale) / 2, cw, ch, vw, vh }
+}
+
+/** Rect relatif kontainer → persegi sumber pada piksel video (sudah dipotong cover). */
+function sourceOf(m: Cover, roi: Rect): Source {
+  const x0 = (roi.x * m.cw - m.ox) / m.scale
+  const y0 = (roi.y * m.ch - m.oy) / m.scale
+  const x1 = ((roi.x + roi.w) * m.cw - m.ox) / m.scale
+  const y1 = ((roi.y + roi.h) * m.ch - m.oy) / m.scale
+  const sx = clamp(Math.min(x0, x1), 0, m.vw - 8)
+  const sy = clamp(Math.min(y0, y1), 0, m.vh - 8)
+  const sw = clamp(Math.abs(x1 - x0), 16, m.vw - sx)
+  const sh = clamp(Math.abs(y1 - y0), 16, m.vh - sy)
+  return { sx, sy, sw, sh, vw: m.vw, vh: m.vh }
+}
+
+/**
+ * Tangkap HANYA area yang terlihat/dibingkai → data URL JPEG.
+ * Mengembalikan juga `source` agar kotak hasil OCR dapat dipetakan balik ke
+ * posisi yang sama persis di pratinjau (overlay tidak bergeser).
+ */
+function captureFromVideo(
+  video: HTMLVideoElement,
+  cw: number,
+  ch: number,
+  roi: Rect,
+  maxSide = 1280,
+): { url: string; source: Source } | null {
+  const cover = coverOf(video, cw, ch)
+  if (!cover) return null
+  const src = sourceOf(cover, roi)
+  const scale = Math.min(1, maxSide / Math.max(src.sw, src.sh))
   const canvas = document.createElement("canvas")
-  canvas.width = Math.round(vw * scale)
-  canvas.height = Math.round(vh * scale)
+  canvas.width = Math.max(16, Math.round(src.sw * scale))
+  canvas.height = Math.max(16, Math.round(src.sh * scale))
   const ctx = canvas.getContext("2d")
   if (!ctx) return null
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-  return canvas.toDataURL("image/jpeg", 0.9)
+  ctx.imageSmoothingQuality = "high"
+  ctx.drawImage(video, src.sx, src.sy, src.sw, src.sh, 0, 0, canvas.width, canvas.height)
+  return { url: canvas.toDataURL("image/jpeg", 0.92), source: src }
+}
+
+/** Rect hasil OCR (ternormalisasi pada citra yang dikirim) → persen kontainer. */
+function rectToBox(rect: number[], src: Source | null, cover: Cover | null) {
+  const [u, v, w, h] = rect
+  if (!src || !cover) return { x: u * 100, y: v * 100, w: w * 100, h: h * 100 }
+  const px = (sx: number, sy: number) => ({
+    x: ((sx * cover.scale + cover.ox) / cover.cw) * 100,
+    y: ((sy * cover.scale + cover.oy) / cover.ch) * 100,
+  })
+  const a = px(src.sx + u * src.sw, src.sy + v * src.sh)
+  const b = px(src.sx + (u + w) * src.sw, src.sy + (v + h) * src.sh)
+  return { x: a.x, y: a.y, w: Math.max(0.4, b.x - a.x), h: Math.max(0.4, b.y - a.y) }
 }
 
 /** Potong satu kotak (rect dinormalkan 0..1) → data URL PNG untuk sampel koreksi. */
@@ -79,14 +145,21 @@ function confTone(c: number) {
 
 export default function LensPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  const stageRef = useRef<HTMLDivElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const loopRef = useRef<number | null>(null)
   const busyRef = useRef(false)
   const fileRef = useRef<HTMLInputElement | null>(null)
+  /** Sumber (piksel video) dari tangkapan terakhir → pemetaan overlay hasil. */
+  const [capSrc, setCapSrc] = useState<Source | null>(null)
 
   const [status, setStatus] = useState<Status>("idle")
   const [error, setError] = useState<string | null>(null)
   const [mode, setMode] = useState<Mode>("auto")
+  const [region, setRegion] = useState<Region>("frame")
+  const [stage, setStage] = useState<{ cw: number; ch: number }>({ cw: 0, ch: 0 })
+  const [coverTick, setCoverTick] = useState(0)
+  const [portrait, setPortrait] = useState(false)
   const [precision, setPrecision] = useState(false)
   const [live, setLive] = useState(true)
   const [torch, setTorch] = useState(false)
@@ -135,11 +208,16 @@ export default function LensPage() {
     }
     setStatus("starting")
     try {
+      // Sensor diminta LANSKAP (16:9). Pada ponsel, buffer portrait membuat
+      // pratinjau menyempit dan tulisan di atas/bawah objek ikut terkirim ke
+      // OCR; dengan rasio lanskap + area baca berbingkai, hanya tulisan yang
+      // dibidik yang diproses.
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: facing },
           width: { ideal: 1920 },
           height: { ideal: 1080 },
+          aspectRatio: { ideal: 16 / 9 },
         },
         audio: false,
       })
@@ -150,8 +228,13 @@ export default function LensPage() {
       }
       const track = stream.getVideoTracks()[0]
       const caps: any = track?.getCapabilities?.() || {}
+      const settings: any = track?.getSettings?.() || {}
       setTorch(Boolean(caps.torch))
       setHasCamera(true)
+      setPortrait(
+        Number(settings.height || videoRef.current?.videoHeight || 0) >
+          Number(settings.width || videoRef.current?.videoWidth || 0),
+      )
       setStatus("live")
     } catch (e) {
       setHasCamera(false)
@@ -165,9 +248,51 @@ export default function LensPage() {
 
   useEffect(() => () => stopCamera(), [stopCamera])
 
+  // Ukur kontainer pratinjau (dipakai pemetaan area baca & overlay hasil).
+  useEffect(() => {
+    const el = stageRef.current
+    if (!el || typeof ResizeObserver === "undefined") return
+    const ro = new ResizeObserver(() => {
+      setStage({ cw: el.clientWidth, ch: el.clientHeight })
+      setCoverTick((t) => t + 1)
+    })
+    ro.observe(el)
+    setStage({ cw: el.clientWidth, ch: el.clientHeight })
+    return () => ro.disconnect()
+  }, [status])
+
+  // Buffer video bisa berubah orientasi saat ponsel diputar.
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    const onResize = () => {
+      setPortrait(v.videoHeight > v.videoWidth)
+      setCoverTick((t) => t + 1)
+    }
+    v.addEventListener("resize", onResize)
+    return () => v.removeEventListener("resize", onResize)
+  }, [status])
+
+  /** Kunci orientasi lanskap (Android Chrome; butuh mode layar penuh). */
+  const goLandscape = useCallback(async () => {
+    try {
+      const el = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> }
+      if (!document.fullscreenElement) {
+        const req = el.requestFullscreen?.bind(el) || el.webkitRequestFullscreen?.bind(el)
+        if (req) await req()
+      }
+      const ori = screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> }
+      if (ori?.lock) await ori.lock("landscape")
+      setPortrait(false)
+    } catch {
+      setError("Peramban ini tidak mengizinkan kunci orientasi. Putar ponsel Anda ke posisi lanskap (mendatar).")
+    }
+  }, [])
+
   // ── pemindaian ───────────────────────────────────────────────────────────
-  const scanOnce = useCallback(async (dataUrl: string) => {
+  const scanOnce = useCallback(async (dataUrl: string, source: Source | null) => {
     busyRef.current = true
+    setCapSrc(source)
     setStatus((s) => (s === "live" ? "scanning" : s))
     try {
       const res = await api.ocr.scan(dataUrl, options, typeof window !== "undefined" && window.innerWidth < 1024 ? "lens-mobile" : "lens-desktop")
@@ -180,18 +305,22 @@ export default function LensPage() {
       setError((e as Error).message.replace(/^API Error \d+: /, ""))
     } finally {
       busyRef.current = false
+      setCoverTick((t) => t + 1)
       setStatus((s) => (s === "scanning" ? "live" : s))
     }
   }, [options])
 
+  /** Tangkap area baca (bingkai / seluruh layar yang terlihat) lalu minta OCR. */
   const grabAndScan = useCallback(async () => {
     const v = videoRef.current
-    if (!v || v.readyState < 2) return
-    const url = frameFromVideo(v)
-    if (!url) return
+    const el = stageRef.current
+    if (!v || v.readyState < 2 || !el) return
+    const shot = captureFromVideo(v, el.clientWidth, el.clientHeight,
+      region === "frame" ? SCAN_FRAME : FULL_FRAME)
+    if (!shot) return
     setManualFrame(null)
-    await scanOnce(url)
-  }, [scanOnce])
+    await scanOnce(shot.url, shot.source)
+  }, [scanOnce, region])
 
   useEffect(() => {
     if (loopRef.current) window.clearInterval(loopRef.current)
@@ -223,6 +352,7 @@ export default function LensPage() {
     setError(null)
     try {
       const res = await api.ocr.scanFile(file, options)
+      setCapSrc(null)                   // foto unggahan dipakai utuh (tanpa bingkai)
       setResult(res)
       setManualFrame(URL.createObjectURL(file))
       const dataUrl = await new Promise<string>((resolve, reject) => {
@@ -333,6 +463,20 @@ export default function LensPage() {
 
   const running = status === "live" || status === "scanning"
 
+  /** Geometri pratinjau: rect area baca (persen) + pemetaan object-cover. */
+  const frame = region === "frame" ? SCAN_FRAME : FULL_FRAME
+  const frameStyle = {
+    left: `${frame.x * 100}%`, top: `${frame.y * 100}%`,
+    width: `${frame.w * 100}%`, height: `${frame.h * 100}%`,
+  }
+  const cover = useMemo(() => {
+    const v = videoRef.current
+    if (!v || !stage.cw || !stage.ch) return null
+    return coverOf(v, stage.cw, stage.ch)
+    // coverTick: dihitung ulang tiap tangkapan/resize/orientasi berubah
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage, coverTick, running])
+
   return (
     <div className="min-h-screen bg-cream pb-20 lg:pb-0">
       <Header />
@@ -364,13 +508,15 @@ export default function LensPage() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
           {/* ── pembidik ── */}
           <section className="overflow-hidden rounded-3xl border border-sand bg-deep-brown shadow-soft">
-            <div className="relative aspect-[4/3] w-full bg-charcoal">
+            {/* Panggung LANSKAP (16:9) — bukan portrait: pratinjau mengisi penuh
+                (object-cover) dan hanya area di dalam bingkai yang dikirim ke OCR. */}
+            <div ref={stageRef} className="relative aspect-video w-full overflow-hidden bg-charcoal">
               <video
                 ref={videoRef}
                 playsInline
                 muted
                 autoPlay
-                className={cn("absolute inset-0 h-full w-full object-contain transition-opacity", running ? "opacity-100" : "opacity-0")}
+                className={cn("absolute inset-0 h-full w-full object-cover transition-opacity", running ? "opacity-100" : "opacity-0")}
               />
               {!running && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
@@ -389,27 +535,49 @@ export default function LensPage() {
                 </div>
               )}
 
-              {/* bingkai bidik + overlay kotak hasil OCR */}
-              {running && !result && (
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                  <div className="h-[62%] w-[76%] rounded-2xl border-2 border-cream/40">
-                    <div className="relative h-full w-full overflow-hidden">
-                      <div className="absolute inset-x-0 h-16 animate-[scan_2.6s_ease-in-out_infinite] bg-gradient-to-b from-saffron/0 via-saffron/25 to-saffron/0" />
-                    </div>
-                  </div>
+              {/* ── area baca: HANYA bagian ini yang dikirim ke OCR ── */}
+              {running && region === "frame" && (
+                <div className="pointer-events-none absolute inset-0">
+                  <div className="absolute inset-x-0 top-0 bg-charcoal/60" style={{ height: `${frame.y * 100}%` }} />
+                  <div className="absolute inset-x-0 bottom-0 bg-charcoal/60"
+                    style={{ height: `${Math.max(0, 1 - frame.y - frame.h) * 100}%` }} />
+                  <div className="absolute bg-charcoal/60"
+                    style={{ top: `${frame.y * 100}%`, height: `${frame.h * 100}%`, left: 0, width: `${frame.x * 100}%` }} />
+                  <div className="absolute bg-charcoal/60"
+                    style={{ top: `${frame.y * 100}%`, height: `${frame.h * 100}%`, right: 0,
+                             width: `${Math.max(0, 1 - frame.x - frame.w) * 100}%` }} />
                 </div>
               )}
+              {running && (
+                <div className="pointer-events-none absolute" style={frameStyle}>
+                  <div className="relative h-full w-full overflow-hidden rounded-2xl border-2 border-cream/60">
+                    {/* sudut tegas ala pemindai */}
+                    {["left-0 top-0 border-l-2 border-t-2", "right-0 top-0 border-r-2 border-t-2",
+                      "left-0 bottom-0 border-l-2 border-b-2", "right-0 bottom-0 border-r-2 border-b-2"].map((c) => (
+                      <span key={c} className={cn("absolute h-5 w-5 border-saffron", c)} />
+                    ))}
+                    {!result && (
+                      <div className="absolute inset-x-0 h-14 animate-[scan_2.6s_ease-in-out_infinite] bg-gradient-to-b from-saffron/0 via-saffron/25 to-saffron/0" />
+                    )}
+                  </div>
+                  <span className="absolute -top-6 left-0 inline-flex items-center gap-1 rounded-full bg-charcoal/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-cream/80">
+                    <ScanLine className="h-3 w-3" /> {REGION_LABEL[region]}
+                  </span>
+                </div>
+              )}
+
+              {/* overlay kotak hasil OCR — dipetakan balik ke posisi aslinya di pratinjau */}
               {running && result && (
                 <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
                   {lines.map((ln, li) =>
                     ln.glyphs.map((g, gi) => {
-                      const [x, y, w, h] = g.rect
+                      const b = rectToBox(g.rect, capSrc, cover)
                       const active = selected?.line === li && selected?.glyph === gi
                       const low = (g.confidence ?? 1) < 0.55
                       return (
                         <g key={`${li}-${gi}`} onClick={() => setSelected({ line: li, glyph: gi })} className="cursor-pointer">
                           <rect
-                            x={x * 100} y={y * 100} width={w * 100} height={h * 100}
+                            x={b.x} y={b.y} width={b.w} height={b.h}
                             fill={active ? "rgba(245,158,11,0.22)" : low ? "rgba(220,38,38,0.14)" : "transparent"}
                             stroke={active ? "#f59e0b" : low ? "#dc2626" : "#ffffff"}
                             strokeWidth={active ? 0.9 : 0.5}
@@ -424,6 +592,14 @@ export default function LensPage() {
               {status === "scanning" && (
                 <div className="absolute inset-x-0 top-0 h-1 animate-pulse bg-saffron" />
               )}
+              {running && portrait && (
+                <button
+                  onClick={goLandscape}
+                  className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 bg-terracotta/90 px-3 py-2 text-xs font-semibold text-cream"
+                >
+                  <RotateCw className="h-3.5 w-3.5" /> Kamera mengirim gambar portrait — ketuk untuk kunci lanskap
+                </button>
+              )}
             </div>
 
             {/* kontrol */}
@@ -437,6 +613,23 @@ export default function LensPage() {
                       mode === m ? "bg-saffron text-cream" : "text-cream/70 hover:text-cream")}
                   >
                     {MODE_LABEL[m]}
+                  </button>
+                ))}
+              </div>
+              {/* Area baca: tulisan di luar bingkai tidak dikirim ke OCR */}
+              <div className="flex overflow-hidden rounded-full bg-charcoal/40 p-1">
+                {(["frame", "full"] as Region[]).map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setRegion(r)}
+                    title={r === "frame"
+                      ? "Hanya tulisan di dalam bingkai yang dibaca"
+                      : "Baca seluruh layar kamera"}
+                    className={cn("inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
+                      region === r ? "bg-sage text-cream" : "text-cream/70 hover:text-cream")}
+                  >
+                    {r === "frame" ? <Crop className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
+                    {r === "frame" ? "Bingkai" : "Penuh"}
                   </button>
                 ))}
               </div>
@@ -478,6 +671,13 @@ export default function LensPage() {
               >
                 <ArrowLeftRight className="h-4 w-4" /> {facing === "environment" ? "Belakang" : "Depan"}
               </button>
+              <button
+                onClick={goLandscape}
+                className="inline-flex items-center gap-1.5 rounded-full bg-charcoal/50 px-3 py-2 text-sm font-semibold text-cream/80 hover:bg-charcoal"
+                title="Kunci orientasi lanskap (layar penuh)"
+              >
+                <RotateCw className="h-4 w-4" /> Lanskap
+              </button>
               <button onClick={() => fileRef.current?.click()} className="inline-flex items-center gap-1.5 rounded-full bg-charcoal/50 px-3 py-2 text-sm font-semibold text-cream/80 hover:bg-charcoal">
                 <Upload className="h-4 w-4" /> Unggah foto
               </button>
@@ -508,10 +708,11 @@ export default function LensPage() {
                 <div className="py-10 text-center">
                   <Lightbulb className="mx-auto mb-2 h-7 w-7 text-saffron/70" />
                   <p className="mx-auto max-w-sm text-sm text-charcoal/60">
-                    Letakkan tulisan dalam bingkai, jaga kamera tegak lurus dan cahaya merata. Hasil muncul otomatis setiap
-                    ~1 detik.
+                    Arahkan kamera <b>mendatar (lanskap)</b> dan masukkan tulisan ke dalam bingkai. Tulisan di luar bingkai
+                    tidak ikut terbaca.
                   </p>
                   <ul className="mx-auto mt-4 max-w-xs space-y-1 text-left text-xs text-charcoal/50">
+                    <li>• Pegang ponsel mendatar — area baca mengikuti bingkai, bukan seluruh sensor.</li>
                     <li>• Satu baris aksara Bali lebih mudah dibaca daripada paragraf panjang.</li>
                     <li>• Untuk prasasti/lontar: potret per baris, lebih dekat.</li>
                     <li>• Salah baca? Ketuk kotaknya lalu kirim koreksi — model dilatih ulang oleh guru/admin.</li>

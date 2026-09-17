@@ -22,7 +22,7 @@ LATIN_TO_BALI_CASES = [
 
 BALI_TO_LATIN_CASES = [
     ("ᬩᬮᬶ", "bali"),
-    ("ᬳ", "a"),  # ha tunggal dibaca "a" (standar LOC/bennylin)
+    ("ᬳ", "ha"),   # ha awal kata dibaca sebagai konsonan "ha" (hanacaraka, hujan)
     ("ᬦ", "na"),
     ("ᬅᬓ᭄ᬱᬭ", "aksara"),
 ]
@@ -50,12 +50,48 @@ def test_bali_to_latin_basic():
 
 
 def test_ha_vocalization():
-    # ha (ᬳ) berfungsi ganda sesuai standar LOC & romanisasi umum (bennylin):
-    # tunggal -> "a"; + tanda vokal -> tanda dibaca langsung; + adeg -> konsonan "h".
-    assert transliterate_bali_to_latin("ᬳ")[0] == "a"
-    assert transliterate_bali_to_latin("ᬳᬶ")[0] == "i"
-    assert transliterate_bali_to_latin("ᬳᬧ")[0] == "apa"
+    # ᬳ (ha) dibaca sebagai konsonan "h" + vokal bawaan/pangangge, sesuai data
+    # proyek (hanacaraka -> "hanacaraka", hujan -> "hujan"). Suara ᬅ tetap "a".
+    assert transliterate_bali_to_latin("ᬳ")[0] == "ha"
+    assert transliterate_bali_to_latin("ᬳᬶ")[0] == "hi"
+    assert transliterate_bali_to_latin("ᬳᬧ")[0] == "hapa"
     assert transliterate_bali_to_latin("ᬳ᭄ᬕ")[0] == "hga"
+    assert transliterate_bali_to_latin("ᬅ")[0] == "a"
+    assert transliterate_bali_to_latin("ᬳᬦᬘᬭᬓ")[0] == "hanacaraka"
+    assert transliterate_bali_to_latin("ᬳᬸᬚᬦ᭄")[0] == "hujan"
+
+
+def test_bali_to_latin_words():
+    # Kata-kata yang dulu salah baca (regresi transliterasi bali -> latin).
+    cases = [
+        ("ᬩᬳᬲ", "bahasa"),        # ba + ha + sa
+        ("ᬧᭀᬳᭀᬦ᭄", "pohon"),
+        ("ᬑᬁ", "om"),               # okara tedung + ulu candra
+        ("ᬅᬂ", "ang"),              # akara + cecek
+        ("ᬅᬄ", "ah"),
+        ("ᬅᬐᬃ", "aair"),            # akara + aikara + surang (bukan satu kata)
+        ("ᬉᬯᬂ", "uwang"),            # ukara + wa + cecek
+        ("ᬚᬶᬦᬄ", "jinah"),           # bisah -> "h" penutup
+        ("ᬢᬶᬬᬂ", "tiyang"),          # setia-glif: ya + cecek (kata "tiang" lewat kamus)
+        ("ᬤᬃᬫ", "dharma"),          # surang (ra repa) -> "r" + vokal
+        ("ᬩᬼᬕᬜ᭄ᬚᬸᬃ", "bleganjur"),
+        ("ᬫᬢᬳᬭᬶ", "matahari"),
+        ("ᬲ᭄ᬯᬲ᭄ᬢᬶ", "swasti"),
+        ("ᬲ᭄ᬯᬲ᭄ᬢ᭄ᬬᬲ᭄ᬢᬸ", "swastyastu"),
+        ("ᬓ᭄ᬭᬶᬱ᭄ᬡ", "kriṣṇa"),       # aksara murda dibaca ṣa/ṇa (tabel proyek)
+        ("ᬧᬤ᭄ᬫ", "padma"),           # adeg-adeg -> gugus konsonan
+    ]
+    for bali, expected in cases:
+        assert transliterate_bali_to_latin(bali)[0] == expected, f"{bali} -> {expected}"
+
+
+def test_bali_to_latin_phrase_and_dictionary():
+    # Frasa multi-kata + kata kamus (dictionary.json) ikut diterjemahkan benar.
+    text, breakdown, _ = transliterate_bali_to_latin("ᬑᬁ ᬲ᭄ᬯᬲ᭄ᬢ᭄ᬬᬲ᭄ᬢᬸ")
+    assert text == "om swastyastu"
+    assert len(text.split()) == 2
+    # ᬳ di tengah frasa tetap "h"
+    assert transliterate_bali_to_latin("ᬩᬳᬲ ᬩᬮᬶ")[0] == "bahasa bali"
 
 
 def test_tumpuk_telu_detection():

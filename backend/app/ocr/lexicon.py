@@ -168,6 +168,12 @@ def build_latin_lm() -> NgramLM:
     lm.fit([list(w) for w in words])
     counts: Dict[str, int] = {}
     for w in words:
+        # Kata 1–2 huruf di korpus repo kebanyakan romanisasi aksara ("ma", "na",
+        # "am") — bukan kata Latin. Memasukkannya membuat bonus kamus menyulut
+        # pada hasil OCR yang salah ("mm am ma" dianggap kata dikenal) dan
+        # merusak pilihan skrip pada mode Otomatis.
+        if len(w) < 3:
+            continue
         counts[w] = counts.get(w, 0) + 1
     lm.words = counts
     return lm
@@ -256,19 +262,28 @@ def get_lm(task: str, labels: Sequence[str]) -> NgramLM:
 
 def beam_decode(cands: Sequence[Sequence[Tuple[str, float]]], lm: NgramLM, *, width: int = 6,
                 allow_space: bool = False, word_gap: float = 0.62,
-                gaps: Optional[Sequence[float]] = None) -> Tuple[List[str], float]:
+                gaps: Optional[Sequence[float]] = None,
+                breaks: Optional[Sequence[bool]] = None) -> Tuple[List[str], float]:
     """Beam search atas kandidat per posisi.
 
     ``cands[i]`` = daftar ``(label, prob)`` terurut menurun untuk posisi ``i``.
     Skor = jumlah log-prob model + log-prob LM (backoff) + bonus kamus per kata.
+
+    Pemisah kata diambil dari ``breaks`` (keputusan segmentasi per baris, yang
+    memakai ambang celah adaptif) bila diberikan; jika tidak, dihitung dari
+    ``gaps`` terhadap ``word_gap`` — agar pemanggil lama tetap berjalan.
     """
     n = len(cands)
     if n == 0:
         return [], 0.0
     beams: List[Tuple[float, List[str]]] = [(0.0, [])]
     for i in range(n):
-        gap = float(gaps[i]) if gaps is not None and i < len(gaps) else 0.0
-        space_before = allow_space and i > 0 and gap >= word_gap
+        if breaks is not None and i < len(breaks):
+            space_here = bool(breaks[i])
+        else:
+            gap = float(gaps[i]) if gaps is not None and i < len(gaps) else 0.0
+            space_here = gap >= word_gap
+        space_before = allow_space and i > 0 and space_here
         nxt: List[Tuple[float, List[str]]] = []
         for score, seq in beams:
             starts = [seq + [" "]] if space_before else [seq]
@@ -285,8 +300,17 @@ def beam_decode(cands: Sequence[Sequence[Tuple[str, float]]], lm: NgramLM, *, wi
             break
         nxt.sort(key=lambda x: x[0], reverse=True)
         beams = nxt[: width]
-    best_score, best_seq = beams[0]
-    if allow_space and lm.words:
-        bonus = sum(lm.word_bonus(w) for w in "".join(best_seq).split() if w)
-        best_score += 0.12 * bonus
+    # Bonus kamus dinilai ulang untuk SEMUA balok (bukan hanya yang terbaik),
+    # karena rangkaian yang membentuk kata dikenal sering sedikit di belakang
+    # secara akustik namun jauh lebih mungkin sebagai teks.
+    ranked: List[Tuple[float, List[str]]] = []
+    for score, seq in beams:
+        total = score
+        if lm.words:
+            text = "".join(seq)
+            words = [w for w in text.split() if w] if allow_space else [text]
+            total += 0.12 * sum(lm.word_bonus(w) for w in words)
+        ranked.append((total, seq))
+    ranked.sort(key=lambda x: x[0], reverse=True)
+    best_score, best_seq = ranked[0]
     return best_seq, round(best_score, 4)

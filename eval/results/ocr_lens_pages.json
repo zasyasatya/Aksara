@@ -1,5 +1,5 @@
 {
- "created": "2026-09-17 01:21",
+ "created": "2026-09-17 05:47",
  "options": {},
  "render": {
   "aksara": {
@@ -8,13 +8,13 @@
     "48": {
      "pages": 10,
      "line_exact_rate": 0.3,
-     "cer": 0.22,
+     "cer": 0.2,
      "line_count_ratio": 1.0,
-     "ms_per_page": 119,
+     "ms_per_page": 130,
      "rows": [
       {
        "text_ref": "ᬩᬮᬶ",
-       "text_hyp": "ᬩᬶ",
+       "text_hyp": "ᬩᬮ",
        "ref": 3,
        "hyp": 2,
        "edits": 1,
@@ -38,7 +38,7 @@
       },
       {
        "text_ref": "ᬓᬭ ᬩᬮᬶ",
-       "text_hyp": "ᬓᬭᬩᬶ",
+       "text_hyp": "ᬓᬭᬩᬮ",
        "ref": 5,
        "hyp": 4,
        "edits": 1,
@@ -46,7 +46,7 @@
       },
       {
        "text_ref": "ᬓᬭ / ᬩᬮᬶ",
-       "text_hyp": "ᬓᬭᬩᬶ",
+       "text_hyp": "ᬓᬭᬩᬮ",
        "ref": 5,
        "hyp": 4,
        "edits": 1,
@@ -62,15 +62,15 @@
       },
       {
        "text_ref": "ᬤᬢ ᬩᬶ ᬫᬬ",
-       "text_hyp": "ᬤᬳᬶᬫᬬ",
+       "text_hyp": "ᬤᬢᬩᬫᬬ",
        "ref": 6,
        "hyp": 5,
-       "edits": 2,
+       "edits": 1,
        "exact": false
       },
       {
        "text_ref": "ᬔᬦ ᬘᬬ ᬤᬢ",
-       "text_hyp": "ᬓᬦᬘᬬᬤᬳ",
+       "text_hyp": "ᬦᬦᬘᬬᬤᬳ",
        "ref": 5,
        "hyp": 6,
        "edits": 2,
@@ -78,7 +78,7 @@
       },
       {
        "text_ref": "ᬩᬮᬶ ᬩᬮᬶ ᬩᬮᬶ",
-       "text_hyp": "ᬩᬶᬩᬶᬩᬶ",
+       "text_hyp": "ᬩᬮᬩᬮᬩᬮ",
        "ref": 9,
        "hyp": 6,
        "edits": 3,
@@ -86,7 +86,7 @@
       },
       {
        "text_ref": "ᬓᬭ ᬓᬭ ᬓᬭ ᬩᬮᬶ",
-       "text_hyp": "ᬓᬭᬓᬭᬓᬭᬩᬶ",
+       "text_hyp": "ᬓᬭᬓᬭᬓᬭᬩᬮ",
        "ref": 9,
        "hyp": 8,
        "edits": 1,
@@ -97,13 +97,13 @@
     "72": {
      "pages": 10,
      "line_exact_rate": 0.3,
-     "cer": 0.22,
+     "cer": 0.2,
      "line_count_ratio": 1.0,
-     "ms_per_page": 135,
+     "ms_per_page": 149,
      "rows": [
       {
        "text_ref": "ᬩᬮᬶ",
-       "text_hyp": "ᬩᬶ",
+       "text_hyp": "ᬩᬮ",
        "ref": 3,
        "hyp": 2,
        "edits": 1,
@@ -127,7 +127,7 @@
       },
       {
        "text_ref": "ᬓᬭ ᬩᬮᬶ",
-       "text_hyp": "ᬓᬭᬩᬶ",
+       "text_hyp": "ᬓᬭᬩᬮ",
        "ref": 5,
        "hyp": 4,
        "edits": 1,
@@ -135,7 +135,7 @@
       },
       {
        "text_ref": "ᬓᬭ / ᬩᬮᬶ",
-       "text_hyp": "ᬓᬭᬩᬶ",
+       "text_hyp": "ᬓᬭᬩᬮ",
        "ref": 5,
        "hyp": 4,
        "edits": 1,
@@ -151,15 +151,15 @@
       },
       {
        "text_ref": "ᬤᬢ ᬩᬶ ᬫᬬ",
-       "text_hyp": "ᬤᬳᬶᬫᬬ",
+       "text_hyp": "ᬤᬢᬩᬫᬬ",
        "ref": 6,
        "hyp": 5,
-       "edits": 2,
+       "edits": 1,
        "exact": false
       },
       {
        "text_ref": "ᬔᬦ ᬘᬬ ᬤᬢ",
-       "text_hyp": "ᬓᬦᬘᬬᬤᬳ",
+       "text_hyp": "ᬦᬦᬘᬬᬤᬳ",
        "ref": 5,
        "hyp": 6,
        "edits": 2,
@@ -167,7 +167,7 @@
       },
       {
        "text_ref": "ᬩᬮᬶ ᬩᬮᬶ ᬩᬮᬶ",
-       "text_hyp": "ᬩᬶᬩᬶᬩᬶ",
+       "text_hyp": "ᬩᬮᬩᬮᬩᬮ",
        "ref": 9,
        "hyp": 6,
        "edits": 3,
@@ -175,7 +175,7 @@
       },
       {
        "text_ref": "ᬓᬭ ᬓᬭ ᬓᬭ ᬩᬮᬶ",
-       "text_hyp": "ᬓᬭᬓᬭᬓᬭᬩᬶ",
+       "text_hyp": "ᬓᬭᬓᬭᬓᬭᬩᬮ",
        "ref": 9,
        "hyp": 8,
        "edits": 1,
@@ -186,13 +186,13 @@
     "96": {
      "pages": 10,
      "line_exact_rate": 0.3,
-     "cer": 0.24,
+     "cer": 0.22,
      "line_count_ratio": 1.0,
-     "ms_per_page": 161,
+     "ms_per_page": 178,
      "rows": [
       {
        "text_ref": "ᬩᬮᬶ",
-       "text_hyp": "ᬩᬶ",
+       "text_hyp": "ᬩᬮ",
        "ref": 3,
        "hyp": 2,
        "edits": 1,
@@ -216,7 +216,7 @@
       },
       {
        "text_ref": "ᬓᬭ ᬩᬮᬶ",
-       "text_hyp": "ᬓᬭᬩᬶ",
+       "text_hyp": "ᬓᬭᬩᬮ",
        "ref": 5,
        "hyp": 4,
        "edits": 1,
@@ -224,7 +224,7 @@
       },
       {
        "text_ref": "ᬓᬭ / ᬩᬮᬶ",
-       "text_hyp": "ᬓᬭᬩᬶ",
+       "text_hyp": "ᬓᬭᬩᬮ",
        "ref": 5,
        "hyp": 4,
        "edits": 1,
@@ -240,15 +240,15 @@
       },
       {
        "text_ref": "ᬤᬢ ᬩᬶ ᬫᬬ",
-       "text_hyp": "ᬤᬳᬶᬫᬬ",
+       "text_hyp": "ᬤᬢᬩᬫᬬ",
        "ref": 6,
        "hyp": 5,
-       "edits": 2,
+       "edits": 1,
        "exact": false
       },
       {
        "text_ref": "ᬔᬦ ᬘᬬ ᬤᬢ",
-       "text_hyp": "ᬓᬦᬘᬬᬤᬳ",
+       "text_hyp": "ᬦᬦᬘᬬᬤᬳ",
        "ref": 5,
        "hyp": 6,
        "edits": 2,
@@ -256,7 +256,7 @@
       },
       {
        "text_ref": "ᬩᬮᬶ ᬩᬮᬶ ᬩᬮᬶ",
-       "text_hyp": "ᬩᬶᬩᬶᬩᬶ",
+       "text_hyp": "ᬩᬮᬩᬮᬩᬮ",
        "ref": 9,
        "hyp": 6,
        "edits": 3,
@@ -264,7 +264,7 @@
       },
       {
        "text_ref": "ᬓᬭ ᬓᬭ ᬓᬭ ᬩᬮᬶ",
-       "text_hyp": "ᬓᬭᬓᬭᬓᬭᬩᬚ",
+       "text_hyp": "ᬓᬭᬓᬭᬓᬭᬩᬭ",
        "ref": 9,
        "hyp": 8,
        "edits": 2,
@@ -279,10 +279,10 @@
    "sizes": {
     "48": {
      "pages": 10,
-     "line_exact_rate": 0.3,
-     "cer": 0.333,
+     "line_exact_rate": 0.7,
+     "cer": 0.024,
      "line_count_ratio": 1.0,
-     "ms_per_page": 140,
+     "ms_per_page": 175,
      "rows": [
       {
        "text_ref": "ok",
@@ -302,59 +302,59 @@
       },
       {
        "text_ref": "hello world",
-       "text_hyp": "heloworlk",
+       "text_hyp": "helloworid",
        "ref": 10,
-       "hyp": 9,
-       "edits": 2,
+       "hyp": 10,
+       "edits": 1,
        "exact": false
       },
       {
        "text_ref": "balinese script",
-       "text_hyp": "barmesescmpt",
+       "text_hyp": "barinesescript",
        "ref": 14,
-       "hyp": 12,
-       "edits": 5,
+       "hyp": 14,
+       "edits": 1,
        "exact": false
       },
       {
        "text_ref": "aksara bali",
-       "text_hyp": "aksara?ba",
+       "text_hyp": "aksarabali",
        "ref": 10,
-       "hyp": 9,
-       "edits": 3,
-       "exact": false
+       "hyp": 10,
+       "edits": 0,
+       "exact": true
       },
       {
        "text_ref": "Aksara Bali / Learn Balinese Script",
-       "text_hyp": "nksara?batearn?uarmesescmp",
+       "text_hyp": "aksarabalilearnbarinesescript",
        "ref": 29,
-       "hyp": 26,
-       "edits": 13,
+       "hyp": 29,
+       "edits": 1,
        "exact": false
       },
       {
        "text_ref": " read the palm leaf",
-       "text_hyp": "read?the?pam?l",
+       "text_hyp": "readthepalmleaf",
        "ref": 15,
-       "hyp": 14,
-       "edits": 7,
-       "exact": false
+       "hyp": 15,
+       "edits": 0,
+       "exact": true
       },
       {
        "text_ref": "Tulisan Bali Latin",
-       "text_hyp": "rursan?bal?la",
+       "text_hyp": "tulisanbalilatin",
        "ref": 16,
-       "hyp": 13,
-       "edits": 8,
-       "exact": false
+       "hyp": 16,
+       "edits": 0,
+       "exact": true
       },
       {
        "text_ref": "the quick brown fox",
-       "text_hyp": "the?qubkbrownfo",
+       "text_hyp": "thequickbrownfox",
        "ref": 16,
-       "hyp": 15,
-       "edits": 4,
-       "exact": false
+       "hyp": 16,
+       "edits": 0,
+       "exact": true
       },
       {
        "text_ref": "ok0123 456789",
@@ -368,10 +368,10 @@
     },
     "72": {
      "pages": 10,
-     "line_exact_rate": 0.3,
-     "cer": 0.389,
+     "line_exact_rate": 0.7,
+     "cer": 0.032,
      "line_count_ratio": 1.0,
-     "ms_per_page": 151,
+     "ms_per_page": 195,
      "rows": [
       {
        "text_ref": "ok",
@@ -391,76 +391,76 @@
       },
       {
        "text_ref": "hello world",
-       "text_hyp": "heloworlk",
+       "text_hyp": "helloworld",
        "ref": 10,
-       "hyp": 9,
-       "edits": 2,
-       "exact": false
+       "hyp": 10,
+       "edits": 0,
+       "exact": true
       },
       {
        "text_ref": "balinese script",
-       "text_hyp": "barmese?scop",
+       "text_hyp": "barinesescript",
        "ref": 14,
-       "hyp": 12,
-       "edits": 7,
+       "hyp": 14,
+       "edits": 1,
        "exact": false
       },
       {
        "text_ref": "aksara bali",
-       "text_hyp": "aksara?ba",
+       "text_hyp": "aksarabali",
        "ref": 10,
-       "hyp": 9,
-       "edits": 3,
-       "exact": false
+       "hyp": 10,
+       "edits": 0,
+       "exact": true
       },
       {
        "text_ref": "Aksara Bali / Learn Balinese Script",
-       "text_hyp": "nksara?batearn?uarmese?sco",
+       "text_hyp": "aksarabalilearnbarinesescript",
        "ref": 29,
-       "hyp": 26,
-       "edits": 15,
+       "hyp": 29,
+       "edits": 1,
        "exact": false
       },
       {
        "text_ref": " read the palm leaf",
-       "text_hyp": "read?the?pam?",
+       "text_hyp": "readthepalmleaf",
        "ref": 15,
-       "hyp": 13,
-       "edits": 7,
-       "exact": false
+       "hyp": 15,
+       "edits": 0,
+       "exact": true
       },
       {
        "text_ref": "Tulisan Bali Latin",
-       "text_hyp": "rursan?bal?la",
+       "text_hyp": "tulisanbalilatin",
        "ref": 16,
-       "hyp": 13,
-       "edits": 8,
-       "exact": false
+       "hyp": 16,
+       "edits": 0,
+       "exact": true
       },
       {
        "text_ref": "the quick brown fox",
-       "text_hyp": "the?quek?brown?",
+       "text_hyp": "thequickbrownfox",
        "ref": 16,
-       "hyp": 15,
-       "edits": 7,
-       "exact": false
+       "hyp": 16,
+       "edits": 0,
+       "exact": true
       },
       {
        "text_ref": "ok0123 456789",
-       "text_hyp": "ok0123456789",
+       "text_hyp": "ok01a3a56789",
        "ref": 12,
        "hyp": 12,
-       "edits": 0,
-       "exact": true
+       "edits": 2,
+       "exact": false
       }
      ]
     },
     "96": {
      "pages": 10,
-     "line_exact_rate": 0.3,
-     "cer": 0.397,
+     "line_exact_rate": 0.6,
+     "cer": 0.056,
      "line_count_ratio": 1.0,
-     "ms_per_page": 176,
+     "ms_per_page": 215,
      "rows": [
       {
        "text_ref": "ok",
@@ -480,67 +480,67 @@
       },
       {
        "text_ref": "hello world",
-       "text_hyp": "heloworlk",
+       "text_hyp": "helloworld",
        "ref": 10,
-       "hyp": 9,
-       "edits": 2,
-       "exact": false
+       "hyp": 10,
+       "edits": 0,
+       "exact": true
       },
       {
        "text_ref": "balinese script",
-       "text_hyp": "harmese?scop",
+       "text_hyp": "barinesescript",
        "ref": 14,
-       "hyp": 12,
-       "edits": 8,
+       "hyp": 14,
+       "edits": 1,
        "exact": false
       },
       {
        "text_ref": "aksara bali",
-       "text_hyp": "aksara?ba",
+       "text_hyp": "aksarabali",
        "ref": 10,
-       "hyp": 9,
+       "hyp": 10,
+       "edits": 0,
+       "exact": true
+      },
+      {
+       "text_ref": "Aksara Bali / Learn Balinese Script",
+       "text_hyp": "aksarabalilearnbarinesescril",
+       "ref": 29,
+       "hyp": 28,
        "edits": 3,
        "exact": false
       },
       {
-       "text_ref": "Aksara Bali / Learn Balinese Script",
-       "text_hyp": "kksara?batearn?karmese?sc",
-       "ref": 29,
-       "hyp": 25,
-       "edits": 15,
-       "exact": false
-      },
-      {
        "text_ref": " read the palm leaf",
-       "text_hyp": "read?the?pam?",
+       "text_hyp": "readthepalmleaf",
        "ref": 15,
-       "hyp": 13,
-       "edits": 7,
-       "exact": false
+       "hyp": 15,
+       "edits": 0,
+       "exact": true
       },
       {
        "text_ref": "Tulisan Bali Latin",
-       "text_hyp": "rursan?bal?la",
+       "text_hyp": "tulisanbalilatin",
        "ref": 16,
-       "hyp": 13,
-       "edits": 8,
-       "exact": false
+       "hyp": 16,
+       "edits": 0,
+       "exact": true
       },
       {
        "text_ref": "the quick brown fox",
-       "text_hyp": "the?quok?brown",
+       "text_hyp": "thequickbrownfot",
        "ref": 16,
-       "hyp": 14,
-       "edits": 7,
+       "hyp": 16,
+       "edits": 1,
        "exact": false
       },
       {
        "text_ref": "ok0123 456789",
-       "text_hyp": "ok0123456789",
+       "text_hyp": "ok01a3a56789",
        "ref": 12,
        "hyp": 12,
-       "edits": 0,
-       "exact": true
+       "edits": 2,
+       "exact": false
       }
      ]
     }
@@ -548,267 +548,7 @@
   }
  },
  "words": {
-  "available": true,
-  "dir": "/tmp/caraka/aksara-datasets-main",
-  "n": 23,
-  "exact_rate": 0.087,
-  "close_rate": 0.696,
-  "mean_cer": 0.326,
-  "ms_mean": 190,
-  "rows": [
-   {
-    "file": "bahasa.png",
-    "gold": "bahasa",
-    "aksara": "ᬩᬧᬲ",
-    "latin": "bapasa",
-    "glyphs": 3,
-    "ms": 90,
-    "cer": 0.167,
-    "exact": false,
-    "close": true
-   },
-   {
-    "file": "bahasa_bali.png",
-    "gold": "bahasabali",
-    "aksara": "ᬩᬧᬲᬩᬮᬶ",
-    "latin": "bapasabali",
-    "glyphs": 6,
-    "ms": 100,
-    "cer": 0.1,
-    "exact": false,
-    "close": true
-   },
-   {
-    "file": "bali-pergi_bali.png",
-    "gold": "balipergibali",
-    "aksara": "ᬃᬮᬶᬕᬮᬭ",
-    "latin": "ligalara",
-    "glyphs": 6,
-    "ms": 252,
-    "cer": 0.538,
-    "exact": false,
-    "close": false
-   },
-   {
-    "file": "belajar.png",
-    "gold": "belajar",
-    "aksara": "ᬾᬦᬮᬚᬃ",
-    "latin": "nalajar",
-    "glyphs": 5,
-    "ms": 81,
-    "cer": 0.286,
-    "exact": false,
-    "close": false
-   },
-   {
-    "file": "belajar_bahasa_bali.png",
-    "gold": "belajarbahasabali",
-    "aksara": "ᬾᬫᬬᬚᬃᬩᬳᬲᬩᬮᬶ",
-    "latin": "mayajarbaasabali",
-    "glyphs": 11,
-    "ms": 212,
-    "cer": 0.235,
-    "exact": false,
-    "close": true
-   },
-   {
-    "file": "belajar_bahasa_sunda.png",
-    "gold": "belajarbahasasunda",
-    "aksara": "ᬾᬢᬮᬚᬃᬩᬧᬲᬩᬮᬶ",
-    "latin": "talajarbapasabali",
-    "glyphs": 11,
-    "ms": 245,
-    "cer": 0.389,
-    "exact": false,
-    "close": false
-   },
-   {
-    "file": "bicara_bahasa_bali.png",
-    "gold": "bicarabahasabali",
-    "aksara": "ᬮᬶᬲᬭᬩᬳᬲᬩᬮᬶ",
-    "latin": "lisarabaasabali",
-    "glyphs": 10,
-    "ms": 192,
-    "cer": 0.188,
-    "exact": false,
-    "close": true
-   },
-   {
-    "file": "gata.png",
-    "gold": "gata",
-    "aksara": "ᬕᬬ",
-    "latin": "gaya",
-    "glyphs": 2,
-    "ms": 52,
-    "cer": 0.25,
-    "exact": false,
-    "close": true
-   },
-   {
-    "file": "kalimat_bali.png",
-    "gold": "kalimatbali",
-    "aksara": "ᬲᬬᬲᬗᬚᬲᬬᬂᬩᬭ ᬾᬤᬬᬩᬗᬾᬭᬦᬦᬗᬓᬾᬫᬓᬗ",
-    "latin": "sayasangajasayangbara dayabangerananangakemakanga",
-    "glyphs": 25,
-    "ms": 219,
-    "cer": 2.545,
-    "exact": false,
-    "close": false
-   },
-   {
-    "file": "kasar.png",
-    "gold": "kasar",
-    "aksara": "ᬓᬲᬃ",
-    "latin": "kasar",
-    "glyphs": 3,
-    "ms": 54,
-    "cer": 0.0,
-    "exact": true,
-    "close": true
-   },
-   {
-    "file": "keberagaman.png",
-    "gold": "keberagaman",
-    "aksara": "ᬾᬭᬾᬦᬭᬕᬫ᭄",
-    "latin": "renaragam",
-    "glyphs": 8,
-    "ms": 133,
-    "cer": 0.364,
-    "exact": false,
-    "close": false
-   },
-   {
-    "file": "pergi_bersama_kadek.png",
-    "gold": "pergibersamakadek",
-    "aksara": "ᬃᬕᬶᬃᬲᬫᬓᬸᬓ᭄",
-    "latin": "girsamakuk",
-    "glyphs": 10,
-    "ms": 227,
-    "cer": 0.412,
-    "exact": false,
-    "close": false
-   },
-   {
-    "file": "pergi_ke_bali.png",
-    "gold": "pergikebali",
-    "aksara": "ᬃᬕᬭᬾᬲᬩᬮᬶ",
-    "latin": "garesabali",
-    "glyphs": 8,
-    "ms": 143,
-    "cer": 0.545,
-    "exact": false,
-    "close": false
-   },
-   {
-    "file": "saya_belajar_bahasa.png",
-    "gold": "sayabelajarbahasa",
-    "aksara": "ᬲᬲᬾᬫᬮᬚᬃᬩᬧᬲ",
-    "latin": "sasemalajarbapasa",
-    "glyphs": 10,
-    "ms": 402,
-    "cer": 0.235,
-    "exact": false,
-    "close": true
-   },
-   {
-    "file": "saya_bicara_bahasa_bali.png",
-    "gold": "sayabicarabahasabali",
-    "aksara": "ᬲᬧᬩᬶᬲᬦᬩᬧᬲᬩᬮᬶ",
-    "latin": "sapabisanabapasabali",
-    "glyphs": 12,
-    "ms": 254,
-    "cer": 0.2,
-    "exact": false,
-    "close": true
-   },
-   {
-    "file": "saya_sayang_bahasa.png",
-    "gold": "sayasayangbahasa",
-    "aksara": "ᬲᬲᬲᬬᬂᬩᬳᬲ",
-    "latin": "sasasayangbaasa",
-    "glyphs": 8,
-    "ms": 316,
-    "cer": 0.125,
-    "exact": false,
-    "close": true
-   },
-   {
-    "file": "saya_sayang_bahasa_bali.png",
-    "gold": "sayasayangbahasabali",
-    "aksara": "ᬲᬬᬲᬬᬂᬩᬳᬲᬩᬮᬶ",
-    "latin": "sayasayangbaasabali",
-    "glyphs": 11,
-    "ms": 229,
-    "cer": 0.05,
-    "exact": false,
-    "close": true
-   },
-   {
-    "file": "saya_sayang_bali.png",
-    "gold": "sayasayangbali",
-    "aksara": "ᬲᬲᬲᬬᬂᬩᬮᬶ",
-    "latin": "sasasayangbali",
-    "glyphs": 8,
-    "ms": 122,
-    "cer": 0.071,
-    "exact": false,
-    "close": true
-   },
-   {
-    "file": "saya_sayang_belajar_bahasa.png",
-    "gold": "sayasayangbelajarbahasa",
-    "aksara": "ᬲᬬᬲᬬᬾᬾᬕᬮᬚᬃᬩᬳᬲ",
-    "latin": "sayasayegalajarbaasa",
-    "glyphs": 13,
-    "ms": 457,
-    "cer": 0.174,
-    "exact": false,
-    "close": true
-   },
-   {
-    "file": "saya_sayang_belajar_caraka.png",
-    "gold": "sayasayangbelajarcaraka",
-    "aksara": "ᬲᬧᬲᬬᬂᬾᬬᬮᬓᬃᬘᬭᬓ",
-    "latin": "sapasayangyalakarcaraka",
-    "glyphs": 13,
-    "ms": 180,
-    "cer": 0.174,
-    "exact": false,
-    "close": true
-   },
-   {
-    "file": "sayang.png",
-    "gold": "sayang",
-    "aksara": "ᬲᬬᬂ",
-    "latin": "sayang",
-    "glyphs": 3,
-    "ms": 60,
-    "cer": 0.0,
-    "exact": true,
-    "close": true
-   },
-   {
-    "file": "sayang_gata.png",
-    "gold": "sayanggata",
-    "aksara": "ᬲᬬᬂᬮᬬ",
-    "latin": "sayanglaya",
-    "glyphs": 5,
-    "ms": 106,
-    "cer": 0.2,
-    "exact": false,
-    "close": true
-   },
-   {
-    "file": "seminyak.png",
-    "gold": "seminyak",
-    "aksara": "ᬾᬲᬫᬶᬜ᭄",
-    "latin": "saminy",
-    "glyphs": 6,
-    "ms": 251,
-    "cer": 0.25,
-    "exact": false,
-    "close": true
-   }
-  ]
+  "available": false,
+  "dir": "/tmp/caraka/aksara-datasets-main"
  }
 }

@@ -416,7 +416,8 @@ def render_char(ch: str, font: ImageFont.FreeTypeFont, size: int, rot: float, sh
 
 
 def build_print_pack(out: Path, name: str, task: str, classes: list[dict], fonts: list[Path],
-                     per_class: int, seed: int, now: str, desc: str, font_license: str) -> dict | None:
+                     per_class: int, seed: int, now: str, desc: str, font_license: str,
+                     extra_per_class: int = 0) -> dict | None:
     fonts = [f for f in fonts if Path(f).is_file()]
     if not fonts:
         print(f"  ! font tidak ditemukan untuk {name} — lewati")
@@ -425,24 +426,40 @@ def build_print_pack(out: Path, name: str, task: str, classes: list[dict], fonts
     rng = np.random.default_rng(seed)
     fcache = {f: ImageFont.truetype(str(f), 120) for f in fonts}
     samples = []
+
+    def emit(cls: dict, glyph: str, tag: str, idx: int) -> None:
+        """Render satu varian glyph → sampel berlabel ``cls['label']``."""
+        font_path = fonts[int(rng.integers(0, len(fonts)))]
+        size = int(rng.uniform(0.62, 1.0) * 120)
+        font = ImageFont.truetype(str(font_path), max(28, size))
+        ink = render_char(glyph, font, size, float(rng.uniform(-7, 7)), float(rng.uniform(-8, 8)))
+        ink = degrade(ink, rng)
+        norm = features.normalize_ink(ink, 64, 52)
+        if not features.has_ink(norm, min_pixels=10):
+            return
+        png = canonical_png(norm)
+        rel = f"images/{cls['label']}/{cls['label']}_{tag}{idx:03d}.png"
+        (out / rel).parent.mkdir(parents=True, exist_ok=True)
+        (out / rel).write_bytes(png)
+        meta = {"font": Path(font_path).name, "kind": "print-render", "dataset": name}
+        if tag:
+            meta["variant"] = glyph
+        samples.append({"file": rel, "label": cls["label"], "split": "train", "sha256": sha(png),
+                        "meta": meta})
+
+    # TAHAP 1: glyph utama kelas (urutan & jumlah undian RNG tidak berubah agar
+    # berkas yang sudah dikomit tetap identik byte-per-byte saat rebuild).
     for cls in classes:
-        glyph = cls["glyph"]
         for i in range(per_class):
-            font_path = fonts[int(rng.integers(0, len(fonts)))]
-            size = int(rng.uniform(0.62, 1.0) * 120)
-            font = ImageFont.truetype(str(font_path), max(28, size))
-            ink = render_char(glyph, font, size, float(rng.uniform(-7, 7)), float(rng.uniform(-8, 8)))
-            ink = degrade(ink, rng)
-            norm = features.normalize_ink(ink, 64, 52)
-            if not features.has_ink(norm, min_pixels=10):
-                continue
-            png = canonical_png(norm)
-            rel = f"images/{cls['label']}/{cls['label']}_{i:03d}.png"
-            (out / rel).parent.mkdir(parents=True, exist_ok=True)
-            (out / rel).write_bytes(png)
-            samples.append({"file": rel, "label": cls["label"], "split": "train", "sha256": sha(png),
-                            "meta": {"font": Path(font_path).name, "kind": "print-render",
-                                    "dataset": name}})
+            emit(cls, cls["glyph"], "", i)
+    # TAHAP 2: varian glyph kelas yang sama — HURUF KAPITAL untuk Latin.
+    # Foto papan nama/buku/judul penuh huruf kapital; tanpa varian ini model
+    # membaca "A" sebagai "n", "L" sebagai "u", "B" sebagai "u", dst.
+    for cls in classes:
+        for vi, variant in enumerate(cls.get("extra_glyphs") or []):
+            tag = chr(ord("a") + vi)          # a, b, … penanda varian pada nama berkas
+            for i in range(extra_per_class):
+                emit(cls, variant, tag, i)
     if not samples:
         return None
     fin = finalize_samples(samples, val_mod=9, test_mod=6)
@@ -450,7 +467,8 @@ def build_print_pack(out: Path, name: str, task: str, classes: list[dict], fonts
         "name": name, "version": 1, "created_at": now, "task": task,
         "description": desc,
         "license": {"images": "CC0-1.0 (render prosedural oleh proyek AKSA)", "font": font_license},
-        "generator": {"script": "eval/build_real_datasets.py", "per_class": per_class, "seed": seed,
+        "generator": {"script": "eval/build_real_datasets.py", "per_class": per_class,
+                      "extra_per_class": extra_per_class, "seed": seed,
                       "fonts": [Path(f).name for f in fonts],
                       "degradation": "blur gauss 0.2–1.3px, noise, gradasi cahaya, shear/rotasi ±7–8°, putus goresan"},
         "image": {"size": 64, "mode": "L", "ink": "black-on-white", "feature_size": 28},
@@ -480,6 +498,8 @@ def main() -> int:
     ap.add_argument("--omniglot-dir", type=Path, default=Path("/tmp/omni/x"))
     ap.add_argument("--caraka-per-class", type=int, default=140)
     ap.add_argument("--print-per-class", type=int, default=56)
+    ap.add_argument("--print-extra-per-class", type=int, default=28,
+                    help="jumlah render per varian glyph tambahan (huruf kapital Latin)")
     ap.add_argument("--only", default="all", help="caraka,omniglot,print (dipisah koma)")
     ap.add_argument("--seed", type=int, default=20260917)
     args = ap.parse_args()
@@ -526,8 +546,10 @@ def main() -> int:
         if m:
             print(f"  aksara-bali-print-v1: {m['counts']['total']} gambar", flush=True)
             made.append(("aksara-bali-print-v1", m["counts"]["total"]))
-        latin_classes = [latin_class(chr(c)) for c in range(0x61, 0x7B)] + [latin_class(f"d{d}") for d in range(10)]
-        latin_classes = [{"label": chr(c), "glyph": chr(c), "name": f"Huruf {chr(c).upper()}", "latin": chr(c), "group": "huruf"}
+        # Label tetap huruf kecil (ruang kelas tidak berubah), tetapi tiap huruf
+        # juga dirender dalam bentuk KAPITAL → model tahan huruf besar.
+        latin_classes = [{"label": chr(c), "glyph": chr(c), "extra_glyphs": [chr(c - 32)],
+                          "name": f"Huruf {chr(c).upper()}", "latin": chr(c), "group": "huruf"}
                          for c in range(0x61, 0x7B)] + [
                             {"label": str(d), "glyph": str(d), "name": f"Angka {d}", "latin": str(d), "group": "angka"}
                             for d in range(10)]
@@ -536,9 +558,11 @@ def main() -> int:
             [DEJAVU / "DejaVuSans.ttf", DEJAVU / "DejaVuSans-Bold.ttf", DEJAVU / "DejaVuSerif.ttf",
              DEJAVU / "DejaVuSerif-Bold.ttf", DEJAVU / "DejaVuSansMono.ttf"],
             args.print_per_class, args.seed + 1, now,
-            "Teks tercetak Latin (a–z, 0–9) dari lima font DejaVu dengan degradasi ala foto — "
-            "bahan latihan pengenal huruf untuk OCR Lens pada papan nama, buku, dan lontar tercetak.",
+            "Teks tercetak Latin (a–z dalam huruf kecil DAN kapital, 0–9) dari lima font DejaVu "
+            "dengan degradasi ala foto — bahan latihan pengenal huruf untuk OCR Lens pada papan "
+            "nama, buku, dan lontar tercetak.",
             "DejaVu Fonts — Bitstream Vera license (bebas digunakan & didistribusikan)",
+            extra_per_class=args.print_extra_per_class,
         )
         if m:
             print(f"  latin-print-v1: {m['counts']['total']} gambar", flush=True)

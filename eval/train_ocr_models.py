@@ -20,6 +20,7 @@ Jalankan dari root repo:
     .venv/bin/python eval/train_ocr_models.py                      # kedua tugas
     .venv/bin/python eval/train_ocr_models.py --task aksara --epochs 60
     .venv/bin/python eval/train_ocr_models.py --quick              # smoke test
+    .venv/bin/python eval/train_ocr_models.py --summary-only       # ringkas model bawaan
 """
 
 from __future__ import annotations
@@ -181,6 +182,44 @@ def train_task(task: str, args) -> dict:
     return {"model_id": model_id, "entry": entry, "report": rep_all, "real": rep_real, "folder": folder}
 
 
+def summary_config(results: list[dict], args) -> dict:
+    """Konfigurasi latih yang benar-benar dipakai model bawaan (dari entry.json)."""
+    hp = (results[0]["entry"].get("hyperparams") or {}) if results else {}
+    return {
+        "arch": results[0]["entry"].get("arch", args.arch) if results else args.arch,
+        "epochs": hp.get("epochs", args.epochs),
+        "batch_size": hp.get("batch_size", args.batch_size),
+        "lr": hp.get("learning_rate", args.lr),
+        "augment": hp.get("augment", args.augment),
+        "class_balance": hp.get("class_balance", args.class_balance),
+        "hidden_units": hp.get("hidden_units", args.hidden),
+        "conv1_filters": hp.get("conv1_filters", args.f1),
+        "conv2_filters": hp.get("conv2_filters", args.f2),
+        "label_smoothing": hp.get("label_smoothing", args.label_smoothing),
+        "eval_tta": (results[0]["report"].get("eval_tta") or args.tta) if results else args.tta,
+        "packs": PACKS,
+    }
+
+
+def bundled_results() -> list[dict]:
+    """Muat model bawaan terkini per tugas (untuk ringkasan tanpa melatih ulang)."""
+    out: list[dict] = []
+    for task in ("aksara", "latin"):
+        root = BUNDLED_DIR / task
+        if not root.exists():
+            continue
+        for folder in sorted(root.glob("lens-*"), key=lambda p: p.stat().st_mtime, reverse=True):
+            rep_p, ent_p = folder / "report.json", folder / "entry.json"
+            if not (rep_p.exists() and ent_p.exists()):
+                continue
+            rep = json.loads(rep_p.read_text(encoding="utf-8"))
+            ent = json.loads(ent_p.read_text(encoding="utf-8"))
+            out.append({"model_id": ent.get("id", folder.name), "entry": ent, "report": rep,
+                        "real": rep.get("real_handwriting"), "folder": folder})
+            break
+    return out
+
+
 def write_summary(results: list[dict], args) -> None:
     out = ROOT / "eval" / "results"
     out.mkdir(parents=True, exist_ok=True)
@@ -205,12 +244,7 @@ def write_summary(results: list[dict], args) -> None:
                if real else "— | — | — | —")
             + f" | {e['train_seconds']} s |"
         )
-    lines += ["", "## Konfigurasi", "", "```json", json.dumps({
-        "arch": args.arch, "epochs": args.epochs, "batch_size": args.batch_size, "lr": args.lr,
-        "augment": args.augment, "class_balance": args.class_balance, "hidden_units": args.hidden,
-        "conv1_filters": args.f1, "conv2_filters": args.f2, "label_smoothing": args.label_smoothing,
-        "eval_tta": args.tta, "packs": PACKS,
-    }, indent=2), "```", ""]
+    lines += ["", "## Konfigurasi", "", "```json", json.dumps(summary_config(results, args), indent=2), "```", ""]
     for r in results:
         real = r["real"] or {}
         per = (real or {}).get("per_class") or r["report"].get("per_class") or []
@@ -222,10 +256,11 @@ def write_summary(results: list[dict], args) -> None:
             lines.append(f"| `{m.get('label')}` | {m.get('precision', 0) * 100:.1f} | {m.get('recall', 0) * 100:.1f} | "
                          f"{m.get('f1', 0) * 100:.1f} | {m.get('support', 0)} |")
         lines.append("")
+    cfg = summary_config(results, args)
     (out / "OCR_LENS_MODELS.md").write_text("\n".join(lines), encoding="utf-8")
     (out / "ocr_lens_models.json").write_text(json.dumps(
         {"created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-         "config": vars(args), "results": [
+         "config": cfg, "results": [
              {"model_id": r["model_id"], "task": r["entry"]["task"], "metrics": r["report"],
               "real_handwriting": r["real"]} for r in results]},
         ensure_ascii=False, indent=2), encoding="utf-8")
@@ -248,8 +283,20 @@ def main() -> int:
     ap.add_argument("--tta", type=int, default=4, help="jumlah transformasi TTA saat evaluasi")
     ap.add_argument("--log-every", type=int, default=2)
     ap.add_argument("--quick", action="store_true")
+    ap.add_argument("--summary-only", action="store_true",
+                    help="regenerasi ringkasan dari model bawaan yang ada (tanpa melatih)")
     ap.add_argument("--keep-store", action="store_true", help="jangan kosongkan store runtime setelah selesai")
     args = ap.parse_args()
+
+    if args.summary_only:
+        results = bundled_results()
+        if not results:
+            print(f"Tidak ada model bawaan di {BUNDLED_DIR.relative_to(ROOT)}.")
+            return 1
+        print("Ringkasan dari model bawaan: " + ", ".join(r["model_id"] for r in results))
+        write_summary(results, args)
+        print("\nSelesai.")
+        return 0
 
     work = Path(tempfile.mkdtemp(prefix="aksara-ocr-train-")) / "ml"
     store.ML_DIR = work
