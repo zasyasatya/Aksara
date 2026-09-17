@@ -479,6 +479,99 @@ Response 200 (409 bila belum ada model produksi, 422 bila gambar tidak berisi ti
 **POST /ml/predict/compare** (admin) — `{ "image", "model_ids": ["…", "…"] }` →
 `{ "results": [prediksi per model] }`.
 
+### OCR Lens — baca tulisan dari kamera (`/lens`)
+
+Pipeline satuOrigin untuk halaman **Lens**: segmentasi baris → potongan aksara →
+klasifikasi CNN per tugas (`aksara` / `latin`) → decoding dengan kamus → transliterasi +
+arti kata. Model yang dipakai adalah model produksi Panel Admin, jadi retraining admin
+langsung memperbaiki Lens. Detail algoritma: `docs/OCR_LENS.md`.
+
+```
+GET  /api/ocr/status                  → kesiapan model per tugas + bawaan pipeline + batas
+POST /api/ocr/scan                    → baca citra (data URL/base64)
+POST /api/ocr/scan/file                → baca citra multipart (kamera hp / curl -F)
+POST /api/ocr/scan/annotate            → JPEG berbingkai kotak (image/jpeg, untuk dibagikan)
+POST /api/ocr/feedback                 → kirim crop yang salah ke antrean admin
+GET  /api/ocr/feedback?task=…          → [admin] antrean koreksi
+GET  /api/ocr/feedback/{id}/image      → [admin] gambar crop sampel
+POST /api/ocr/feedback/{id}/decide?task=… → [admin] accept | reject | relabel
+POST /api/ocr/feedback/train           → [admin] setujui koreksi + latih ulang model tugas itu
+GET  /api/ocr/config                   → [admin] bawaan + batas + field pipeline yang sah
+PUT  /api/ocr/config                   → [admin] ubah bawaan/limits/umpan balik
+POST /api/ocr/models/install           → [admin] pasang model OCR bawaan dari repo
+GET  /api/ocr/selftest?task=…&font_size=48 → [admin] uji mandiri pipeline (render → OCR → skor)
+```
+
+**Request** — `POST /api/ocr/scan`
+
+```json
+{
+  "image": "data:image/jpeg;base64,/9j/4AAQ…",
+  "options": { "script": "auto", "tta": 2, "use_language_model": true, "max_side": 2400 },
+  "annotate": false
+}
+```
+
+`options` menerima seluruh field `ScanOptions` (dijepit otomatis bila di luar rentang):
+`script` (`auto|aksara|latin`), `binarize` (`sauvola|otsu|fixed`), `invert` (`auto|dark-ink|light-ink`),
+`deskew`, `tta` (0–12), `beam_width`, `use_language_model`, `split_marks`, `close_iters`,
+`merge_gap_ratio`, `word_gap_ratio`, `resplit_below`, `split_width_ratio`, `max_glyphs`,
+`top_k`, `with_crops`, `upscale_small`, `target_line_height`, `script_margin`, `line_min_ink`, `max_side`.
+
+**Response** — 200
+
+```json
+{
+  "scan_id": "6a1b2c3d4e",
+  "detected_script": "aksara",
+  "text": { "aksara": "ᬅᬓ᭄ᬱᬭ", "latin": "", "all": "ᬅᬓ᭄ᬱᬭ" },
+  "lines": [{
+    "index": 0, "script": "aksara", "text": "ᬅᬓ᭄ᬱᬭ",
+    "rect": [0.04, 0.18, 0.62, 0.11],
+    "glyphs": [{
+      "index": 0, "label": "a", "glyph": "ᬅ", "name": "A", "latin": "a",
+      "rect": [0.04, 0.18, 0.09, 0.10], "confidence": 0.93,
+      "alternatives": [{ "label": "ma", "glyph": "ᬫ", "probability": 0.03 }],
+      "marks": [{ "label": "adeg-adeg", "glyph": "ᬰ", "confidence": 0.88 }],
+      "parts": [{ "role": "body", "score": 0.93 }]
+    }]
+  }],
+  "translation": { "bali_to_latin": { "source": "ᬅᬓ᭄ᬱᬭ", "result": "aksara", "direction": "bali-to-latin", "warnings": [], "breakdown": [] } },
+  "glossary": [{ "word": "aksara", "bali": "ᬅᬓ᭄ᬱᬭ", "meaning": "huruf", "note": "Sa sapa untuk ssa" }],
+  "models": [{ "task": "aksara", "model_id": "lens-aksara-deepcnn-20260917", "arch": "deepcnn", "accuracy": 0.9429 }],
+  "stats": { "elapsed_ms": 184, "lines": 1, "glyphs": 5, "mean_confidence": 0.79, "tasks": ["aksara"], "tta": 2, "language_model": true },
+  "warnings": [],
+  "annotated": "data:image/jpeg;base64,…  (bila annotate/options.annotate)"
+}
+```
+
+`rect` dinormalisasi `[x, y, lebar, tinggi]` (0–1) terhadap citra **setelah** pra-proses, sehingga
+dapat dipakai langsung sebagai overlay di `<video>`/`<canvas>`.
+
+Contoh di atas disederhanakan untuk memperjelas bentuk respons. Pada citra nyata hasil render
+font, bentuk paling sering ditemukan: `hello world` → `{"latin": "heloworlk"}` (9 aksara,
+`mean_confidence` 0,91, 143 ms) — sedangkan kata ber-*pasangan* (ᬅᬓ᭄ᬱᬭ) masih sering terbaca
+sebagai kombinasi aksara dasar + pangangge (`ᬲᬾᬧᬭ` → “separa”) karena bentuknya dilumat shaping
+OpenType menjadi satu ligatur. Lihat “Batas yang diketahui” di `docs/OCR_LENS.md`.
+
+**Kesalahan umum**
+
+| Kode | Keadaan |
+| --- | --- |
+| `400` | base64/berkas bukan gambar; `options` bukan JSON; label di luar kelas aktif |
+| `413` | gambar melebihi `limits.max_image_bytes` |
+| `422` | gambar terbaca tetapi tidak dapat diproses |
+| `429` | melewati `limits.scan_per_minute` (per IP; admin dibebaskan pada mode prod) |
+| `503` | model OCR tugas tersebut belum terpasang (`POST /api/ocr/models/install`) |
+
+```bash
+curl -s http://localhost:8000/api/ocr/status
+curl -s -X POST http://localhost:8000/api/ocr/scan \
+  -H "Content-Type: application/json" \
+  -d '{"image":"data:image/png;base64,…","options":{"script":"latin","tta":4}}'
+curl -s -X POST http://localhost:8000/api/ocr/scan/file -F file=@foto.jpg -F annotate=1 | head -c 200
+```
+
 ### Dictionary (Future)
 
 **GET /dictionary?search=bali**

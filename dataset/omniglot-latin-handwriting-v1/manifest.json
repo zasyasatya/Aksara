@@ -1,0 +1,6466 @@
+{
+ "name": "omniglot-latin-handwriting-v1",
+ "version": 1,
+ "created_at": "2026-09-17T00:24:00+00:00",
+ "task": "latin",
+ "description": "Dataset AKTUAL tulisan tangan Latin (huruf kecil a–z) dari Omniglot: setiap karakter digambar 20 orang berbeda lewat Amazon Mechanical Turk. Split dibuat per PENULIS (writer-independent) sehingga evaluasi tidak menilai penulis yang sama dengan saat training. Dipakai untuk melatih & menguji pengenal huruf Latin pada OCR Lens.",
+ "license": {
+  "images": "MIT (repo brendenlake/omniglot)",
+  "attribution": "Lake, Salakhutdinov & Tenenbaum, 'Human-level concept learning…', Science 350(6266), 2015"
+ },
+ "source": {
+  "name": "omniglot",
+  "url": "https://github.com/brendenlake/omniglot",
+  "path": "python/images_background.zip → images_background/Latin",
+  "original_format": "PNG 105×105, tinta putih di latar hitam"
+ },
+ "generator": {
+  "script": "eval/build_real_datasets.py",
+  "split": {
+   "writers_train": "01–14",
+   "writers_val": "15–17",
+   "writers_test": "18–20"
+  }
+ },
+ "image": {
+  "size": 64,
+  "mode": "L",
+  "ink": "black-on-white",
+  "feature_size": 28
+ },
+ "classes": [
+  {
+   "label": "a",
+   "glyph": "a",
+   "name": "Huruf A",
+   "latin": "a",
+   "group": "huruf"
+  },
+  {
+   "label": "b",
+   "glyph": "b",
+   "name": "Huruf B",
+   "latin": "b",
+   "group": "huruf"
+  },
+  {
+   "label": "c",
+   "glyph": "c",
+   "name": "Huruf C",
+   "latin": "c",
+   "group": "huruf"
+  },
+  {
+   "label": "d",
+   "glyph": "d",
+   "name": "Huruf D",
+   "latin": "d",
+   "group": "huruf"
+  },
+  {
+   "label": "e",
+   "glyph": "e",
+   "name": "Huruf E",
+   "latin": "e",
+   "group": "huruf"
+  },
+  {
+   "label": "f",
+   "glyph": "f",
+   "name": "Huruf F",
+   "latin": "f",
+   "group": "huruf"
+  },
+  {
+   "label": "g",
+   "glyph": "g",
+   "name": "Huruf G",
+   "latin": "g",
+   "group": "huruf"
+  },
+  {
+   "label": "h",
+   "glyph": "h",
+   "name": "Huruf H",
+   "latin": "h",
+   "group": "huruf"
+  },
+  {
+   "label": "i",
+   "glyph": "i",
+   "name": "Huruf I",
+   "latin": "i",
+   "group": "huruf"
+  },
+  {
+   "label": "j",
+   "glyph": "j",
+   "name": "Huruf J",
+   "latin": "j",
+   "group": "huruf"
+  },
+  {
+   "label": "k",
+   "glyph": "k",
+   "name": "Huruf K",
+   "latin": "k",
+   "group": "huruf"
+  },
+  {
+   "label": "l",
+   "glyph": "l",
+   "name": "Huruf L",
+   "latin": "l",
+   "group": "huruf"
+  },
+  {
+   "label": "m",
+   "glyph": "m",
+   "name": "Huruf M",
+   "latin": "m",
+   "group": "huruf"
+  },
+  {
+   "label": "n",
+   "glyph": "n",
+   "name": "Huruf N",
+   "latin": "n",
+   "group": "huruf"
+  },
+  {
+   "label": "o",
+   "glyph": "o",
+   "name": "Huruf O",
+   "latin": "o",
+   "group": "huruf"
+  },
+  {
+   "label": "p",
+   "glyph": "p",
+   "name": "Huruf P",
+   "latin": "p",
+   "group": "huruf"
+  },
+  {
+   "label": "q",
+   "glyph": "q",
+   "name": "Huruf Q",
+   "latin": "q",
+   "group": "huruf"
+  },
+  {
+   "label": "r",
+   "glyph": "r",
+   "name": "Huruf R",
+   "latin": "r",
+   "group": "huruf"
+  },
+  {
+   "label": "s",
+   "glyph": "s",
+   "name": "Huruf S",
+   "latin": "s",
+   "group": "huruf"
+  },
+  {
+   "label": "t",
+   "glyph": "t",
+   "name": "Huruf T",
+   "latin": "t",
+   "group": "huruf"
+  },
+  {
+   "label": "u",
+   "glyph": "u",
+   "name": "Huruf U",
+   "latin": "u",
+   "group": "huruf"
+  },
+  {
+   "label": "v",
+   "glyph": "v",
+   "name": "Huruf V",
+   "latin": "v",
+   "group": "huruf"
+  },
+  {
+   "label": "w",
+   "glyph": "w",
+   "name": "Huruf W",
+   "latin": "w",
+   "group": "huruf"
+  },
+  {
+   "label": "x",
+   "glyph": "x",
+   "name": "Huruf X",
+   "latin": "x",
+   "group": "huruf"
+  },
+  {
+   "label": "y",
+   "glyph": "y",
+   "name": "Huruf Y",
+   "latin": "y",
+   "group": "huruf"
+  },
+  {
+   "label": "z",
+   "glyph": "z",
+   "name": "Huruf Z",
+   "latin": "z",
+   "group": "huruf"
+  }
+ ],
+ "counts": {
+  "total": 520,
+  "per_split": {
+   "train": 364,
+   "val": 78,
+   "test": 78
+  },
+  "per_class": 20
+ },
+ "samples": [
+  {
+   "file": "images/a/a_01.png",
+   "label": "a",
+   "split": "train",
+   "sha256": "53acec04840fea1745525f5e2e57c6c53c0c214d3c0fed9a43b091948f5ddb6b",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character01/0683_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_02.png",
+   "label": "a",
+   "split": "train",
+   "sha256": "c2d143588f30c3e87afcf8b869ce469ffb61c1eb3919aed69a60afc34a3e24d7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character01/0683_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_03.png",
+   "label": "a",
+   "split": "train",
+   "sha256": "ab90557e3ad656b52dbece3eaa9954d8acf695dea81c229b37680ec5e12d31f3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character01/0683_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_04.png",
+   "label": "a",
+   "split": "train",
+   "sha256": "b182779dcee737ebd92401f49c738886710b448fd9d57a98a882bd81aaa8fd8e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character01/0683_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_05.png",
+   "label": "a",
+   "split": "train",
+   "sha256": "a87e65fc38fd09f1e50c67c4e0758db05d7f8970889f440bb8c6601b626bed60",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character01/0683_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_06.png",
+   "label": "a",
+   "split": "train",
+   "sha256": "d02a10b72dd186048c17ba7808d37263584d361cec0ce2b4ef80d0da68c453d5",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character01/0683_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_07.png",
+   "label": "a",
+   "split": "train",
+   "sha256": "e327f04327f2dc0e09b618e648b491363a1e0a5ae6c55bcf821d1951a259eaf7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character01/0683_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_08.png",
+   "label": "a",
+   "split": "train",
+   "sha256": "ea580c8f263325869308d02fc49813854658c247e901eb9336b3faba61d78f1f",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character01/0683_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_09.png",
+   "label": "a",
+   "split": "train",
+   "sha256": "e85138d5287396564c590306483f31ec45dda02ae82ca507f235833b28d3302d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character01/0683_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_10.png",
+   "label": "a",
+   "split": "train",
+   "sha256": "9c66d51512391d27d92272184c762bd7fd950a74fa64ae27cf778133ed8bf85c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character01/0683_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_11.png",
+   "label": "a",
+   "split": "train",
+   "sha256": "6ede7e19f235331f0103d6e5e0a35c71c1f8664fff5e223e29a8cb74f0ac6f93",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character01/0683_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_12.png",
+   "label": "a",
+   "split": "train",
+   "sha256": "c2389c1985ed993490b689c48aacc5bc33c389846c3fcd024a3f829fac355047",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character01/0683_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_13.png",
+   "label": "a",
+   "split": "train",
+   "sha256": "f1185485e9c8a47d1033b9f9e1033363995381d84069cf33419a8edb7aa9ff96",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character01/0683_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_14.png",
+   "label": "a",
+   "split": "train",
+   "sha256": "02807cbb4fd812aa95840e63dcf307a3e67dd7dc86e1c0696bd5e39264cb66d8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character01/0683_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_15.png",
+   "label": "a",
+   "split": "val",
+   "sha256": "59e58c045b1b63ea12bcd3f78c068314cbc0be8539006e635476734fff62ba9e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character01/0683_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_16.png",
+   "label": "a",
+   "split": "val",
+   "sha256": "4d538d9a0b709c584c86783bc9876051f2967d4af7a2df53ff9497252ed27737",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character01/0683_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_17.png",
+   "label": "a",
+   "split": "val",
+   "sha256": "269e7755d415dfd140ce9c22aa180fc311a0a8445cb573e01d7719db0fc5a65d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character01/0683_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_18.png",
+   "label": "a",
+   "split": "test",
+   "sha256": "be7b9f0a3abd80ed590e99eb5d00a0102a9411d5bf89da132ed3b9b7eeff8767",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character01/0683_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_19.png",
+   "label": "a",
+   "split": "test",
+   "sha256": "77d04b4c589387c85fa44fb84ab13e1571873d16ccef862f2c7f81c3715eec9a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character01/0683_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/a/a_20.png",
+   "label": "a",
+   "split": "test",
+   "sha256": "e832bd10e8d1292a55a4b38f064191c961a5154177648b35d51ce5a0545b30c0",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character01/0683_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_01.png",
+   "label": "b",
+   "split": "train",
+   "sha256": "5475c9b50cd6f1f129b07afd3a224ca037346fa40dc0a31752639b5bb8c0efce",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character02/0684_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_02.png",
+   "label": "b",
+   "split": "train",
+   "sha256": "e225c57eccde7c10a495ed49c7f18d8993b1de712de06f2b3684787e56ddcb60",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character02/0684_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_03.png",
+   "label": "b",
+   "split": "train",
+   "sha256": "c3fa2fc8f0b4028d9bff9a6b344dd3470ebcdf4ef078b52552b7f87d87ed6259",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character02/0684_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_04.png",
+   "label": "b",
+   "split": "train",
+   "sha256": "3dcfb890eadd0307468abdcf809d122d98af85ef662996e2040cdbad574e4c07",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character02/0684_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_05.png",
+   "label": "b",
+   "split": "train",
+   "sha256": "5891d8ccafa1d651eaa84c433e49ea5a1ee8c99a3eab5ac2fa83aba9f0d0a886",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character02/0684_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_06.png",
+   "label": "b",
+   "split": "train",
+   "sha256": "95dc9eefc5daec74dd3637a3130c034696daebce541de7017e45c4dec849210f",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character02/0684_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_07.png",
+   "label": "b",
+   "split": "train",
+   "sha256": "b15b6eab8bee0aa4917db5dec44c644822e252b3340fd4890f16bff999237189",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character02/0684_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_08.png",
+   "label": "b",
+   "split": "train",
+   "sha256": "b1251d287256357a7107ec3f488e40f5fdad932d1b557c43ffd825f2d6aaccf7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character02/0684_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_09.png",
+   "label": "b",
+   "split": "train",
+   "sha256": "678b144de0fea1afdacc304eb93afc46e9eb99364b66199a9e9846106f1dc837",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character02/0684_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_10.png",
+   "label": "b",
+   "split": "train",
+   "sha256": "a9abf02a30770fb7426da4f1b4dba8271e5fded378a64128e2de9da68f3b2607",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character02/0684_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_11.png",
+   "label": "b",
+   "split": "train",
+   "sha256": "79d9bd7a7f9af13fb5b2b6552e5a119479a800e28f4e98e863cd73d320028cda",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character02/0684_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_12.png",
+   "label": "b",
+   "split": "train",
+   "sha256": "bea74e5dbe365e6ba7cc03b3d9f152dcbccd83f6b802fd22db8aa2c73b8f56be",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character02/0684_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_13.png",
+   "label": "b",
+   "split": "train",
+   "sha256": "f45c405579d1c03f5a749575de162f1f76b9de3249c53f9e234cc0ede6eefac3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character02/0684_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_14.png",
+   "label": "b",
+   "split": "train",
+   "sha256": "307fd530bcef42c752889cb3558b4ac3e0290e77b4285c8a899d89d9209a8722",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character02/0684_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_15.png",
+   "label": "b",
+   "split": "val",
+   "sha256": "b784feff94a0e231193bfd2340812c1edc48b1f670bfcf5d1ffcaf8d500a8047",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character02/0684_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_16.png",
+   "label": "b",
+   "split": "val",
+   "sha256": "d27196a74de5d8d2e4bae52fd5b0b7169747dc367f64b3696ef0a5ac29536a06",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character02/0684_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_17.png",
+   "label": "b",
+   "split": "val",
+   "sha256": "9d14cecfe89cd8f0479507a58023aa2c576b38fc43ff35d2fd27efbaeb331067",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character02/0684_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_18.png",
+   "label": "b",
+   "split": "test",
+   "sha256": "042fb729a9e1155e98e1924edcd7234472b00b2a16f5f44da91b8289cfc0a419",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character02/0684_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_19.png",
+   "label": "b",
+   "split": "test",
+   "sha256": "af2124b7147c8a572ba1112a05d8846b77f23ab76425075d1a23fb5961ca069b",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character02/0684_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/b/b_20.png",
+   "label": "b",
+   "split": "test",
+   "sha256": "9c8affdf84a15b7acfa3ecbd68f163311d93188e551e9dd1f2e08fa132c88d43",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character02/0684_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_01.png",
+   "label": "c",
+   "split": "train",
+   "sha256": "2d4fa4ca6fe29951b26b5411c6ac5608f681ac9f7a2318807f0c1f7edaa45ed8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character03/0685_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_02.png",
+   "label": "c",
+   "split": "train",
+   "sha256": "378850394debaf6885c1ff743d42e0a97175fef4359411952c8a5d3831207ec1",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character03/0685_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_03.png",
+   "label": "c",
+   "split": "train",
+   "sha256": "04065ff4714b49f28b21ae6898fc4e9273cca4cb0892558682a1dac0a0dafd78",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character03/0685_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_04.png",
+   "label": "c",
+   "split": "train",
+   "sha256": "7a27ff4bc2ec6de96d6dda7bbd9641b03ff319919998effe75a3844076c54241",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character03/0685_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_05.png",
+   "label": "c",
+   "split": "train",
+   "sha256": "f78d68cb4c6985c19b2693231f42feb36219e8867219e256ce71788f7c33ec5d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character03/0685_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_06.png",
+   "label": "c",
+   "split": "train",
+   "sha256": "6a169e0d39d913db2b775356f998558aa527bcb0ccfc992edd08163ffc75417e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character03/0685_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_07.png",
+   "label": "c",
+   "split": "train",
+   "sha256": "8ec6083efddd7198f8d0d5351e8389eaefe22d5a31d142645db16b946d668341",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character03/0685_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_08.png",
+   "label": "c",
+   "split": "train",
+   "sha256": "b2c2c8e8ba57bbb53622021bcf2f572eccea7a202e93068fa13f377d4e762662",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character03/0685_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_09.png",
+   "label": "c",
+   "split": "train",
+   "sha256": "13045fe999e644abb7db317eba69f22030899475693885d992f1040a89fecfe7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character03/0685_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_10.png",
+   "label": "c",
+   "split": "train",
+   "sha256": "68875d2f81ce2489976fc771e598f2554934e55d52e836aae7c371e56fb217ce",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character03/0685_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_11.png",
+   "label": "c",
+   "split": "train",
+   "sha256": "e2b62fda9bd98b693c2154c54ff12e979476e35f711cec29cfd3197384438400",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character03/0685_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_12.png",
+   "label": "c",
+   "split": "train",
+   "sha256": "8db2cd04ce5508ea111a041add25ad870f8d48fdf9c87e0a23b8747dd1e9f6fd",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character03/0685_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_13.png",
+   "label": "c",
+   "split": "train",
+   "sha256": "933e99dec8f7153400727719616ba7a17558bf1b8396c22a79081475463314e0",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character03/0685_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_14.png",
+   "label": "c",
+   "split": "train",
+   "sha256": "296b9f2113e8716ab3f0d36dade77b5c25943d06f7bebbe809ce3101e7028f3c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character03/0685_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_15.png",
+   "label": "c",
+   "split": "val",
+   "sha256": "d07228a12ae3489b8ee5433ef346e976c5c934f17d55cf285b4860b100dab2b0",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character03/0685_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_16.png",
+   "label": "c",
+   "split": "val",
+   "sha256": "9aa5624c889dd7a873dbbf22e8dac0d69270f9fac3578b552d52a817fd29f292",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character03/0685_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_17.png",
+   "label": "c",
+   "split": "val",
+   "sha256": "d0fc0f928c62c7ca7ed57fab63df7213e52f68cd1e9a2763e8a8f3633a33cd55",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character03/0685_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_18.png",
+   "label": "c",
+   "split": "test",
+   "sha256": "84b187c9e190f3c8f0a1334272a0fc1402d5f4374f312f71bee1e3872d98995d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character03/0685_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_19.png",
+   "label": "c",
+   "split": "test",
+   "sha256": "e0553bbcc509e92d1a0e140500847e06fb3f48883f37eb0c9a2e568f28041c4d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character03/0685_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/c/c_20.png",
+   "label": "c",
+   "split": "test",
+   "sha256": "789a03336ff503c68810092105b249303bffe41d82984f87918ec5755dabfda9",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character03/0685_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_01.png",
+   "label": "d",
+   "split": "train",
+   "sha256": "ff63a568a83969c4fe957360da07ccf38f6800c8596c11ae118a09c9a20eb72d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character04/0686_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_02.png",
+   "label": "d",
+   "split": "train",
+   "sha256": "1ded202ee9139d562f02993b0fff15a07da175d2a99aa6501f6f53adfebd61f2",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character04/0686_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_03.png",
+   "label": "d",
+   "split": "train",
+   "sha256": "fc5a622632bcd2ba681dfe4eaeb6796ee01bee8db00aa446006bd25a73be13d5",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character04/0686_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_04.png",
+   "label": "d",
+   "split": "train",
+   "sha256": "c4d2bdfcf39ecf1a84d8acdb69c0839073b16cf5d0edaf7ce37bdcd0b9407a74",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character04/0686_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_05.png",
+   "label": "d",
+   "split": "train",
+   "sha256": "2a92c7b0c74871ade98b7b933e2deecb0a932523dd2e23a92d23dc68388a2019",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character04/0686_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_06.png",
+   "label": "d",
+   "split": "train",
+   "sha256": "ec02a5b5c1a1078490b9dcc96e9fc556e022d809963f3051879de6728fa45f48",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character04/0686_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_07.png",
+   "label": "d",
+   "split": "train",
+   "sha256": "0ccb755d127084716982bf11e51d85235e7ef28795916533f631cf557638b46c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character04/0686_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_08.png",
+   "label": "d",
+   "split": "train",
+   "sha256": "22f498c6dfb0fecb113e3ef365e7590522d5e1447fbfefc3c100829c233c999c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character04/0686_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_09.png",
+   "label": "d",
+   "split": "train",
+   "sha256": "16b902407efd6d09af6699a1050083bfa2bcb89d505f3dc165769bf8d27bc679",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character04/0686_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_10.png",
+   "label": "d",
+   "split": "train",
+   "sha256": "5e9c5442bb86741154e1e454cbaeec0cf26f23df2e40942e84964a726eff993f",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character04/0686_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_11.png",
+   "label": "d",
+   "split": "train",
+   "sha256": "80a95fd2e1465cf39f089f707f271ed6dd4cdd83fc5479a4a8a481416313c2fb",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character04/0686_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_12.png",
+   "label": "d",
+   "split": "train",
+   "sha256": "639276f14abf50f5d55fd19b7b63376b457d1860f1b85e30d0c90993ac4b0ee1",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character04/0686_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_13.png",
+   "label": "d",
+   "split": "train",
+   "sha256": "34a733b91b80cf4a748a4742b8c3c3cc03ffa0fc793ba6bdcbf3c9d7da7039da",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character04/0686_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_14.png",
+   "label": "d",
+   "split": "train",
+   "sha256": "4af5b85c14978a77f851dc8de9920764a6a3750433e8911c100d6c9e11b4f78e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character04/0686_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_15.png",
+   "label": "d",
+   "split": "val",
+   "sha256": "d437d425c05e302df6153f96620124c175234b4320ecc2759d867a16c69525c9",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character04/0686_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_16.png",
+   "label": "d",
+   "split": "val",
+   "sha256": "2dff34677b41362082fbbf16a61503fa5f4bb9a636c8c8f546a93cb1dbf6a691",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character04/0686_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_17.png",
+   "label": "d",
+   "split": "val",
+   "sha256": "dcd139595f11949451b57e1b3574c597625e13f43a0196ee4d2fa93b622e1ba9",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character04/0686_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_18.png",
+   "label": "d",
+   "split": "test",
+   "sha256": "4a2e57165c496db0f94c9d285f535eb235d1dd9553f4e7dde157576da3a493c0",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character04/0686_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_19.png",
+   "label": "d",
+   "split": "test",
+   "sha256": "c70f94e36833d9bd1e93d5e8148487b70189614921fc580c492ce2f15b3ee73e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character04/0686_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/d/d_20.png",
+   "label": "d",
+   "split": "test",
+   "sha256": "d9338926616e26c4035fb53f9efc75f828dd6b8302845e51d4ea637bec574c2e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character04/0686_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_01.png",
+   "label": "e",
+   "split": "train",
+   "sha256": "789c46fb1353d94ffc8904233999b16e6138815fca89e9f102463dde76fc40e7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character05/0687_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_02.png",
+   "label": "e",
+   "split": "train",
+   "sha256": "61d017c67a921def12a52c347872cdb9d0c1cc09829e8656b66aaef3c1fd5778",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character05/0687_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_03.png",
+   "label": "e",
+   "split": "train",
+   "sha256": "2c96891b2ab4ad2165318736d73dcadd83a240195d4108f1bd1a139a9d974764",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character05/0687_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_04.png",
+   "label": "e",
+   "split": "train",
+   "sha256": "29eef7dca64b51766771c2573175ed17e9f8e2214875d5084ba87ed4b7f60ed5",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character05/0687_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_05.png",
+   "label": "e",
+   "split": "train",
+   "sha256": "17a05f6f48fd998207645b29d3ef96559937d00ce1907c12538b460c0838bc08",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character05/0687_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_06.png",
+   "label": "e",
+   "split": "train",
+   "sha256": "996f26c1f4aafd2f9cfc182acb1013daf7734e02702cbec2184072460e8a18a1",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character05/0687_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_07.png",
+   "label": "e",
+   "split": "train",
+   "sha256": "73c7a36a6f564db1943c830afb836b9d09e50659e20932155be72c8c8f2a52e8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character05/0687_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_08.png",
+   "label": "e",
+   "split": "train",
+   "sha256": "95f73cf1f43fc5d6ef98c0e886cbbfe3cced02f1aaf6579bede345b199bcaccc",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character05/0687_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_09.png",
+   "label": "e",
+   "split": "train",
+   "sha256": "f9caf4e838fb86efcc8f627dd1fa6f1ad0ab32aa49aafc7fa3c03f7564382d8e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character05/0687_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_10.png",
+   "label": "e",
+   "split": "train",
+   "sha256": "e14393d56876a71f4fc135da77da2c236f9f5e6bf49e51b9f67d1b499025e3a2",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character05/0687_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_11.png",
+   "label": "e",
+   "split": "train",
+   "sha256": "50cebfbdb3069e4a81e7a877c4a68a5ee0ef8e5a6233417b7624037932558922",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character05/0687_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_12.png",
+   "label": "e",
+   "split": "train",
+   "sha256": "5ba0f5be707bbe25c546689faaac293881f11ab76210b5e5b585b919ceb83445",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character05/0687_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_13.png",
+   "label": "e",
+   "split": "train",
+   "sha256": "2b90ce1a35547a7830200d5cc75bc4c45a704fb1b0a0a92cf21efd65728b770f",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character05/0687_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_14.png",
+   "label": "e",
+   "split": "train",
+   "sha256": "a42e4e95937748c2f6fd2de073f8565768c7c4d9933a8014369e35fd01ef9fa0",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character05/0687_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_15.png",
+   "label": "e",
+   "split": "val",
+   "sha256": "d305ce72a1d6070ce6b8f7f0836890afde999c276494e75ee83545b77d312c3e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character05/0687_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_16.png",
+   "label": "e",
+   "split": "val",
+   "sha256": "b85132e35dff23132915957e55b68745afaef62fe48ea216d07429c849807b91",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character05/0687_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_17.png",
+   "label": "e",
+   "split": "val",
+   "sha256": "be6c4032db3e3bed96db838609ddfe8705f47b78b23eb99f1b96b768595a6992",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character05/0687_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_18.png",
+   "label": "e",
+   "split": "test",
+   "sha256": "6c6a4ab09139036109c676911716c75349fd62162061218d610bc61d33460fd6",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character05/0687_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_19.png",
+   "label": "e",
+   "split": "test",
+   "sha256": "dd69641f106da20cf28a2acae75d91f7fe717245cb79a5ed3ea760645d24c93a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character05/0687_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/e/e_20.png",
+   "label": "e",
+   "split": "test",
+   "sha256": "2e795305224616165e79f29e607ed31ff48ff83c0425ad406638f804b24bb3e5",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character05/0687_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_01.png",
+   "label": "f",
+   "split": "train",
+   "sha256": "8e1a37a7c2333518040bcee690f02dcb53ea787a34a2c75de7745fc19734151c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character06/0688_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_02.png",
+   "label": "f",
+   "split": "train",
+   "sha256": "65b5f1c1cc13b7f4e21f480a9ca3ce750117051acd717453312ffe1c3c1f0929",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character06/0688_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_03.png",
+   "label": "f",
+   "split": "train",
+   "sha256": "a4f4208cbdffbac7b9a0dfb2156ba1b925c7014e2919cc79b6df27f4535028f5",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character06/0688_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_04.png",
+   "label": "f",
+   "split": "train",
+   "sha256": "f7b3c52ceb59e2ab87e444abbf261c2f0a99b2ca7927289a77a465eeb706016f",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character06/0688_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_05.png",
+   "label": "f",
+   "split": "train",
+   "sha256": "399637177ef858001a3d718dc8145f6bf29c602b6f3a293ae4f9fc1077e92d6b",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character06/0688_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_06.png",
+   "label": "f",
+   "split": "train",
+   "sha256": "edca090ae2c7ca61b7cb571d0fd8a9068961980a0334ec40da9ac07159ca5a48",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character06/0688_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_07.png",
+   "label": "f",
+   "split": "train",
+   "sha256": "70459b2ea32bfb894c73d41a44b8fd2b8fcd8559b9bdfdd5fc2e5f7e9e3a8c48",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character06/0688_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_08.png",
+   "label": "f",
+   "split": "train",
+   "sha256": "29f50e5f08d8d44ed76b847d73dd6126b5a3f76b26150a6f5d132d764674c340",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character06/0688_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_09.png",
+   "label": "f",
+   "split": "train",
+   "sha256": "8aed66fcabb4383c108004ed002080f1fffa621018f69befd2f6214e25bfd41b",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character06/0688_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_10.png",
+   "label": "f",
+   "split": "train",
+   "sha256": "d61ff8fd31b3418f4841d9516cad034e04b474c8852e9391a2f09d50cc29b587",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character06/0688_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_11.png",
+   "label": "f",
+   "split": "train",
+   "sha256": "9125862d27661574e60e28fef2b37d27a71f6ba3a9a87f5e64adc09842ced43d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character06/0688_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_12.png",
+   "label": "f",
+   "split": "train",
+   "sha256": "ed2d1622af5e9c23a5dba1f248291c3a765295842bfc3890c8ca21430ddddda8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character06/0688_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_13.png",
+   "label": "f",
+   "split": "train",
+   "sha256": "f1bd14e5acad7684724bea71741c683e1f8ea88613252ac3c26e3c9256cd811f",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character06/0688_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_14.png",
+   "label": "f",
+   "split": "train",
+   "sha256": "29b006154a3cd6c85135a000e2355e590f08752ce99ecde3dbfe2e81336ad6c4",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character06/0688_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_15.png",
+   "label": "f",
+   "split": "val",
+   "sha256": "a13d05162c76bcb8a51b0cf24b059f90e1b24079e6f37c2ab682d3056f01442b",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character06/0688_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_16.png",
+   "label": "f",
+   "split": "val",
+   "sha256": "631445687cdd52fcc39390deaf3ca1aaf89f1974bb3f41dbf508fe017cf70e8a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character06/0688_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_17.png",
+   "label": "f",
+   "split": "val",
+   "sha256": "08ccef75af5bba2b041807372ab2bbdf3dc6a67558eab19a1cc6def6ed0056be",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character06/0688_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_18.png",
+   "label": "f",
+   "split": "test",
+   "sha256": "8a165c6045796dfe5a94943ab5e554b49081db6342fb04174c99cd8fec4c1e36",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character06/0688_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_19.png",
+   "label": "f",
+   "split": "test",
+   "sha256": "687d685585bf697019e7eac533c4a00675d8aca864391d6062e9a69cdc2a8e8b",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character06/0688_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/f/f_20.png",
+   "label": "f",
+   "split": "test",
+   "sha256": "6c8898c8475e1fbcabd52856005db64322a54f06913904dad41b514f53fb0657",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character06/0688_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_01.png",
+   "label": "g",
+   "split": "train",
+   "sha256": "a1c9349449cacf448784bbb1de34c07b9092eccda365ce0a19b855c48c6e4090",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character07/0689_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_02.png",
+   "label": "g",
+   "split": "train",
+   "sha256": "1c8ecee748b04f29f36bd144ef33735da619351e4d52eac16a6c151b43f8f2f3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character07/0689_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_03.png",
+   "label": "g",
+   "split": "train",
+   "sha256": "372216e960a1e2a9f6980c837091afcb25985a834ec44ad5897214d99b049031",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character07/0689_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_04.png",
+   "label": "g",
+   "split": "train",
+   "sha256": "6c5399bc62bd7b9b89bbec9d8ca61c0a2aa65043de25dcc8c15f38ae49bdd2fc",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character07/0689_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_05.png",
+   "label": "g",
+   "split": "train",
+   "sha256": "5c744ff39df1a681532ab864d295b805c12db6a47fb91567ad1b948ab5737a5a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character07/0689_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_06.png",
+   "label": "g",
+   "split": "train",
+   "sha256": "67daec3e7ea13eb71eecb92badc8ee25cd89689403b6f6c7c95c52cbaabf3159",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character07/0689_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_07.png",
+   "label": "g",
+   "split": "train",
+   "sha256": "994601ab1b98747e9f820dc20b5740c26e29a451f55e75a82522f66ca448025a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character07/0689_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_08.png",
+   "label": "g",
+   "split": "train",
+   "sha256": "34bf07872011a142d857bc6396104d1e4815eb362ff92e82bb4900466a405f6e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character07/0689_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_09.png",
+   "label": "g",
+   "split": "train",
+   "sha256": "89d92bbd7fffd135db3a5c16865b6fff1ed353f8d6bb0554c140684027e02479",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character07/0689_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_10.png",
+   "label": "g",
+   "split": "train",
+   "sha256": "b3175832ee03c1c75d3cbf11b78d66c271ebae68f94567dc3313c18d96009432",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character07/0689_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_11.png",
+   "label": "g",
+   "split": "train",
+   "sha256": "47e55927dd55d5b5524d93236c0e99f46e6cd0e58f7587e07e844174834a84d3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character07/0689_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_12.png",
+   "label": "g",
+   "split": "train",
+   "sha256": "4448d1502b6859c57f411fc25de95347e28ee1161d37b277f2a5734055141d64",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character07/0689_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_13.png",
+   "label": "g",
+   "split": "train",
+   "sha256": "39e228031f06f1b4301186a1f4a94343d0969dd9009304f7398b758a6422b76c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character07/0689_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_14.png",
+   "label": "g",
+   "split": "train",
+   "sha256": "cb813558eda21ef8102cdab61f54de65183105dd14e860d995fc46fa76371cce",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character07/0689_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_15.png",
+   "label": "g",
+   "split": "val",
+   "sha256": "3654340161ccf2c6de4b473db7b1dfbf6166d6641e482950fa41baad86f426bb",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character07/0689_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_16.png",
+   "label": "g",
+   "split": "val",
+   "sha256": "ccfc497c6d62e55e6e1b97eefad77218904f4c42a59fd9dd546af1462b2f2583",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character07/0689_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_17.png",
+   "label": "g",
+   "split": "val",
+   "sha256": "dc9f5a11f9beb4051df33c6ece97cfdb3634a5b411675ae5841927c117b556d4",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character07/0689_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_18.png",
+   "label": "g",
+   "split": "test",
+   "sha256": "aa572c7d4b835d71a4d7bde863326b695b022bf0b4cadb576522bd61d322d22e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character07/0689_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_19.png",
+   "label": "g",
+   "split": "test",
+   "sha256": "c5605996215d7297aeccdf9197557d9da077ca645be34b5ace51d16b260c0d5d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character07/0689_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/g/g_20.png",
+   "label": "g",
+   "split": "test",
+   "sha256": "a5ba6a973d6503adfb26dfdea2b44aa74799a951d9ae0eb820059a5e968c6e5e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character07/0689_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_01.png",
+   "label": "h",
+   "split": "train",
+   "sha256": "0f8d519306db0f9f898d56c0d93bf7768ed07fb57adfc6c28820a376534db24a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character08/0690_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_02.png",
+   "label": "h",
+   "split": "train",
+   "sha256": "a327bf0d1787ca19acd7d2b5dd731228fd886bd93db140ae985228031be46b97",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character08/0690_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_03.png",
+   "label": "h",
+   "split": "train",
+   "sha256": "993005a988d606d531c2c32ea79a5bcb2d51b2d0e223adfd579091e262364fc2",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character08/0690_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_04.png",
+   "label": "h",
+   "split": "train",
+   "sha256": "8ae8e2aaa3df5eef791b9ada6d6da341bf1e69c2cb889ef3d99c5d6140244dce",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character08/0690_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_05.png",
+   "label": "h",
+   "split": "train",
+   "sha256": "561fecee662878dd10bd53a9af9a04318f15b65e6d32fd110565f25a9bd9f0ce",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character08/0690_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_06.png",
+   "label": "h",
+   "split": "train",
+   "sha256": "a5169d96a63e2978fe71fde2baaa8bfc831a0265a861bc1e47e66f800f733fb8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character08/0690_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_07.png",
+   "label": "h",
+   "split": "train",
+   "sha256": "a4066818e8a18880a86927e3b5e22a675b1e8be93bb6cd63b0ff2b47603efae3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character08/0690_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_08.png",
+   "label": "h",
+   "split": "train",
+   "sha256": "14734fe936538c99b192041955f46663b719013e46ed291f27aec05d0bcc1486",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character08/0690_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_09.png",
+   "label": "h",
+   "split": "train",
+   "sha256": "9218cf6574b83c9eae333eabf2a861976980ab75a0a77de76dfdea8ea95a98e8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character08/0690_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_10.png",
+   "label": "h",
+   "split": "train",
+   "sha256": "ef3a3d720eb9ce078e5450b74002c5d822de2adcfc35950f848d61ce8ec7de28",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character08/0690_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_11.png",
+   "label": "h",
+   "split": "train",
+   "sha256": "afd343387e53f6cc1545402b7f6470c552e663f88c456c8618d0f0f8b52039a3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character08/0690_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_12.png",
+   "label": "h",
+   "split": "train",
+   "sha256": "9202150948df0421f27428f37d1767624723c0ba89b76550ada7b7f937d103bc",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character08/0690_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_13.png",
+   "label": "h",
+   "split": "train",
+   "sha256": "7e9bc2409755a845527f19f27eda38cfbcedc2e6663b1f440746e99d994314ad",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character08/0690_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_14.png",
+   "label": "h",
+   "split": "train",
+   "sha256": "bed0a8ae24cee4cbd51bc60e6963c7c148eec170095a7583bfb531d5de9ccce5",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character08/0690_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_15.png",
+   "label": "h",
+   "split": "val",
+   "sha256": "0f84f5fae233fff3522d62a02d8ba8636dcb70a1c6de7222ffadca8adcfbec2e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character08/0690_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_16.png",
+   "label": "h",
+   "split": "val",
+   "sha256": "3897f730c8721e2c74ddd2a262d6fd2ffe7a81d1989fbb31832727ee02419882",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character08/0690_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_17.png",
+   "label": "h",
+   "split": "val",
+   "sha256": "27965b20dc1262713cd20475cca2a64cd1debfddcd47f1e4f5499080c43756dc",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character08/0690_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_18.png",
+   "label": "h",
+   "split": "test",
+   "sha256": "74b18690c756752baa2c46ee9268420c36352059926061cb577cf003d23ffdc6",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character08/0690_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_19.png",
+   "label": "h",
+   "split": "test",
+   "sha256": "10cf0ce5cea6c417c0ae6c7283b4f3e3fa3ad8e4c6f533e8dc403ed21ad07a2e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character08/0690_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/h/h_20.png",
+   "label": "h",
+   "split": "test",
+   "sha256": "f091f0f3193c93f7124f54113f6e34c5f49148cf35b426ba81c24455258c6506",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character08/0690_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_01.png",
+   "label": "i",
+   "split": "train",
+   "sha256": "a6da1d2a0c697d50956b7699aec0dd3d09e5f461d588ac40f6a20a1e2ccedc1e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character09/0691_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_02.png",
+   "label": "i",
+   "split": "train",
+   "sha256": "761f270796ea6e02a2a15606c5611a138e5767019e35407c7c227b373ac570bd",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character09/0691_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_03.png",
+   "label": "i",
+   "split": "train",
+   "sha256": "8c034b371b877b18908c76313c170ff77139ecd32a04a037085fd3568f5cd8d8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character09/0691_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_04.png",
+   "label": "i",
+   "split": "train",
+   "sha256": "db603fe38f8984683209972a2007a299f37efda8a6861bd508382bcee28ac8e7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character09/0691_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_05.png",
+   "label": "i",
+   "split": "train",
+   "sha256": "143061b5b7a64b55c3fbf7d91729579dfc8f20f4d4a271dd13ca9b51e1f1d884",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character09/0691_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_06.png",
+   "label": "i",
+   "split": "train",
+   "sha256": "aa1ecb574a6b6121b45f56afb5f43924fd58288f3638fd571a435ffea0bd5e9b",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character09/0691_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_07.png",
+   "label": "i",
+   "split": "train",
+   "sha256": "499ec44eb54f9f0ed8ad70c008dc5f440da4c8339aef3eeed33deef7b133df5a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character09/0691_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_08.png",
+   "label": "i",
+   "split": "train",
+   "sha256": "b5b4537d0287c3c4c183ad0094a46726efcd438cf6a6ef0db6b69733d3748a3e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character09/0691_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_09.png",
+   "label": "i",
+   "split": "train",
+   "sha256": "7c9fe3ec62192e7bdb9cba533ae3a634f13b24145f97085113997116b6b949a5",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character09/0691_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_10.png",
+   "label": "i",
+   "split": "train",
+   "sha256": "2e158027cbbc14e3a93df45b899837d5bc9f875c4beccde280044d377212b513",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character09/0691_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_11.png",
+   "label": "i",
+   "split": "train",
+   "sha256": "08ebac50b7353039446c749088b51358de60ec2dfa15f6b6b7b8c08f9630bace",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character09/0691_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_12.png",
+   "label": "i",
+   "split": "train",
+   "sha256": "ab2bc6ef90749de58dac33bcd258b477fd6374ecd13a83602f6b0aa6875b2ce3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character09/0691_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_13.png",
+   "label": "i",
+   "split": "train",
+   "sha256": "aa4a4d3931ec34fe6bd2f66a5771856daa1dda484abc74831f326cd63560039e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character09/0691_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_14.png",
+   "label": "i",
+   "split": "train",
+   "sha256": "52b0fded2d3dc87356b27e3bf2d4271abb97d5010c4c67a625d01008f7a81ff8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character09/0691_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_15.png",
+   "label": "i",
+   "split": "val",
+   "sha256": "b34ce152b65c777b9712c45f68c94a06ee95805bdb6354fe5369e57ed2e3832b",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character09/0691_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_16.png",
+   "label": "i",
+   "split": "val",
+   "sha256": "04dc30244a17a627c85e95dabf126ba2c00a5da5b612cc62473b2e969ea5611d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character09/0691_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_17.png",
+   "label": "i",
+   "split": "val",
+   "sha256": "c2f33e99974471b02e296dc5eb5aea3bb569262a4a996e0751c3b5f1e4d8190d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character09/0691_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_18.png",
+   "label": "i",
+   "split": "test",
+   "sha256": "61d44707679f67b1c81b73c1763f2be757bb72346980ab5c0b75bfdd4771f497",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character09/0691_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_19.png",
+   "label": "i",
+   "split": "test",
+   "sha256": "6f6ca48fd9d9b888e3ea876f796fb84dd16f286b7341465132e25517f22127b6",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character09/0691_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/i/i_20.png",
+   "label": "i",
+   "split": "test",
+   "sha256": "b3d221f57004c662c5c03c048b2f05a80e378bec8fde8392fdd036b041df5b5d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character09/0691_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_01.png",
+   "label": "j",
+   "split": "train",
+   "sha256": "a63276ecfc3e1b5c90576cc851f6e6b5937646d092263ee3011bfe0179506bfd",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character10/0692_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_02.png",
+   "label": "j",
+   "split": "train",
+   "sha256": "8c157a1044851fa1d289412a5c2fa06469622097f74f6ca65cf6b91e9b872d6b",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character10/0692_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_03.png",
+   "label": "j",
+   "split": "train",
+   "sha256": "4d907222e8da93cd2f3f841159cc165f474b1b0e3f9bd56e585f848d7d8a2572",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character10/0692_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_04.png",
+   "label": "j",
+   "split": "train",
+   "sha256": "c098e32df209635de1076b79999c7e4e90b0cf98ba736109fb9b5b56ad86d2d4",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character10/0692_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_05.png",
+   "label": "j",
+   "split": "train",
+   "sha256": "1eabaa73f88121be6de030ce171cada2417c2ce543e47849249de18cdbf9d704",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character10/0692_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_06.png",
+   "label": "j",
+   "split": "train",
+   "sha256": "b629803a299d3ce1955332d58d428c85248c21e3febd307093bb5246c2e3d80c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character10/0692_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_07.png",
+   "label": "j",
+   "split": "train",
+   "sha256": "733f671bc53956cf05659a2ed356ad0625b1f679889140312c4f25b6efafa805",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character10/0692_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_08.png",
+   "label": "j",
+   "split": "train",
+   "sha256": "aed20f0dd1df71b154f06bfdbf81eb9bacd3cb53a4f06f274bb15c934e813b8e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character10/0692_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_09.png",
+   "label": "j",
+   "split": "train",
+   "sha256": "ac8ba19f89cea62e2c542030c31f9bd98692a96db265adc381cd8217da04a9c0",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character10/0692_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_10.png",
+   "label": "j",
+   "split": "train",
+   "sha256": "4cbc7a8f05f4ccbd0957930b92cae8c98b4252121a1cbc1f97aa2e6d373f37d7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character10/0692_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_11.png",
+   "label": "j",
+   "split": "train",
+   "sha256": "4b3ea249fc0400f06d7337214faad1c876b0c2c8319beb087f33c30289c2d8a2",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character10/0692_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_12.png",
+   "label": "j",
+   "split": "train",
+   "sha256": "32de4d5ed844deb188c5f49e28ab8db0fc1f68fe79c0af74028ebd87137c12d0",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character10/0692_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_13.png",
+   "label": "j",
+   "split": "train",
+   "sha256": "12a1db2f505c082eaf230d9d4c519409188b76f5f3046bca641f900912763d80",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character10/0692_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_14.png",
+   "label": "j",
+   "split": "train",
+   "sha256": "b6a866d1b00dc5f7a05f64d526d81b8c7f0421f0daf09e457f253ceee6d2a032",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character10/0692_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_15.png",
+   "label": "j",
+   "split": "val",
+   "sha256": "66befb635c534a601dba0f07f96e34bfef2be49fd0091243771d5a7ddb586808",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character10/0692_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_16.png",
+   "label": "j",
+   "split": "val",
+   "sha256": "e5de194750ea7f40da322387f3b9b651c2b008af18a1134d14180e323c4bcecc",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character10/0692_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_17.png",
+   "label": "j",
+   "split": "val",
+   "sha256": "cdcc46a3c82d7f24e25a586607c250ca0e5cc63e8f4ae1a595f345491c301580",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character10/0692_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_18.png",
+   "label": "j",
+   "split": "test",
+   "sha256": "bd050a37bfdcbae3beabf0982a924aa17900b9e4222d69bc09eb89d3556d02c5",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character10/0692_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_19.png",
+   "label": "j",
+   "split": "test",
+   "sha256": "80520f58fea5edc63452680dfb91baa3c350c99b40f7109620970f0aefb87d1a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character10/0692_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/j/j_20.png",
+   "label": "j",
+   "split": "test",
+   "sha256": "e9a007176eda03ed74289d581c08ea906687d1022b2a436ef0b16c157aef01ab",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character10/0692_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_01.png",
+   "label": "k",
+   "split": "train",
+   "sha256": "af436a95532669c04e0aae9bf357f6c690d5adf654ff0621030969c85c90c381",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character11/0693_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_02.png",
+   "label": "k",
+   "split": "train",
+   "sha256": "8d4da5a07efb042f9a6ef7ceb513cca9346fcf0f11a31f86331e81c5e0d77de3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character11/0693_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_03.png",
+   "label": "k",
+   "split": "train",
+   "sha256": "2a03ee8fbe6ed8b593d310f1de31510b1641da7f7c7700a744a764a9c80de886",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character11/0693_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_04.png",
+   "label": "k",
+   "split": "train",
+   "sha256": "8c82668c07376e5e5753df3260260f1c900bcd7d666d0663f384acc91d98a9c4",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character11/0693_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_05.png",
+   "label": "k",
+   "split": "train",
+   "sha256": "e05a1a279dfd8296b0aa9f588e50955b7a5187fb6f7b81be356117d9da6a3e46",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character11/0693_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_06.png",
+   "label": "k",
+   "split": "train",
+   "sha256": "5489cf6f3b2b3b8ddb3f389094e67548e8e4df678841bad7912698e443bf6a88",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character11/0693_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_07.png",
+   "label": "k",
+   "split": "train",
+   "sha256": "6e7b9aac3d57e88e1312c1ecaf07d36606981156558dbe76d95f55f2b065947c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character11/0693_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_08.png",
+   "label": "k",
+   "split": "train",
+   "sha256": "4719c4f4de05bacf3caf572a249fd7a2d6e99d3eb771229f3d768cb4e21fcf80",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character11/0693_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_09.png",
+   "label": "k",
+   "split": "train",
+   "sha256": "4c18ba2d4b7dce4db125d2a5a208fdcbdb72f9dbe40579e72c508d90ce1aa695",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character11/0693_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_10.png",
+   "label": "k",
+   "split": "train",
+   "sha256": "44c6aa456051ba58e713da6ae032dc3bf58b3a6ab024ad5fa12eb06a9ddc0ddd",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character11/0693_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_11.png",
+   "label": "k",
+   "split": "train",
+   "sha256": "503f0deb9888a60e2540fc4ed5488ec61ab3612d40c223267ce88b27d06c6df7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character11/0693_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_12.png",
+   "label": "k",
+   "split": "train",
+   "sha256": "75ae8ee16e97f5e525f5db067861c516681ee3e52e38aba18b7efa7281dbd97e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character11/0693_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_13.png",
+   "label": "k",
+   "split": "train",
+   "sha256": "c2ce4ba89022693f442e8cd081522c50672add4cde225cdf58e570354d2770e2",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character11/0693_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_14.png",
+   "label": "k",
+   "split": "train",
+   "sha256": "2c2ae17e94792d32797f60b152ba414f40ea9eb7ceb125a5a2f83d6473795260",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character11/0693_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_15.png",
+   "label": "k",
+   "split": "val",
+   "sha256": "823b4d090d9230f88eb45fd607c3d01c839128130a9fbc6f97e9bf35e07071f1",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character11/0693_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_16.png",
+   "label": "k",
+   "split": "val",
+   "sha256": "5ad2b6f2d519fd72d32f0ac62be861e32b4a7efb4d34210ee07022e5819a37aa",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character11/0693_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_17.png",
+   "label": "k",
+   "split": "val",
+   "sha256": "ba12b53fd3c37808a71a5d474cb9de56017df2392847f7917cf7e81c318cd671",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character11/0693_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_18.png",
+   "label": "k",
+   "split": "test",
+   "sha256": "610245b543dc2482f7782514cf6c7d0af10de14cfd9ebe4c90328883ee6be7b8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character11/0693_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_19.png",
+   "label": "k",
+   "split": "test",
+   "sha256": "e20a9c5405ab10a3995818ff4851a080142e5a9a9a469eb73239aa940269e0bf",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character11/0693_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/k/k_20.png",
+   "label": "k",
+   "split": "test",
+   "sha256": "65f0843bff28c8f72affcd6bf39484971ab987571a418baddd86e4096d4b4108",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character11/0693_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_01.png",
+   "label": "l",
+   "split": "train",
+   "sha256": "abff906e981e4ff71199a5bd58c493bf1904941d1c08ce148d150b6eff6ab95f",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character12/0694_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_02.png",
+   "label": "l",
+   "split": "train",
+   "sha256": "6093ba1f78e53f0420445ef30511ef414659d550c4b33fcefb4d8a0e1d914919",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character12/0694_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_03.png",
+   "label": "l",
+   "split": "train",
+   "sha256": "15ea7e22ddcc686563afbb3628f00e90a4215c46c01fee97f683bd3a53ca7ad6",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character12/0694_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_04.png",
+   "label": "l",
+   "split": "train",
+   "sha256": "b919a5f6d6cd0b0948a3de6d35f1110000c0b736f4edf9bc67cc36defa3815dd",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character12/0694_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_05.png",
+   "label": "l",
+   "split": "train",
+   "sha256": "277020d31aaf26b48279eb6cb404e87e740055e1be371e10505f7641ae7a20bf",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character12/0694_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_06.png",
+   "label": "l",
+   "split": "train",
+   "sha256": "64cb0d47d3eab5cffd1842f772b5c6a75fb8ebfa698f784a5725538a32e88044",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character12/0694_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_07.png",
+   "label": "l",
+   "split": "train",
+   "sha256": "74fb0fc1ebebf3e509efc014eb5ea7232fbf152bac1eb59b95d90600afbf3256",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character12/0694_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_08.png",
+   "label": "l",
+   "split": "train",
+   "sha256": "fadd4f94de9c0bbd815db103fe34acce306e64328ae4f8a29d42b84b303cb6ab",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character12/0694_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_09.png",
+   "label": "l",
+   "split": "train",
+   "sha256": "1b5dc8464474b5d6a6287a6d08aa39507f70579307adde53b3cc23fa218c187a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character12/0694_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_10.png",
+   "label": "l",
+   "split": "train",
+   "sha256": "d6068a60967ea0f098f9d050fa93a4758972d131b56340ab513937fdd3fe36d9",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character12/0694_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_11.png",
+   "label": "l",
+   "split": "train",
+   "sha256": "b824ae095bc2ab9dfd8bbe85b8db4df83ee99cfece851383d329cdbfc1238d7c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character12/0694_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_12.png",
+   "label": "l",
+   "split": "train",
+   "sha256": "e5d49060a91cabde240aa8d8b6de695f62f0a91c979692dd4a13c51e87d5c339",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character12/0694_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_13.png",
+   "label": "l",
+   "split": "train",
+   "sha256": "21169aa3b640b612ae80559ea734b2aad4b7b90a9e3a2896c28f2ca71e960da3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character12/0694_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_14.png",
+   "label": "l",
+   "split": "train",
+   "sha256": "2669bc8585cc31363b6c88228b9ea9c1a1e5ddf1a456cdd0293856f007d9e8d1",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character12/0694_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_15.png",
+   "label": "l",
+   "split": "val",
+   "sha256": "94db6bd19858a8f02483602817192e2390e23a81be04f88671fcfc243bf6d13a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character12/0694_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_16.png",
+   "label": "l",
+   "split": "val",
+   "sha256": "6a4b0669f64abde56f0dc6784fd9abdce6beafef712f37d1d8aa1c49ca76e887",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character12/0694_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_17.png",
+   "label": "l",
+   "split": "val",
+   "sha256": "13987d4897e05bbd510b5c737ed56b8b3a3d2880be22420be4310dfafb5d5ce1",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character12/0694_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_18.png",
+   "label": "l",
+   "split": "test",
+   "sha256": "e62f9746767dad4a9d6b5a781a24582b9ecff29787301289311f2bfe19896648",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character12/0694_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_19.png",
+   "label": "l",
+   "split": "test",
+   "sha256": "d59eaedc6524fefad052c00068d4f605d620cc65ade4046336ac3e071ef0e3ac",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character12/0694_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/l/l_20.png",
+   "label": "l",
+   "split": "test",
+   "sha256": "f6e627e4167de59695b27c4fb628df3b97c4a17ffa8e1fce0a98edd91d96b134",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character12/0694_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_01.png",
+   "label": "m",
+   "split": "train",
+   "sha256": "738b886298500ad4ff554ee0005a356a044fc98e6936daf5342ff314b557cca7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character13/0695_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_02.png",
+   "label": "m",
+   "split": "train",
+   "sha256": "a78e022b1c85bfe6b87bbc9fd627c5935a9c8689fd9c945546830a472b849527",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character13/0695_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_03.png",
+   "label": "m",
+   "split": "train",
+   "sha256": "9ba0e2cc132a744ac30a7b6d44a0304e9977a5c2fba15789538233c06b2591dd",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character13/0695_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_04.png",
+   "label": "m",
+   "split": "train",
+   "sha256": "f4c02cf0bf2369ce393f162a7d873fe844bea8d846d6af3d2b5b68151cfda045",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character13/0695_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_05.png",
+   "label": "m",
+   "split": "train",
+   "sha256": "abfbe5674b9593a0342e2d9abfc22ff8c9a2d3ad9b46594b006281e2c57a1837",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character13/0695_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_06.png",
+   "label": "m",
+   "split": "train",
+   "sha256": "e6810094d72db805762c3857f2189b089bd27c0c5ce596d47082bc085b80d176",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character13/0695_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_07.png",
+   "label": "m",
+   "split": "train",
+   "sha256": "2a0569c38b31df62d362d86f679ee9836923e0df7ae5d5c1ddef2c32b6fac72c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character13/0695_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_08.png",
+   "label": "m",
+   "split": "train",
+   "sha256": "eef05a6c7cd1bea72ee9f21380892be99480da7b7a633335905b5159d58f8f63",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character13/0695_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_09.png",
+   "label": "m",
+   "split": "train",
+   "sha256": "060897923e5f52d99676df19ccdcca0f17d256b542b9441c432174812146e4f3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character13/0695_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_10.png",
+   "label": "m",
+   "split": "train",
+   "sha256": "6cb93e76171b295ec6c4e0e45afb5db47176f8613636ed1c58d8f065eeed203c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character13/0695_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_11.png",
+   "label": "m",
+   "split": "train",
+   "sha256": "b5f1fcd58d4118568e03fcb33a655118338b32eee66bc5e1a1ddfae31c6b3f6a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character13/0695_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_12.png",
+   "label": "m",
+   "split": "train",
+   "sha256": "3273648725718b7ace54e45da5b5c633979d1a328c78d246e22fa8839a48ff85",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character13/0695_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_13.png",
+   "label": "m",
+   "split": "train",
+   "sha256": "e6e360f354b66a0058b82d4ef7771102eeeb176267f19d194b36dc9c49d9345d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character13/0695_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_14.png",
+   "label": "m",
+   "split": "train",
+   "sha256": "96afdb52dec4e0af07c04868495c1d40f7cf38e6a8923b275f18c858827111e4",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character13/0695_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_15.png",
+   "label": "m",
+   "split": "val",
+   "sha256": "21fcb15cb04ef71b3d478f035b581bb1dc209b500d10396f380d48b25917376b",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character13/0695_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_16.png",
+   "label": "m",
+   "split": "val",
+   "sha256": "c92c12ce3deb39c53bee7636b70e3c01201a55d0b527d197192ad88d4f5d3863",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character13/0695_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_17.png",
+   "label": "m",
+   "split": "val",
+   "sha256": "0112184ed18b5dcf08ff664b5e9eda1098b14956da4ab57b775de111b26394b0",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character13/0695_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_18.png",
+   "label": "m",
+   "split": "test",
+   "sha256": "0bba3534eca9c74c57afc1f2d76e114962ba9184b11941c189497b2db78487c3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character13/0695_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_19.png",
+   "label": "m",
+   "split": "test",
+   "sha256": "e6e2467a3bb49ac1492744bc3b0b7b8139e2155689721be750d541608ba2493c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character13/0695_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/m/m_20.png",
+   "label": "m",
+   "split": "test",
+   "sha256": "8950307c85206fc5ecaf245cd26f4b91de2d02c29d6addd78a5795370be4d10f",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character13/0695_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_01.png",
+   "label": "n",
+   "split": "train",
+   "sha256": "ebe7ee56a33b2ac58cadecc5e1ea4c73f994df8a566fd1b68641f73e19b7b053",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character14/0696_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_02.png",
+   "label": "n",
+   "split": "train",
+   "sha256": "e435a0d494282fd75ac9a9342b3f9dc06e86510f23546157ca90c2f24d5fe117",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character14/0696_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_03.png",
+   "label": "n",
+   "split": "train",
+   "sha256": "736b94503285dec524c0beeb031d4d4f4bed3a00a273e7fb3d70a475ca4270b5",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character14/0696_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_04.png",
+   "label": "n",
+   "split": "train",
+   "sha256": "42f6612019ccebb825db8dbdf9628c079bd6ac39e94e8d5d3f4777e0059e9a18",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character14/0696_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_05.png",
+   "label": "n",
+   "split": "train",
+   "sha256": "82930e83fb8d5c21d8b2139a5c4942112dff8e7a162105397e969622c92ff82b",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character14/0696_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_06.png",
+   "label": "n",
+   "split": "train",
+   "sha256": "b9a84284092bf34ac758a9cb41e788efd8cbbc2bcae07af4836bbd85620c411c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character14/0696_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_07.png",
+   "label": "n",
+   "split": "train",
+   "sha256": "3dac3a326bb2d0e84f71c718b36ee93bbee7d13c98285f9b7df18c77eccb0d4e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character14/0696_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_08.png",
+   "label": "n",
+   "split": "train",
+   "sha256": "4656bee8c03ee28517858df1d7f373a6d027a883b518f621ce4a9f3de7a14c38",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character14/0696_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_09.png",
+   "label": "n",
+   "split": "train",
+   "sha256": "4fe81644991634f48dac9d86f8e90a292956f322cf6ee5a83e6aa191a6803b18",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character14/0696_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_10.png",
+   "label": "n",
+   "split": "train",
+   "sha256": "17e219357654c0920721d069e4942949d970e65471435be492ede1470323eff9",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character14/0696_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_11.png",
+   "label": "n",
+   "split": "train",
+   "sha256": "96a4c16d6f62ddb0aa20c0fb759f77d076dbec33d5bff477ca105fbc15640bd4",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character14/0696_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_12.png",
+   "label": "n",
+   "split": "train",
+   "sha256": "1595ecabe2813d8f8a4ac6168d85660b87261e34570412bcb7522138c30d2028",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character14/0696_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_13.png",
+   "label": "n",
+   "split": "train",
+   "sha256": "17f9a912575ee224fd2d9c43b75f65f040ecc0de987174e2078ef55024f6db85",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character14/0696_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_14.png",
+   "label": "n",
+   "split": "train",
+   "sha256": "cd047d3e11979b82856ebe9c54cd89f3f549f0c98241ccba875b48ae92151e52",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character14/0696_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_15.png",
+   "label": "n",
+   "split": "val",
+   "sha256": "c764edd114a9c9ee197713b77e60a4c6339178992dde28ed054a6374049a2b02",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character14/0696_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_16.png",
+   "label": "n",
+   "split": "val",
+   "sha256": "86c4c44953ce881a2ef9e9890f2fe3f1f9069d29662c0becd4a0900710e895b7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character14/0696_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_17.png",
+   "label": "n",
+   "split": "val",
+   "sha256": "253c99f50b17dc8c28bc7e77a97072223d445da16dee5337ee199a8d16a302e1",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character14/0696_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_18.png",
+   "label": "n",
+   "split": "test",
+   "sha256": "bb86cafcbbf7bee967cf77d4a44944e6bf08db661c0e4d6f8a1fec78387314de",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character14/0696_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_19.png",
+   "label": "n",
+   "split": "test",
+   "sha256": "b03bd6607791383c27797e37d1a61016cf3f309c2612878a6c347ee5fec48952",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character14/0696_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/n/n_20.png",
+   "label": "n",
+   "split": "test",
+   "sha256": "1c29e8aa31b8aa7bdb775ed63c4f5d96f3d332388670c0d26f9c71d293774bbb",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character14/0696_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_01.png",
+   "label": "o",
+   "split": "train",
+   "sha256": "c48b79328ae6ab92d99b1f7e6f58d1b84804b32dae44f237b5c08731c9af87d0",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character15/0697_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_02.png",
+   "label": "o",
+   "split": "train",
+   "sha256": "3fbf87bc64b02482e234bba7350e67ee03ab13e141031a266aab309d2d3ac8d8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character15/0697_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_03.png",
+   "label": "o",
+   "split": "train",
+   "sha256": "76ea726b3479e3f515719dc67f9407fd7fec259a666df12f5179e49abc57d0ca",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character15/0697_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_04.png",
+   "label": "o",
+   "split": "train",
+   "sha256": "b9bcfcb10bc70d3734af34c80abd7edf636ee1adbfe6ecebfbd2d0f555cd8bfd",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character15/0697_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_05.png",
+   "label": "o",
+   "split": "train",
+   "sha256": "465bce5c2c109f85ea38906f8b03fbf37526049cff44df2ff535d3b888b8923c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character15/0697_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_06.png",
+   "label": "o",
+   "split": "train",
+   "sha256": "ecabb618677f846739d2bfd25574126019c3d747d6c8a5096b7911c1e3e788d8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character15/0697_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_07.png",
+   "label": "o",
+   "split": "train",
+   "sha256": "7d352321c4cec0b109a8588c0b7d23480eac93b5e7dda03b8bcbdca5e3bdaa36",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character15/0697_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_08.png",
+   "label": "o",
+   "split": "train",
+   "sha256": "eba9047ee3d5c988860bfc209f20cb597ce4ef0cfcac862af3e636119c04aad7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character15/0697_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_09.png",
+   "label": "o",
+   "split": "train",
+   "sha256": "f592108b022583405f20ace9148574d2260da544435039fb41a3402c5b56e9c4",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character15/0697_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_10.png",
+   "label": "o",
+   "split": "train",
+   "sha256": "800b534c8403fea3665037973b4752177ac90f93dcfc371a9d770fdf35faeeaf",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character15/0697_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_11.png",
+   "label": "o",
+   "split": "train",
+   "sha256": "8ed4b69982b0ea4fc8224c9d16a9e7e1ac9251470c03a90bfea3b3d953b55044",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character15/0697_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_12.png",
+   "label": "o",
+   "split": "train",
+   "sha256": "011e46727f1865900fb57f4eb287729b0770131ad9bf7eb85a265efbe322e546",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character15/0697_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_13.png",
+   "label": "o",
+   "split": "train",
+   "sha256": "56728622e88ec9aa5cc535c433943adf7e4b8eedfc1beb6f001ebc8e16c6de06",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character15/0697_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_14.png",
+   "label": "o",
+   "split": "train",
+   "sha256": "9fc797142ad9740234049141f04462a645a89ab639cf15d396a9d6b9539a2b23",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character15/0697_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_15.png",
+   "label": "o",
+   "split": "val",
+   "sha256": "0aab716efc777dd3511b066a3b73a225bc3275a79cb63931e7fa29f259651fd8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character15/0697_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_16.png",
+   "label": "o",
+   "split": "val",
+   "sha256": "79c48125a9cb31198132dab2bb7e16b5f9754f86779027b351279143538583b9",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character15/0697_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_17.png",
+   "label": "o",
+   "split": "val",
+   "sha256": "2dea7402f3ec48b2ca0a42411ded58f46d840eb5c4bd3f07d5c9732b0ff0da25",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character15/0697_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_18.png",
+   "label": "o",
+   "split": "test",
+   "sha256": "a3116dff1a866f99eac3b56d575a302bce60bba3bf8429bfea8bed09142d18a0",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character15/0697_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_19.png",
+   "label": "o",
+   "split": "test",
+   "sha256": "f756e13098f04f4104befeeda615fccb833a989edddd4856ffbb4207ad640ce7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character15/0697_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/o/o_20.png",
+   "label": "o",
+   "split": "test",
+   "sha256": "edba7bc8db8e06eb2eda9d7d3e9dcdfedd3e9d00ec36565aa4ef5944594754a7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character15/0697_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_01.png",
+   "label": "p",
+   "split": "train",
+   "sha256": "721fd7ad845042351b7c0a8ab17a56fd3ef6afff2288f7394b0bad0934f7fec3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character16/0698_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_02.png",
+   "label": "p",
+   "split": "train",
+   "sha256": "022ca4ac45527b9751553347480b4f4c3705e14599b906587f2671c26bc6172c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character16/0698_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_03.png",
+   "label": "p",
+   "split": "train",
+   "sha256": "cf74931ae6a2e95795d78d72c21be5f38960554c21c1cc8a22eadb6c384498c4",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character16/0698_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_04.png",
+   "label": "p",
+   "split": "train",
+   "sha256": "5d29365ca410aeaf3fd5ac646f4d36c24a36420b6c2fa594aa8d1512becc90b6",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character16/0698_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_05.png",
+   "label": "p",
+   "split": "train",
+   "sha256": "32f22ec8afde627fe3ac6ef5d3e42f0b11c12200679961edb7a166f01ab0dc32",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character16/0698_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_06.png",
+   "label": "p",
+   "split": "train",
+   "sha256": "bfbf71fec83c9d45152f542599372fb7c52799a3a773e53eb836fc36bd6a5ace",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character16/0698_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_07.png",
+   "label": "p",
+   "split": "train",
+   "sha256": "57371b5c02412747762fa5bceb32499591b272c07c601d545aa75cd2a89737cb",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character16/0698_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_08.png",
+   "label": "p",
+   "split": "train",
+   "sha256": "fa67b8cac9e0e1eea78f0c992dcd05d3335f496e0e2002018a1eda4b46376162",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character16/0698_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_09.png",
+   "label": "p",
+   "split": "train",
+   "sha256": "c75cacc420a704860b2bb7ade961adf4205f19c77be24cd67d4ac861a182daa1",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character16/0698_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_10.png",
+   "label": "p",
+   "split": "train",
+   "sha256": "41bd5bedd0f06b7afc669303a1c019759b69ba5e23bb87be348df21a5adf26fa",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character16/0698_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_11.png",
+   "label": "p",
+   "split": "train",
+   "sha256": "1bd7df34eb0b56a8b6bb33444edacee1f3861b7d7460fb212fb98ec48bb3b8f6",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character16/0698_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_12.png",
+   "label": "p",
+   "split": "train",
+   "sha256": "496929a49c798cce494794c0365aa57492e2c6751b09596891e1e8c2798600ed",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character16/0698_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_13.png",
+   "label": "p",
+   "split": "train",
+   "sha256": "9c717bf5383dcea2ffefee7a548bdcc4416ff2f41cf99413355309e7837aad06",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character16/0698_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_14.png",
+   "label": "p",
+   "split": "train",
+   "sha256": "16de4ff7b1083f27cead89d26104745a91c2fadcec5a3040722ce677734591c9",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character16/0698_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_15.png",
+   "label": "p",
+   "split": "val",
+   "sha256": "1a33a71850388c723e971ea9f704f4e32fbce3d182b905d11dcd322c6d6f45dc",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character16/0698_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_16.png",
+   "label": "p",
+   "split": "val",
+   "sha256": "e3b08bea19d19d1e87bc18718e8295e4304a4bc8f36fd29ff71d97fa61e43c35",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character16/0698_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_17.png",
+   "label": "p",
+   "split": "val",
+   "sha256": "1f8322d6b2ce1bb2a6c0fe25cda166508ddc02c2abfed6111321fcca48deb08d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character16/0698_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_18.png",
+   "label": "p",
+   "split": "test",
+   "sha256": "76918c3f9b1299cb35c9f6a62a023dcb9812dac6655de3881e268e2ca7c102f3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character16/0698_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_19.png",
+   "label": "p",
+   "split": "test",
+   "sha256": "67e440d1ffaca3073b7dc61707290162820064c379453ed69b722188b16c9741",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character16/0698_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/p/p_20.png",
+   "label": "p",
+   "split": "test",
+   "sha256": "1e63c659d8a41ba7e5aa76b9a6fd03983bc423e325a51730278c492b4789e893",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character16/0698_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_01.png",
+   "label": "q",
+   "split": "train",
+   "sha256": "a3c73921d3d1ca8cbda87bf6cfb7a9bea2a8d31388617768328d7cfc7dd39b26",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character17/0699_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_02.png",
+   "label": "q",
+   "split": "train",
+   "sha256": "cab52f8a4fccfd29899d3fb0c6a551fc59ed290e48517c9e71780113f3b17673",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character17/0699_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_03.png",
+   "label": "q",
+   "split": "train",
+   "sha256": "029e24fd14e157dedff2d9dba173578857e03ac8ef2124e11916aaef360a2600",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character17/0699_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_04.png",
+   "label": "q",
+   "split": "train",
+   "sha256": "b85dcf2d8ec6fab47b855c1a42da397dbb83ae103512b98599d5a0145baed35c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character17/0699_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_05.png",
+   "label": "q",
+   "split": "train",
+   "sha256": "1e4f663bea952b95fb3c4b951a6abc2fa06feddd2e03e2ca53b30de8d07d2983",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character17/0699_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_06.png",
+   "label": "q",
+   "split": "train",
+   "sha256": "3784d71f9d33f2e98e993be1499ccf23ea5f38d3567d739a17d05c4bc3a87fd3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character17/0699_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_07.png",
+   "label": "q",
+   "split": "train",
+   "sha256": "6bfe456506ecbb11dfbb4fdcaa930417a0cc055a59e10f0ea0997d0dd92f0e21",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character17/0699_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_08.png",
+   "label": "q",
+   "split": "train",
+   "sha256": "1347471181c0a66b0ace6bef10543ccf30f347ce18f057e3c13ffb93f6a8ce7e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character17/0699_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_09.png",
+   "label": "q",
+   "split": "train",
+   "sha256": "3d220a825f94b70cbca0b919485e06a252743a7caa2db4e401c6c9a7b96a3efe",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character17/0699_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_10.png",
+   "label": "q",
+   "split": "train",
+   "sha256": "916ea02abe21ec0eb9d855501bcf0a9000817a11ddca90d802b3836acb3e46d4",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character17/0699_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_11.png",
+   "label": "q",
+   "split": "train",
+   "sha256": "a0732201984dfda55e28d9de9ab60a5ac374dfd8465a4d7ca7c67fc7cb87aa56",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character17/0699_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_12.png",
+   "label": "q",
+   "split": "train",
+   "sha256": "151f736de17880ef6622a84a03bf9ae10cc3685681b79294881d14d3fc94e81f",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character17/0699_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_13.png",
+   "label": "q",
+   "split": "train",
+   "sha256": "8f8265995e7c9216e44b71185056216be6856b660e2aa87e4ce250292ab7d118",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character17/0699_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_14.png",
+   "label": "q",
+   "split": "train",
+   "sha256": "707d96288df1e7e6bd3fb519b6b87829d2740880523408dfd10caed62bbd3dbe",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character17/0699_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_15.png",
+   "label": "q",
+   "split": "val",
+   "sha256": "e808927dbdfbbd9a9bc878aa66429000436d0ed256b394bb8fa93c30a0ae731e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character17/0699_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_16.png",
+   "label": "q",
+   "split": "val",
+   "sha256": "1df688198dc742a121bdb03aaf7e29604f6dac1edbfa13fb4c3a048268d9e6c4",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character17/0699_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_17.png",
+   "label": "q",
+   "split": "val",
+   "sha256": "04d0819b5f5e0049d61187665e005dc354a96cf66ed3e15f738f6abd81973a3a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character17/0699_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_18.png",
+   "label": "q",
+   "split": "test",
+   "sha256": "ab48e3277308f591235b9d445775b2d41633179bf8419864952f2aeb7b8f09ac",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character17/0699_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_19.png",
+   "label": "q",
+   "split": "test",
+   "sha256": "8dfc4d97b771d73c51cfd523a8e0879a9b7d9f65b25c533145b99c9c04f51bb7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character17/0699_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/q/q_20.png",
+   "label": "q",
+   "split": "test",
+   "sha256": "20abfc4f06f6ef26e921244c7ad9a331315172b441682094068aba9e0ae2e171",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character17/0699_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_01.png",
+   "label": "r",
+   "split": "train",
+   "sha256": "cad1b87a603a93f9faa98d6f6d91206a61464ef6bdda470420fa26904d1464b6",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character18/0700_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_02.png",
+   "label": "r",
+   "split": "train",
+   "sha256": "752a53a7c01040237e033fa56300fb8099b66fd33aa30941768d866f5bb186a9",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character18/0700_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_03.png",
+   "label": "r",
+   "split": "train",
+   "sha256": "d9d5b06de5af8c6ac6c94702d7e094c77e986b6c20240db6cdaec7ef48abcbe1",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character18/0700_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_04.png",
+   "label": "r",
+   "split": "train",
+   "sha256": "ce0f86798b938d9dc65a052d4cb2a7a3fd13d012b146b3a56744aeb2874ea26e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character18/0700_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_05.png",
+   "label": "r",
+   "split": "train",
+   "sha256": "b926ec5d108e561df055eac39288fc0204f19adf8425b83af493cb2caa21e6fa",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character18/0700_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_06.png",
+   "label": "r",
+   "split": "train",
+   "sha256": "285e33f5d8e7fd8f24d243650723f1c7415f3be74ab18ae7879278518986e496",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character18/0700_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_07.png",
+   "label": "r",
+   "split": "train",
+   "sha256": "88168eed6edc61169e26bfff5aad216199134f9a77401bb3bf0eda7b58e5642c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character18/0700_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_08.png",
+   "label": "r",
+   "split": "train",
+   "sha256": "01e83647f19659dc3b705f37fd4538391f76cb45bdf1e148bb5fea5f128673e9",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character18/0700_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_09.png",
+   "label": "r",
+   "split": "train",
+   "sha256": "1497c40b17b99ee2c5ec7ec740e0dd56abb06e4e37361a1948498bcc3e0602fc",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character18/0700_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_10.png",
+   "label": "r",
+   "split": "train",
+   "sha256": "227a96095633471d853f4de36955df4e75bf505cfbb0fa66f518f1d8ef04f7bd",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character18/0700_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_11.png",
+   "label": "r",
+   "split": "train",
+   "sha256": "da2d4ff7edc88033957be451ca16f50a5f6849d8fed2ac8fbd4ed7f74828ead6",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character18/0700_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_12.png",
+   "label": "r",
+   "split": "train",
+   "sha256": "99e4240dcc46a94d03ab2f59d542aa8bab2026ba76fdae8f92e992452d72a4ef",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character18/0700_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_13.png",
+   "label": "r",
+   "split": "train",
+   "sha256": "c65b4cff31687a1caa7b4ec0379a654d522d39100bbd4245c78a704ab4d0be63",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character18/0700_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_14.png",
+   "label": "r",
+   "split": "train",
+   "sha256": "4493da101f8e83e1641c7968c358514525c0f194584c8335116c0d4b70f2b7ac",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character18/0700_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_15.png",
+   "label": "r",
+   "split": "val",
+   "sha256": "6670934a471bda44835d3801c3fee43c2e249e89e8da29a4ad8db3a759b426f1",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character18/0700_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_16.png",
+   "label": "r",
+   "split": "val",
+   "sha256": "80da942b6095507aea43e90a7a5a19446739cf25e44de5bb9f6f6be2aff3021c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character18/0700_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_17.png",
+   "label": "r",
+   "split": "val",
+   "sha256": "13b6dcb185329ec715e46a2490c109446f35ba4f7d2b83bd089605bb9040be46",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character18/0700_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_18.png",
+   "label": "r",
+   "split": "test",
+   "sha256": "f33220fd305f9c5a214b65fc4ef884ebe9176937f7bf960d35786fd8d6f83b4f",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character18/0700_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_19.png",
+   "label": "r",
+   "split": "test",
+   "sha256": "9d01ba005a8518d8aff7f4483b85545c2922bcf383cef08425a52376431c77e7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character18/0700_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/r/r_20.png",
+   "label": "r",
+   "split": "test",
+   "sha256": "98132df43098801ba104e4881273be0e5c327215edac217cb4bd4ee0f7d7f546",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character18/0700_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_01.png",
+   "label": "s",
+   "split": "train",
+   "sha256": "4a7d98502948db7dd1da6085f110d8c8d9e6184bd4fe44a8c1d3d46ba6e2ac32",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character19/0701_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_02.png",
+   "label": "s",
+   "split": "train",
+   "sha256": "07d274d5927b8a9605bd4bbf792493d10bb1e1fb45c86da2ddd44e8c3763ba58",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character19/0701_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_03.png",
+   "label": "s",
+   "split": "train",
+   "sha256": "120741a617061a5cc07bc112103981d26d56e5abeed525376b8b26bd4c000452",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character19/0701_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_04.png",
+   "label": "s",
+   "split": "train",
+   "sha256": "a356c84c3868430e16a71ef3ae6c2406e8150ed4028e5f243d97466f49adb213",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character19/0701_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_05.png",
+   "label": "s",
+   "split": "train",
+   "sha256": "a80378c507191bfcea833baa1f642ea0db8292005df744de62660008590cea10",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character19/0701_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_06.png",
+   "label": "s",
+   "split": "train",
+   "sha256": "92ac5a387ccd9bff1c0bcf37dee8121826d1a3b793b29ab29ee42428fda13003",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character19/0701_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_07.png",
+   "label": "s",
+   "split": "train",
+   "sha256": "df8f0046819c71b4b741af8a55b5894cc05544672e5e3634be797459aff27ae8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character19/0701_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_08.png",
+   "label": "s",
+   "split": "train",
+   "sha256": "170cfb019074b592891bcc0cc30ea2d0bfa82a222319b00973dcab08196b0894",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character19/0701_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_09.png",
+   "label": "s",
+   "split": "train",
+   "sha256": "481f41ccc5dffb2b7fa4a674a755cfb896fb11a12ecb70f56539e508a1e02765",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character19/0701_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_10.png",
+   "label": "s",
+   "split": "train",
+   "sha256": "7ebfff4a7c09cd55957e783cdc140589026c9aca578332105be93669d0abc0c8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character19/0701_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_11.png",
+   "label": "s",
+   "split": "train",
+   "sha256": "9a9f14ca88e482799e1355dd6e872b03920cd26c4270b87715b6f50936527a5d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character19/0701_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_12.png",
+   "label": "s",
+   "split": "train",
+   "sha256": "c13443464d1cd7d171db6cf650c9df12eb699fe070b773424f414dfa445f04e0",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character19/0701_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_13.png",
+   "label": "s",
+   "split": "train",
+   "sha256": "b35a620e7943634031fbe6fa95695052265a4383409afb59ba452611f0ab1a9e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character19/0701_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_14.png",
+   "label": "s",
+   "split": "train",
+   "sha256": "c051839fcaa0c99338b8dc6a26c53612898378c2e8aaaba71c97e8f241dd15ce",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character19/0701_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_15.png",
+   "label": "s",
+   "split": "val",
+   "sha256": "77374780a6856b5d2192f45140134b01c742f5416ce0b16ec81bf2d488b17326",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character19/0701_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_16.png",
+   "label": "s",
+   "split": "val",
+   "sha256": "bb91c2376cfda89141017008352c5b0ebf9a92aed0771882e6ecc248e540c617",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character19/0701_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_17.png",
+   "label": "s",
+   "split": "val",
+   "sha256": "7d4e2d1c436323515a0645be1976141a42483ae0e3b7711833e6fb0450268bc5",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character19/0701_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_18.png",
+   "label": "s",
+   "split": "test",
+   "sha256": "2f18f54a258600bf7af01a853f9de463bced8dbf7b3e196c8a2ed4f968917876",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character19/0701_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_19.png",
+   "label": "s",
+   "split": "test",
+   "sha256": "dc5f8feb1a4890f8506823b8a161822666d6ae07ab80b677d4559d12388ea8d3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character19/0701_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/s/s_20.png",
+   "label": "s",
+   "split": "test",
+   "sha256": "65569a2b1b48b94ba80b8c6e93b92428963b59224bde11382c9c75c160abfb11",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character19/0701_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_01.png",
+   "label": "t",
+   "split": "train",
+   "sha256": "80f9e34b6f86b5dd6988bb3c918c569c4930569177a3806e9343632c4a6e475c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character20/0702_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_02.png",
+   "label": "t",
+   "split": "train",
+   "sha256": "1db95b6fbd545e83e7e1326d92181e59f5b20295235dc1af94e14a100867eecf",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character20/0702_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_03.png",
+   "label": "t",
+   "split": "train",
+   "sha256": "fcd73aeb921a2d98a1a155de2f03df33090c9d96cd6a368ec10be656370b5077",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character20/0702_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_04.png",
+   "label": "t",
+   "split": "train",
+   "sha256": "47f03c77f242920bac34a49650df40e2ebc76a217e1ad98b16a157fe2efc6a52",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character20/0702_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_05.png",
+   "label": "t",
+   "split": "train",
+   "sha256": "50b3d3cf9be73e08a9c786427f98d6931fbd74c1f2880175126390d96074f2e4",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character20/0702_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_06.png",
+   "label": "t",
+   "split": "train",
+   "sha256": "e916292ae488ba183bb14f075c7e3d814f5f1a49057d68bf3624e15bb9a30667",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character20/0702_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_07.png",
+   "label": "t",
+   "split": "train",
+   "sha256": "4838f336f2749a3dd3f9c3490ceed5a22624109df63751376cccf7caa25ebcd2",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character20/0702_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_08.png",
+   "label": "t",
+   "split": "train",
+   "sha256": "5938e23ac37e5248afd6441d89ffc2dac4a9696afa2de4e64e99049893fb1453",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character20/0702_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_09.png",
+   "label": "t",
+   "split": "train",
+   "sha256": "92b79df7b4683d245205ec4e6cb1ee99d275ec22ea9fd3787d0b45f2a0cb4997",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character20/0702_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_10.png",
+   "label": "t",
+   "split": "train",
+   "sha256": "7668d1ca91b667345eb4bf9fa741c40d532dbd0d244dc4c1258cf77555563529",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character20/0702_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_11.png",
+   "label": "t",
+   "split": "train",
+   "sha256": "7ead90010f6459c8335835db3c57b08bfbd36394778bf3cde1a4c0a497ff2ccd",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character20/0702_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_12.png",
+   "label": "t",
+   "split": "train",
+   "sha256": "c3d5424aedb7afdd1b6f18f43f2f0bf3272d1c774e3c12ad4d56f499eda2cd8a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character20/0702_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_13.png",
+   "label": "t",
+   "split": "train",
+   "sha256": "c32895936fc194730019d51312b5e1b0ec93e8471e7391f0fde3959c4233f820",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character20/0702_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_14.png",
+   "label": "t",
+   "split": "train",
+   "sha256": "6c5847febdd2826b1d4b789f0175fbdda3308ae7a512e7f145784cd910880dd5",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character20/0702_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_15.png",
+   "label": "t",
+   "split": "val",
+   "sha256": "a6ffb9def515a5246f87002635a4185aa8d87878806b9df570961c2462db54db",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character20/0702_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_16.png",
+   "label": "t",
+   "split": "val",
+   "sha256": "4ecbac80962c29e608bcaa7a00fb8a13ac705f4162b460b744babe5a9717311d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character20/0702_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_17.png",
+   "label": "t",
+   "split": "val",
+   "sha256": "2b49546017e7ae56d725766c8223cd118d2c3b064b5991f4dbeb66836d4ee194",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character20/0702_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_18.png",
+   "label": "t",
+   "split": "test",
+   "sha256": "2a423be1c59b61d29e3a02ca857170b8c7488fa47b12cd4473441031bc11fafe",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character20/0702_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_19.png",
+   "label": "t",
+   "split": "test",
+   "sha256": "965bc8ae95d69605c411aca54a6be13698c7567cc6afd877abcaa41ad42e95a7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character20/0702_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/t/t_20.png",
+   "label": "t",
+   "split": "test",
+   "sha256": "054be2603adda876911a58e077a7f8c1b0c6b3d171e80a694609eb3a12d00ec3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character20/0702_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_01.png",
+   "label": "u",
+   "split": "train",
+   "sha256": "8649006125a0cab44169885870a02f8904a7d3ed3b15678644fe024e96b1f0b2",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character21/0703_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_02.png",
+   "label": "u",
+   "split": "train",
+   "sha256": "304df8f6ccccfcf0e98fb988fea419b69f69a9c0c73ce09278aa9b760962be65",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character21/0703_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_03.png",
+   "label": "u",
+   "split": "train",
+   "sha256": "014c1066b5ef4b746c6db31f40b45823528ce2bce7199626b210577c057e90cb",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character21/0703_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_04.png",
+   "label": "u",
+   "split": "train",
+   "sha256": "c5fd0fc64ff23016285781c54e11037afbc6521b295eed9ac70c210aa0cf4088",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character21/0703_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_05.png",
+   "label": "u",
+   "split": "train",
+   "sha256": "ea84be21ccc8c9a66a64d7c28bb69ab6da728eb23c683a8c87b8b91689c5f6d8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character21/0703_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_06.png",
+   "label": "u",
+   "split": "train",
+   "sha256": "59a46ffee6691ca88d8e0716185af2bf9da12b188bd801e8ae71e2e8c1b48f45",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character21/0703_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_07.png",
+   "label": "u",
+   "split": "train",
+   "sha256": "438129f2b84e2321b0fe3bdaa747eaa33ba6a164407856b4f0ca5c4e88c64a49",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character21/0703_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_08.png",
+   "label": "u",
+   "split": "train",
+   "sha256": "357630df3e465bb440b5c2f4ccb1a975c7b563c963a4dd315e62095264df2300",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character21/0703_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_09.png",
+   "label": "u",
+   "split": "train",
+   "sha256": "a87b0c7c86d7fb4c518b854593107883e7a177a34476221ecff66ccff1de780f",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character21/0703_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_10.png",
+   "label": "u",
+   "split": "train",
+   "sha256": "c587d017603d40ca96e35276d193b8b62cab23678bfa398cb7389a3c993bdb46",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character21/0703_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_11.png",
+   "label": "u",
+   "split": "train",
+   "sha256": "788a98ae36557cef1e4892acb477ca578564407f7008648965714fe2ef132283",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character21/0703_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_12.png",
+   "label": "u",
+   "split": "train",
+   "sha256": "d1bc2aacdae084ef61dd7b5d90a27c07acc6871163035aa7a297d96f92833f7f",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character21/0703_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_13.png",
+   "label": "u",
+   "split": "train",
+   "sha256": "d93fe40e50905a4b0f9f58f90d203864e04972a036a83436c367a8e075a9397a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character21/0703_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_14.png",
+   "label": "u",
+   "split": "train",
+   "sha256": "ebb98d000ff3ce0c9c787d1fa09785390451551e291e12fcb54abd4d96c18142",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character21/0703_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_15.png",
+   "label": "u",
+   "split": "val",
+   "sha256": "617e11b420b0324bc21d69d84e10e2f1886fd09f1e35a4fd5520148089a14a27",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character21/0703_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_16.png",
+   "label": "u",
+   "split": "val",
+   "sha256": "d68f5ff4f58022dfd876084f5fcbd2418f43876764068ceda50d5366e14a5f17",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character21/0703_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_17.png",
+   "label": "u",
+   "split": "val",
+   "sha256": "0e1798a580988c9ecc311727ecb7454d1bbc6f89b5032e7a0479a7e0ef473826",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character21/0703_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_18.png",
+   "label": "u",
+   "split": "test",
+   "sha256": "2d58b6b14533cfc9ee0e8bf40d5c3d3da03b12cd0dc2134c5334e1c31bfa3fb3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character21/0703_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_19.png",
+   "label": "u",
+   "split": "test",
+   "sha256": "6f5c69b2bd65ba0f4a6c62839ca9ff63c15cede4efae1923cf573428af8db6b4",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character21/0703_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/u/u_20.png",
+   "label": "u",
+   "split": "test",
+   "sha256": "4d3c7b5aedc1690c6497902e158f7dfea07b18b1e42bded4d365bd6e6d130544",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character21/0703_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_01.png",
+   "label": "v",
+   "split": "train",
+   "sha256": "ff0bacc3d837abfbef0ed601cfb22123280f15413cf36e6026aa71596f79381b",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character22/0704_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_02.png",
+   "label": "v",
+   "split": "train",
+   "sha256": "515f5df3f4ea92810d0797647986e1140aaa56d3e02639fa966b40d59c27d576",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character22/0704_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_03.png",
+   "label": "v",
+   "split": "train",
+   "sha256": "259aa00636b85e414cbd547c5296f280b53952a9431e29771ad16813aeb1c71e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character22/0704_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_04.png",
+   "label": "v",
+   "split": "train",
+   "sha256": "c38400e40dfc562c690962136b57c63294444d035467e0f805181b7101b81502",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character22/0704_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_05.png",
+   "label": "v",
+   "split": "train",
+   "sha256": "632dda2b18af573059b4795d212efbbe160197211939c4551495f4f84f2da9f3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character22/0704_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_06.png",
+   "label": "v",
+   "split": "train",
+   "sha256": "825e4ade4a29c3a1bcabb0af5ce2968dcc115841c707d29d3ab1d76c75f33f66",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character22/0704_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_07.png",
+   "label": "v",
+   "split": "train",
+   "sha256": "8d4d348c520b0649a26b32e51ade500defe51f41154243348428a218d5f1a5cf",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character22/0704_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_08.png",
+   "label": "v",
+   "split": "train",
+   "sha256": "ff5beded332e7db84ae2f1ee81f0fa1cd0f19dd3d2862a01e440629159c5ac82",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character22/0704_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_09.png",
+   "label": "v",
+   "split": "train",
+   "sha256": "23f340fbfad51c5b4eebf3e26656f37975b9c7c1e4c6c78841d5906ea0bb1216",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character22/0704_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_10.png",
+   "label": "v",
+   "split": "train",
+   "sha256": "427ce78e7ac585d076d514b5597b2a18c7bb259409b23281c373249dc70b472e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character22/0704_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_11.png",
+   "label": "v",
+   "split": "train",
+   "sha256": "34dccad10e7a87b3e027bfb5cbcff7b201e7d8ef71351117d2730f37cc4213c3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character22/0704_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_12.png",
+   "label": "v",
+   "split": "train",
+   "sha256": "39ac09c8db9acc7fdcb3388758b94e11964a45295223afa9c3e9d6ffd87811c5",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character22/0704_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_13.png",
+   "label": "v",
+   "split": "train",
+   "sha256": "a684412fec002f528a46a68754ff58010051d44bae5aed539edd78a885318d25",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character22/0704_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_14.png",
+   "label": "v",
+   "split": "train",
+   "sha256": "c5de7de46027a0254d0296927d05e50e0f1645c819bd4e9f2d69251ccf4a4e3c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character22/0704_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_15.png",
+   "label": "v",
+   "split": "val",
+   "sha256": "b8f5a3ec003cf53170d96598d12b7f6593eca06173df0f092282d3337dc5d9f7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character22/0704_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_16.png",
+   "label": "v",
+   "split": "val",
+   "sha256": "c751a9b9bbcc97f17224e56b5ffe6308bc4be73a1b27d3ae2290d9af14545add",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character22/0704_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_17.png",
+   "label": "v",
+   "split": "val",
+   "sha256": "d36f999df581a153464b03c29a342b7c9e7812a676e929407744e5e0bd830047",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character22/0704_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_18.png",
+   "label": "v",
+   "split": "test",
+   "sha256": "4f6706a9623fc8f02bb6a14cd3906d2d9e0d7b84b78047ebc52b09ca91a33b58",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character22/0704_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_19.png",
+   "label": "v",
+   "split": "test",
+   "sha256": "d299a8f7efb25a1a5bf293ab03a46cd8340d9b419ae46def046828151cbeb63f",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character22/0704_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/v/v_20.png",
+   "label": "v",
+   "split": "test",
+   "sha256": "811b6d2c88b25458f712499d5f06625260371fe36836a00c2f6cde0a1e56b662",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character22/0704_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_01.png",
+   "label": "w",
+   "split": "train",
+   "sha256": "30624e669c806d2e7622ae20af05fe8923cce0dc6f119ca436469d2fa0163d8e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character23/0705_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_02.png",
+   "label": "w",
+   "split": "train",
+   "sha256": "1fa3031eb4140c86e4c0a3268ecd2a6d25d698a6b704ac0aa434e9d2052ae69a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character23/0705_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_03.png",
+   "label": "w",
+   "split": "train",
+   "sha256": "32fbe72b67160d3df2533049d3c405a0b46b9a44d36c97570ba63fdd7f517192",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character23/0705_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_04.png",
+   "label": "w",
+   "split": "train",
+   "sha256": "63cabbf281fa3236d44959072b26dea98e6fb6e1919fb7abdb397af673406114",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character23/0705_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_05.png",
+   "label": "w",
+   "split": "train",
+   "sha256": "fa81915bbb64fc6e96ef7711d37ffb08b654718d8e826f37089bb4d298b1b5ae",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character23/0705_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_06.png",
+   "label": "w",
+   "split": "train",
+   "sha256": "ad24c7ea21160e22aef9a37d4ae0de75959d2caafecce61fb64322b1b3c961a4",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character23/0705_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_07.png",
+   "label": "w",
+   "split": "train",
+   "sha256": "110263aa83d64fcec3aab105c6f5954f2c6b280af1fb3970ffb65334dc9ba5c9",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character23/0705_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_08.png",
+   "label": "w",
+   "split": "train",
+   "sha256": "fe7a111c85f0ffcafddfb9cff78c3bc11379a25a491b68e45b111d4261606ed2",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character23/0705_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_09.png",
+   "label": "w",
+   "split": "train",
+   "sha256": "c4a2e41465bf3ea007a12726e98a83ad948281ad11917b321d69e202d0393e66",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character23/0705_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_10.png",
+   "label": "w",
+   "split": "train",
+   "sha256": "02bc4a13538c104613ff90d07f95ca8778465ff7a39b30480a05debdb1f539a6",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character23/0705_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_11.png",
+   "label": "w",
+   "split": "train",
+   "sha256": "8acc31666249061bf3cc61712899a7cc1fd850fb23c81d5c624749af5454c749",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character23/0705_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_12.png",
+   "label": "w",
+   "split": "train",
+   "sha256": "24f3256ee3017884d999726dc018bdd193408d10763e82e411dcd8c11e99f01e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character23/0705_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_13.png",
+   "label": "w",
+   "split": "train",
+   "sha256": "baa0a0fa48f4e3708563ec1ba75ad83bf8de5b5e6f48e71e56e9979013e66d22",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character23/0705_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_14.png",
+   "label": "w",
+   "split": "train",
+   "sha256": "300c07ee0b65a191f36eebc8950f8a72b766f0045428c2d83d36a5dbf99e2b97",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character23/0705_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_15.png",
+   "label": "w",
+   "split": "val",
+   "sha256": "fdeb315d9c33ebfde48d42027bb7b2da843c1b8513d1d58762690c2801c535c0",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character23/0705_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_16.png",
+   "label": "w",
+   "split": "val",
+   "sha256": "4a5e8acc0fd0ac2e41cd6e0b5061e290d153a0103148ff7746dbc7b78f39c7a3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character23/0705_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_17.png",
+   "label": "w",
+   "split": "val",
+   "sha256": "ebbb4bc653b57896e63bc0cb65003cdf2415770598927423cc612def112a6e45",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character23/0705_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_18.png",
+   "label": "w",
+   "split": "test",
+   "sha256": "09a79e06d32b62ab1d431c826857b1acc012ef919abb9249d99305bcfde7f6b5",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character23/0705_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_19.png",
+   "label": "w",
+   "split": "test",
+   "sha256": "5227c419175b5bff9bde578e937ad76858b41139acf09762e13171f9e86cfab4",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character23/0705_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/w/w_20.png",
+   "label": "w",
+   "split": "test",
+   "sha256": "d1a351f81ac5fbd4d2b8b27b78f18f358576ee44421c1d286ec524d7c876b1d8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character23/0705_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_01.png",
+   "label": "x",
+   "split": "train",
+   "sha256": "0222285f725bcbef236c759d081a368a2a82b5189df7abd3697f0821d1e87f8d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character24/0706_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_02.png",
+   "label": "x",
+   "split": "train",
+   "sha256": "f05d36be00e3cf03d175f00c6ff2403c09f726b794da5fe807d4a2f669804ba2",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character24/0706_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_03.png",
+   "label": "x",
+   "split": "train",
+   "sha256": "0b0fcd07ff8b4dedbf78fae4aefca05b43faabc28b52e725099998a1b2f6354f",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character24/0706_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_04.png",
+   "label": "x",
+   "split": "train",
+   "sha256": "0ae4d24d1cca7b2e186f4244cbd101f8417533826dd701408e18ff5806d7cb36",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character24/0706_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_05.png",
+   "label": "x",
+   "split": "train",
+   "sha256": "be675279b2aa0ea4377cfae36712ec3fa51df1c2cb6bba6afda38b02e70b8867",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character24/0706_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_06.png",
+   "label": "x",
+   "split": "train",
+   "sha256": "621fb7170d75e1d5963ebc622be0b31b4cac1a000152a8ec88c415503348ee5e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character24/0706_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_07.png",
+   "label": "x",
+   "split": "train",
+   "sha256": "c3ea595850d4a1fc3798cbb2abf7f8542c49e5f064a2f9e24441707c594977c2",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character24/0706_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_08.png",
+   "label": "x",
+   "split": "train",
+   "sha256": "611aafe133d5a614393cd1f0b47ec7e9cad3a6969dd5077adcf679f57a3532e1",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character24/0706_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_09.png",
+   "label": "x",
+   "split": "train",
+   "sha256": "0101bc389680d7d0340b0b825da437e854ca7528bd87e5ecb129df1efe2e8e64",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character24/0706_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_10.png",
+   "label": "x",
+   "split": "train",
+   "sha256": "2b1a18b009104ea86da9d94619499f88b203ec7fcdfb33dfdc92976f5f41a1fb",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character24/0706_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_11.png",
+   "label": "x",
+   "split": "train",
+   "sha256": "8cf5858f30438449353efdaa9835c31ece6e3dd47d7ef971ac35f6d8606bd7a7",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character24/0706_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_12.png",
+   "label": "x",
+   "split": "train",
+   "sha256": "b86165315530b1fc846650fb1277d78f109a3f2fb7a85be67dc20ac10d392f0e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character24/0706_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_13.png",
+   "label": "x",
+   "split": "train",
+   "sha256": "a84fec671301d6c018af8eda04e26b281e5788a06352b82e30db2332c318424d",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character24/0706_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_14.png",
+   "label": "x",
+   "split": "train",
+   "sha256": "ec342438b7113f0e8be4a36c5d931ae1e1c316ba84bcc38e3d923c46d451afbc",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character24/0706_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_15.png",
+   "label": "x",
+   "split": "val",
+   "sha256": "4762a4973b192a7e50c329ec90ec2583a8ee02d0e10bc2e7ecf0490d6d96e07e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character24/0706_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_16.png",
+   "label": "x",
+   "split": "val",
+   "sha256": "f50fb4b428f431b2c0bae543b2dc5b0fd72a6615f5c55b8a92c23d92355d76c2",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character24/0706_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_17.png",
+   "label": "x",
+   "split": "val",
+   "sha256": "eca9ea90f8a4981cf0ec2a9f23c4908cb6b96d015d4a7eb4fa67c05347c9832a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character24/0706_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_18.png",
+   "label": "x",
+   "split": "test",
+   "sha256": "1933e06b566cca1700946dc3be448cc250903203f4f2b92b2dec4b07abf61298",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character24/0706_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_19.png",
+   "label": "x",
+   "split": "test",
+   "sha256": "84dc5480732080a2700a2569f0e7dc90ea43fcfd8cb04aae7880e714a7def3e0",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character24/0706_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/x/x_20.png",
+   "label": "x",
+   "split": "test",
+   "sha256": "2eac61bd9d9ded803ff1b1179455444ccb435ed429bbd891d7f21f234c705f16",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character24/0706_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_01.png",
+   "label": "y",
+   "split": "train",
+   "sha256": "d48a2f9c8fcf224f026147a2a5ef7e18e64e7178a45d591a09513039ea8fbf91",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character25/0707_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_02.png",
+   "label": "y",
+   "split": "train",
+   "sha256": "824c90d5d180dae53f724c94a94117319529bb3ec11662d979f40bef11aa3b28",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character25/0707_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_03.png",
+   "label": "y",
+   "split": "train",
+   "sha256": "8fa0c0b7249e7df11497714879f4923d7ef82221d9d1311da7668507c214b609",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character25/0707_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_04.png",
+   "label": "y",
+   "split": "train",
+   "sha256": "6725db84c76d4e23b120d1f698dfe99b331e420287c7e962c056f4d85b2233c1",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character25/0707_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_05.png",
+   "label": "y",
+   "split": "train",
+   "sha256": "55f0986766ffc28d9f21a28ad6e16ad2c14d6a9a95728005ac0f459a5a71189b",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character25/0707_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_06.png",
+   "label": "y",
+   "split": "train",
+   "sha256": "3114891b1bfc1a3e49385a86442409e80f94eb6a4f43cda7da27b9cb01064e6e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character25/0707_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_07.png",
+   "label": "y",
+   "split": "train",
+   "sha256": "6705d0093ebbe1d6477fe48484f3931159807262b919efba6ab1abfaad150902",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character25/0707_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_08.png",
+   "label": "y",
+   "split": "train",
+   "sha256": "5857071166e80c8f0ffedc71ed2e69df119ea1d521b28d7d8788d9824015149e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character25/0707_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_09.png",
+   "label": "y",
+   "split": "train",
+   "sha256": "e6045e9bdd4cd5a66004d121308a5b1f29729b26c4c86475c05dee43d45e0355",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character25/0707_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_10.png",
+   "label": "y",
+   "split": "train",
+   "sha256": "e79e73c781afad5c438d56484002ee19b1fade6213f4f3eff88624959b8ce73e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character25/0707_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_11.png",
+   "label": "y",
+   "split": "train",
+   "sha256": "51e3c61833818f725318f30d75c35d1aea032bc4e33ad65eac64b66d8686c102",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character25/0707_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_12.png",
+   "label": "y",
+   "split": "train",
+   "sha256": "8b663d5ccd8238aed99ef42baecff1346e1c7f3053b0a76680207160c71172bd",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character25/0707_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_13.png",
+   "label": "y",
+   "split": "train",
+   "sha256": "69902ad8d887a7ce373958ad4bf965e8881634ef15829e1877002ea35a816eaf",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character25/0707_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_14.png",
+   "label": "y",
+   "split": "train",
+   "sha256": "5e47a9d26358fa7ad1fb340cf107bf98437f7d452e08eec3789e35576fb124ce",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character25/0707_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_15.png",
+   "label": "y",
+   "split": "val",
+   "sha256": "d2e11d5d6713143933d239c712bce00989fe9dcc0ce492ecfd15864aba5a1161",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character25/0707_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_16.png",
+   "label": "y",
+   "split": "val",
+   "sha256": "69841c275d1ca0aedf99f5bf3fa1d7c88ce36bec8dd3b2c9d99dc20abcf43c20",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character25/0707_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_17.png",
+   "label": "y",
+   "split": "val",
+   "sha256": "ec33fa9eefbb18ec351f22a311fb0da13703c72dc2737434397637502121de10",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character25/0707_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_18.png",
+   "label": "y",
+   "split": "test",
+   "sha256": "8e713c52081583b21d5b1b07bf2a7a054c70545ee61ed1c7ee0af810cee8a2a3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character25/0707_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_19.png",
+   "label": "y",
+   "split": "test",
+   "sha256": "390a59fdb143b396f68f975d7e941370aef4fc6b9807d5838e41de3450ce272b",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character25/0707_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/y/y_20.png",
+   "label": "y",
+   "split": "test",
+   "sha256": "317f496b4194cbdb0770dd1218fbceb939e13274d8a8ebad5ca0263fb6d8e2d5",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character25/0707_20.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_01.png",
+   "label": "z",
+   "split": "train",
+   "sha256": "607c53663fd5cd7bbea8f97f084424bc4f2f18d9db321d5c55f01a44ab66aedb",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 1,
+    "source_file": "character26/0708_01.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_02.png",
+   "label": "z",
+   "split": "train",
+   "sha256": "0a816d1363ff9122d60e42af95e36a0e5672c6cad38dcb8d8f78b87a5eb6175e",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 2,
+    "source_file": "character26/0708_02.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_03.png",
+   "label": "z",
+   "split": "train",
+   "sha256": "2e2d2cabe3ec9b79bcdf23740d6b1f661073a3700dbf47708e338079db1ea6a8",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 3,
+    "source_file": "character26/0708_03.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_04.png",
+   "label": "z",
+   "split": "train",
+   "sha256": "1bf514c1ba3210eb0e5105a27cd1a57387254253ddd2e0726757a3fb35f433b3",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 4,
+    "source_file": "character26/0708_04.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_05.png",
+   "label": "z",
+   "split": "train",
+   "sha256": "e3eb18907079c419412ce935850a06241eae5536e32e9450a66dada77deb31fe",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 5,
+    "source_file": "character26/0708_05.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_06.png",
+   "label": "z",
+   "split": "train",
+   "sha256": "50c0a0e85a438424f0284a790b976a8487bb996c70826fd425666a125cdd257f",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 6,
+    "source_file": "character26/0708_06.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_07.png",
+   "label": "z",
+   "split": "train",
+   "sha256": "ce2f1a66cc198255b165e4df6c900eb724c06b3ac9be3ddb9f9647f7399052e2",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 7,
+    "source_file": "character26/0708_07.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_08.png",
+   "label": "z",
+   "split": "train",
+   "sha256": "43094f5adf5f25e9c1b5c1b3b282b3ea828ee14bfcedd8059fe80c1a731c1d60",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 8,
+    "source_file": "character26/0708_08.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_09.png",
+   "label": "z",
+   "split": "train",
+   "sha256": "e13fb22c0102ca34b166963a8898d1bc6326bcffd74004c32a334dd632cd819a",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 9,
+    "source_file": "character26/0708_09.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_10.png",
+   "label": "z",
+   "split": "train",
+   "sha256": "f30518d17c53edaac374e23f52a45f3fcb82ed77b8e8479c938c4ae67de600bf",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 10,
+    "source_file": "character26/0708_10.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_11.png",
+   "label": "z",
+   "split": "train",
+   "sha256": "2b8bfef8ea5244f9d74d4c7b8ff58295796ae3fcd111c9b006e07213c3b25a4c",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 11,
+    "source_file": "character26/0708_11.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_12.png",
+   "label": "z",
+   "split": "train",
+   "sha256": "573c399e531542489a29847053ea629842a9c41979da1352605a01d1a86a1b26",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 12,
+    "source_file": "character26/0708_12.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_13.png",
+   "label": "z",
+   "split": "train",
+   "sha256": "32d87a80f61e34b2ce56485e431824ca1153e6a36e2db565fa72ea2074b180a4",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 13,
+    "source_file": "character26/0708_13.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_14.png",
+   "label": "z",
+   "split": "train",
+   "sha256": "f628adead761a9ee66d30c6c28fa47d5699d3bd509a7e989077f92b99aa0c08b",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 14,
+    "source_file": "character26/0708_14.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_15.png",
+   "label": "z",
+   "split": "val",
+   "sha256": "662b7807abe7588e3e786ef96e2e0420569bb6c927383a962375f144ff56bb38",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 15,
+    "source_file": "character26/0708_15.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_16.png",
+   "label": "z",
+   "split": "val",
+   "sha256": "28724cfeace2b4b2916bc7d07ddba7d93858ee4a472bff9b840a164734679cff",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 16,
+    "source_file": "character26/0708_16.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_17.png",
+   "label": "z",
+   "split": "val",
+   "sha256": "eaf661cd7c59cb272832dbdb83381a36ea92ae779de45fa727f92392fc0eec03",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 17,
+    "source_file": "character26/0708_17.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_18.png",
+   "label": "z",
+   "split": "test",
+   "sha256": "105074ed0eb241d07e47309861b5e51fb449fed74ef9826d70ed3795416ffbe6",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 18,
+    "source_file": "character26/0708_18.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_19.png",
+   "label": "z",
+   "split": "test",
+   "sha256": "7e418e82e3a63741dcf5860b063134afd187b90835f24258e30e0c56ebfacddd",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 19,
+    "source_file": "character26/0708_19.png",
+    "kind": "handwriting-real"
+   }
+  },
+  {
+   "file": "images/z/z_20.png",
+   "label": "z",
+   "split": "test",
+   "sha256": "ce17015486786b63646a9d220a5b132d379a47227d59ccb8888619e87b833749",
+   "meta": {
+    "dataset": "omniglot-latin",
+    "writer": 20,
+    "source_file": "character26/0708_20.png",
+    "kind": "handwriting-real"
+   }
+  }
+ ]
+}

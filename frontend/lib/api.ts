@@ -350,14 +350,174 @@ export interface MlPrediction {
   error?: string
 }
 
+export interface MlTaskInfo {
+  id: MlTaskId
+  name: string
+  short: string
+  description: string
+  default_arch: string
+  n_default_classes: number
+}
+
 export interface MlStatus {
   mode: "dev" | "prod"
   is_admin: boolean
+  task?: MlTaskId
+  tasks?: MlTaskInfo[]
   production_model: MlModelEntry | null
   dataset: { total: number; labeled: number; unlabeled: number; review: number; per_split: Record<MlSplit, number>; n_classes: number; version: number }
   models_total: number
   active_job: { id: string; status: MlJobStatus; arch: string; progress: number; message: string } | null
   font_available: boolean
+}
+
+// ── OCR Lens (kamera: Aksara Bali + Latin → terjemahan) ─────────────────
+
+export type OcrScript = "auto" | "aksara" | "latin"
+
+export interface OcrScanOptions {
+  script?: OcrScript
+  tta?: number
+  beam_width?: number
+  use_language_model?: boolean
+  deskew?: boolean
+  binarize?: "sauvola" | "otsu" | "fixed"
+  sauvola_window?: number
+  sauvola_k?: number
+  invert?: "auto" | "dark-ink" | "light-ink"
+  min_area?: number
+  min_height?: number
+  close_iters?: number
+  merge_gap_ratio?: number
+  word_gap_ratio?: number
+  max_glyphs?: number
+  split_marks?: boolean
+  top_k?: number
+  split_width_ratio?: number
+  resplit_below?: number
+  with_crops?: boolean
+  upscale_small?: boolean
+  target_line_height?: number
+  script_margin?: number
+  line_min_ink?: number
+  max_side?: number
+  [key: string]: unknown
+}
+
+export interface OcrAlternative {
+  label: string
+  probability: number
+  glyph: string
+  name: string
+  latin: string
+}
+
+export interface OcrMark {
+  role: string
+  label: string
+  glyph: string
+  name: string
+  latin: string
+  probability: number
+  box: number[]
+  rect?: number[]
+}
+
+export interface OcrGlyph {
+  index: number
+  box: number[]
+  rect: number[]
+  gap_before: number
+  word_break: boolean
+  split?: boolean
+  label?: string
+  glyph?: string
+  name?: string
+  latin?: string
+  confidence?: number
+  corrected?: boolean
+  crop?: string
+  alternatives: OcrAlternative[]
+  marks: OcrMark[]
+}
+
+export interface OcrLine {
+  index: number
+  y: number[]
+  height: number
+  script: OcrScript
+  text: string
+  confidence: number
+  lm_score?: number
+  scores?: Record<string, number>
+  glyphs: OcrGlyph[]
+}
+
+export interface OcrTransliteration {
+  source: string
+  result: string
+  direction: string
+  warnings: string[]
+  breakdown: any[]
+}
+
+export interface OcrScanResult {
+  scan_id: string
+  lines: OcrLine[]
+  text: { aksara: string; latin: string; all: string }
+  detected_script: OcrScript | "unknown"
+  translation: Record<string, OcrTransliteration>
+  glossary: { word: string; meaning?: string; note?: string; [k: string]: unknown }[]
+  models: { task: MlTaskId; model_id: string; name: string; arch?: string; accuracy?: number }[]
+  stats: Record<string, any>
+  warnings: string[]
+  options: Record<string, any>
+  annotated?: string
+}
+
+export interface OcrTaskInfo {
+  ready: boolean
+  model_id: string | null
+  name: string | null
+  arch: string | null
+  created_at: string | null
+  accuracy: number | null
+  real_handwriting_accuracy: number | null
+  n_classes: number
+  classes: string[]
+  dataset: { labeled: number; review: number; unlabeled: number }
+}
+
+export interface OcrStatus {
+  mode: "dev" | "prod"
+  is_admin: boolean
+  limits: Record<string, number>
+  feedback: { enabled: boolean; require_review: boolean; max_images_per_scan?: number; max_bytes?: number }
+  default_options: OcrScanOptions
+  tasks: Record<MlTaskId, OcrTaskInfo>
+  bundled?: { bundled_available: boolean; production: Record<string, string | null>; bundled: any[] }
+  corrections_pending?: number
+}
+
+export interface OcrCorrection {
+  id: string
+  label: string | null
+  status: string
+  split: string
+  source: string
+  note?: string
+  created_at?: string
+  task: MlTaskId
+  meta?: Record<string, any>
+}
+
+export interface OcrSelftest {
+  task: MlTaskId
+  samples: number
+  exact_line_rate: number
+  cer: number
+  elapsed_ms?: number
+  rows: { reference: string; hypothesis: string; cer: number; exact: boolean; lines: number }[]
 }
 
 // ── Otentikasi (login username + password → sesi) ───────────────────────
@@ -414,8 +574,26 @@ function authHeaders(): Record<string, string> {
   return session ? { Authorization: `Bearer ${session.token}` } : {}
 }
 
+/** Tugas ML aktif untuk Panel Admin (Aksara Bali | Latin). */
+export type MlTaskId = "aksara" | "latin"
+let mlTask: MlTaskId = "aksara"
+
+export function setMlTask(task: MlTaskId | string | null | undefined) {
+  mlTask = task === "latin" ? "latin" : "aksara"
+}
+export function getMlTask(): MlTaskId {
+  return mlTask
+}
+
+/** Semua endpoint /ml/* membawa tugas aktif kecuali sudah menyebutkannya. */
+function withMlTask(endpoint: string): string {
+  if (!endpoint.startsWith("/ml/")) return endpoint
+  if (/[?&]task=/.test(endpoint)) return endpoint
+  return `${endpoint}${endpoint.includes("?") ? "&" : "?"}task=${mlTask}`
+}
+
 async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const url = `${API_BASE}${endpoint}`
+  const url = `${API_BASE}${withMlTask(endpoint)}`
   const res = await fetch(url, {
     ...options,
     headers: {
@@ -699,6 +877,80 @@ export const api = {
       fetchAPI<MlPrediction>("/ml/predict", { method: "POST", body: JSON.stringify(body) }),
     compare: (image: string, model_ids: string[]) =>
       fetchAPI<{ results: MlPrediction[] }>("/ml/predict/compare", { method: "POST", body: JSON.stringify({ image, model_ids }), headers: authHeaders() }),
+  },
+
+  // ── OCR Lens: kamera → teks → terjemahan ──
+  ocr: {
+    status: () => fetchAPI<OcrStatus>("/ocr/status", { headers: authHeaders() }),
+
+    scan: (image: string, options?: OcrScanOptions, client?: string) =>
+      fetchAPI<OcrScanResult>("/ocr/scan", {
+        method: "POST",
+        body: JSON.stringify({ image, options: options ?? {}, client: client ?? "lens-web" }),
+        headers: authHeaders(),
+      }),
+
+    /** Unggah Blob/File (form kamera, file picker, atau hasil canvas). */
+    scanFile: async (file: Blob | File, options?: OcrScanOptions, annotate = false): Promise<OcrScanResult> => {
+      const fd = new FormData()
+      fd.append("file", file, file instanceof File ? file.name : "capture.jpg")
+      if (options && Object.keys(options).length) fd.append("options", JSON.stringify(options))
+      if (annotate) fd.append("annotate", "1")
+      const res = await fetch(`${API_BASE}/ocr/scan/file`, { method: "POST", body: fd, headers: authHeaders() })
+      if (!res.ok) throw new Error(`API Error ${res.status}: ${await res.text()}`)
+      return res.json()
+    },
+
+    /** JPEG berbingkai hasil OCR (untuk dibagikan / disimpan). */
+    scanAnnotated: async (image: string, options?: OcrScanOptions, background: "black" | "white" = "black") => {
+      const res = await fetch(`${API_BASE}/ocr/scan/annotate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify({ image, options: options ?? {}, background }),
+      })
+      if (!res.ok) throw new Error(`API Error ${res.status}: ${await res.text()}`)
+      return res.blob()
+    },
+
+    feedback: (body: { image: string; task: MlTaskId; label?: string | null; kind?: "glyph" | "line"; scan_id?: string; note?: string; device?: string }) =>
+      fetchAPI<{ sample_id: string; status: string; message: string }>("/ocr/feedback", {
+        method: "POST", body: JSON.stringify(body), headers: authHeaders(),
+      }),
+
+    pending: (task?: MlTaskId | null, limit = 60, offset = 0) => {
+      const qs = new URLSearchParams()
+      if (task) qs.set("task", task)
+      qs.set("limit", String(limit))
+      if (offset) qs.set("offset", String(offset))
+      return fetchAPI<{ samples: OcrCorrection[]; total: number; review: number; limit: number; offset: number }>(
+        `/ocr/feedback?${qs.toString()}`, { headers: authHeaders() })
+    },
+
+    correctionImageUrl: (sampleId: string, task: MlTaskId) => `${API_BASE}/ocr/feedback/${sampleId}/image?task=${task}`,
+
+    decide: (sampleId: string, task: MlTaskId, body: { action: "accept" | "reject" | "relabel"; label?: string; split?: string }) =>
+      fetchAPI<{ message?: string; removed?: number }>(`/ocr/feedback/${sampleId}/decide?task=${task}`, {
+        method: "POST", body: JSON.stringify(body), headers: authHeaders(),
+      }),
+
+    train: (body: { task: MlTaskId; arch?: string; name?: string; auto_approve?: boolean; hyperparams?: Record<string, number> }) =>
+      fetchAPI<{ job: any; approved: number; dataset: Record<string, number>; message?: string }>("/ocr/feedback/train", {
+        method: "POST", body: JSON.stringify(body), headers: authHeaders(),
+      }),
+
+    config: () => fetchAPI<Record<string, any>>("/ocr/config", { headers: authHeaders() }),
+
+    setConfig: (body: { default_options?: OcrScanOptions; limits?: Record<string, number>; feedback?: Record<string, any>; note?: string }) =>
+      fetchAPI<Record<string, any> & { message: string }>("/ocr/config", {
+        method: "PUT", body: JSON.stringify(body), headers: authHeaders(),
+      }),
+
+    installBundled: (force = false) =>
+      fetchAPI<{ installed: Record<string, any>; production: Record<string, boolean>; message: string }>(
+        `/ocr/models/install${force ? "?force=true" : ""}`, { method: "POST", headers: authHeaders() }),
+
+    selftest: (task: MlTaskId = "aksara", font_size = 48) =>
+      fetchAPI<OcrSelftest>(`/ocr/selftest?task=${task}&font_size=${font_size}`, { headers: authHeaders() }),
   },
 
   // ── Engagement & sekolah mitra ──

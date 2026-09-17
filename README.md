@@ -15,6 +15,16 @@
 - Penanganan khusus: La gantungan + pepet boleh (bleganjur), Cakra + pepet dilarang
 - Dictionary untuk kata khusus (Angklung, Aksara, Om Swastyastu)
 
+### 📷 Lens — OCR Kamera (`/lens`)
+- **Arahkan kamera ke tulisan** — Aksara Bali atau Latin — dibaca per baris & per aksara, lengkap
+  dengan transliterasi Latin, tulisan Bali dari teks Latin, dan arti kata dari kamus
+- Auto-translate dua arah memakai mesin transliterasi proyek (bukan layanan pihak ketiga)
+- Overlay kotak per aksara seperti Google Lens; ketuk kotak untuk melihat 5 kandidat + kirim koreksi
+- Kamera hp (`facingMode: environment`, lampu senter, mode Presisi) maupun laptop (webcam / unggah foto)
+- Model: CNN NumPy yang sama dengan Panel Admin — **retraining admin langsung memperbaiki Lens**
+- Akurasi: 94,3% (aksara) / 98,1% (latin) pada split test; 91,0% / 89,7% pada tulisan tangan nyata;
+  69,6% kata tulisan tangan Caraka terbaca “mendekati” (CER ≤ 25%) — lihat `docs/OCR_LENS.md`
+
 ### 📚 Belajar Bertahap
 - 11 level: Wresastra 18 → Pangangge Suara → Tengenan → Gantungan → Swalalita → Kalimat
 - Setiap aksara: visual, cara tulis, audio, contoh kata
@@ -84,14 +94,22 @@ Aksara/
 │   ├── DATASET_MODEL.md - Dataset & model classifier tulisan tangan (detail + evaluasi 90%+)
 │   ├── ML_RETRAINING.md - Panel Model ML: dataset, labeling, retraining, evaluasi, hasil percobaan 6 arsitektur
 │   ├── PANDUAN_RETRAINING.md - Panduan admin langkah demi langkah retraining (23 screenshot panel)
+│   ├── OCR_LENS.md - Pipeline OCR kamera: segmentasi, decoding kamus, dataset, batas yang diketahui
 │   ├── DEMO_SCRIPT.md - Skrip video demo 5 menit
 │   └── slides/ - Deck slide (HTML 16:9, navigasi keyboard + speaker notes)
-├── dataset/
-│   └── aksara-bali-handwriting-v1/ - Paket dataset gambar (1.080 PNG 64×64, 18 kelas, manifest label+split, CC0) — diimpor sekali klik dari /admin/ml
+├── dataset/ - Paket gambar latih (PNG 64×64 + manifest label/split), diimpor sekali klik dari /admin/ml
+│   ├── aksara-bali-handwriting-v1/ - 1.080 sampel 18 kelas Wresastra (render sintetis, CC0)
+│   ├── caraka-aksara-bali-v1/ - 2.704 tulisan tangan nyata 26 kelas (turunan dataset Caraka/Bangkit, atribusi di README paket)
+│   ├── aksara-bali-print-v1/ - 1.456 aksara tercetak (Noto Sans Balinese, OFL) + degradasi foto
+│   ├── omniglot-latin-handwriting-v1/ - 520 huruf Latin tulisan tangan (Omniglot, MIT)
+│   └── latin-print-v1/ - 2.016 huruf+angka Latin tercetak (DejaVu, OFL)
 ├── eval/
 │   ├── evaluate_handwriting.py - Harness evaluasi classifier template-matching (reproducible)
 │   ├── ml_experiments.py - Percobaan retraining (benchmark 6 arsitektur + ablasi ukuran data)
 │   ├── build_dataset.py - Bangun paket dataset dataset/<nama> (manifest + PNG) secara deterministik
+│   ├── build_real_datasets.py - Bangun paket dari data nyata (Caraka, Omniglot) + render tercetak
+│   ├── train_ocr_models.py - Latih model OCR Lens per tugas → `backend/app/data/ml_bundled/` + laporan
+│   ├── evaluate_ocr.py - Evaluasi tingkat halaman (render + kata tulisan tangan nyata): CER & exact
 │   ├── results/ - Laporan percobaan terakhir (markdown + JSON)
 │   └── README.md - Cara menjalankan evaluasi
 ├── backend/
@@ -256,6 +274,15 @@ engagement (kunjungan/twibbon/sekolah) tidak hilang saat redeploy.
 cd backend
 pytest -v --cov=app
 # Test cases: 100+ transliteration cases from academic papers
+# + test_ml.py (store/training/registry multi-tugas) + test_ocr.py (segmentasi, decoding, /api/ocr/*)
+```
+
+Evaluasi model & pipeline OCR (angka yang dikutip README/dokumentasi berasal dari sini):
+
+```bash
+.venv/bin/python eval/evaluate_handwriting.py    # classifier on-device (template matching)
+.venv/bin/python eval/train_ocr_models.py --epochs 48 --tta 6   # latih ulang model bawaan Lens
+.venv/bin/python eval/evaluate_ocr.py --caraka /path/aksara-datasets-main   # akurasi tingkat halaman
 ```
 
 ### Frontend
@@ -358,6 +385,30 @@ curl -X PUT http://localhost:8000/api/settings/theme \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $SESSION" \
   -d '{"theme": "lontar"}'   # native | lontar | segara | pura | sawah | candi
+```
+
+### OCR Lens API (`/api/ocr/*`)
+
+```bash
+# Kesiapan model per tugas + bawaan pipeline + batas pemakaian
+curl http://localhost:8000/api/ocr/status
+
+# Baca satu citra (data URL base64) → baris, glyph, kandidat, translasi
+curl -X POST http://localhost:8000/api/ocr/scan -H "Content-Type: application/json" \
+  -d '{"image":"data:image/jpeg;base64,…","options":{"script":"auto","tta":2}}'
+
+# Versi multipart (kamera hp / curl)
+curl -X POST http://localhost:8000/api/ocr/scan/file -F file=@foto.jpg -F options='{"script":"aksara"}'
+
+# Kirim koreksi (crop + label) ke antrean admin → jadi data latih setelah disetujui
+curl -X POST http://localhost:8000/api/ocr/feedback -H "Content-Type: application/json" \
+  -d '{"image":"data:image/png;base64,…","task":"aksara","label":"ba","note":"salah baca"}'
+
+# [admin] tinjau antrean, ubah bawaan pipeline, uji mandiri pipeline
+curl -H "Authorization: Bearer $SESSION" "http://localhost:8000/api/ocr/feedback?task=aksara"
+curl -X PUT http://localhost:8000/api/ocr/config -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $SESSION" -d '{"default_options":{"tta":4,"close_iters":1}}'
+curl -H "Authorization: Bearer $SESSION" "http://localhost:8000/api/ocr/selftest?task=aksara&font_size=48"
 ```
 
 ### Variabel lingkungan

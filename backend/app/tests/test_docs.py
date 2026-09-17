@@ -8,7 +8,7 @@ from app.routers.docs import DOCS_DATA_PATH
 
 client = TestClient(app)
 
-ALL_SLUGS = {"penggunaan-murid", "penggunaan-guru", "penggunaan-admin", "metode-scientific", "dataset-dan-model", "panduan-retraining"}
+ALL_SLUGS = {"penggunaan-murid", "penggunaan-guru", "penggunaan-admin", "metode-scientific", "dataset-dan-model", "panduan-retraining", "lens-ocr"}
 
 
 def test_mode_env_alias():

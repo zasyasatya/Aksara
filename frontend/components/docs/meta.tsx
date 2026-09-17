@@ -8,6 +8,7 @@ import {
   Database,
   BookOpen,
   Brain,
+  ScanText,
   type LucideIcon,
 } from "lucide-react"
 import { DocsRole } from "@/lib/api"
@@ -20,6 +21,7 @@ export const IconByName: Record<string, LucideIcon> = {
   Database,
   BookOpen,
   Brain,
+  ScanText,
 }
 
 export const docRoleMeta: Record<DocsRole, { label: string; badge: "saffron" | "outline" | "default" }> = {

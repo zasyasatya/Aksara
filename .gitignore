@@ -58,5 +58,9 @@ eval/.venv/
 
 # Artefak ML runtime (dataset gambar, index, bobot model, registry) — dibuat dari
 # Panel Admin; persist via volume data. Hasil percobaan didokumentasikan di docs/.
+# Data runtime OCR Lens (cache model bahasa & konfigurasi hasil edit admin)
+backend/app/data/ocr.json
+backend/app/data/ocr_lm_aksara.json
+
 backend/app/data/ml/*
 !backend/app/data/ml/README.md

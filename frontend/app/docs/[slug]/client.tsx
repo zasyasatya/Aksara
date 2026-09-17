@@ -13,6 +13,7 @@ import { ContentAdmin } from "@/components/docs/content-admin"
 import { ContentScientific } from "@/components/docs/content-scientific"
 import { ContentDatasetModel } from "@/components/docs/content-dataset-model"
 import { ContentRetraining } from "@/components/docs/content-retraining"
+import { ContentLens } from "@/components/docs/content-lens"
 import { Lock, Loader2, FileQuestion } from "lucide-react"
 
 const CONTENTS: Record<string, () => React.JSX.Element> = {
@@ -22,6 +23,7 @@ const CONTENTS: Record<string, () => React.JSX.Element> = {
   "metode-scientific": ContentScientific,
   "dataset-dan-model": ContentDatasetModel,
   "panduan-retraining": ContentRetraining,
+  "lens-ocr": ContentLens,
 }
 
 export function DocsArticleClient() {

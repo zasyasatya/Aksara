@@ -38,9 +38,13 @@ def _now() -> float:
     return time.time()
 
 
-def list_jobs() -> List[Dict]:
+def list_jobs(task: Optional[str] = None) -> List[Dict]:
+    from .tasks import resolve as resolve_task
+
+    t = resolve_task(task) if task else None
     with _jobs_lock:
-        return sorted((dict(j) for j in _jobs.values()), key=lambda j: j["created_at"], reverse=True)
+        jobs = [dict(j) for j in _jobs.values() if t is None or j.get("task") == t]
+    return sorted(jobs, key=lambda j: j["created_at"], reverse=True)
 
 
 def get_job(job_id: str) -> Optional[Dict]:
@@ -49,10 +53,15 @@ def get_job(job_id: str) -> Optional[Dict]:
         return dict(j) if j else None
 
 
-def active_job() -> Optional[Dict]:
+def active_job(task: Optional[str] = None) -> Optional[Dict]:
+    from .tasks import resolve as resolve_task
+
+    t = resolve_task(task) if task else None
     with _jobs_lock:
         if _active_job_id and _active_job_id in _jobs:
-            return dict(_jobs[_active_job_id])
+            job = _jobs[_active_job_id]
+            if t is None or job.get("task") == t:
+                return dict(job)
         return None
 
 
@@ -104,28 +113,34 @@ def start_training(
     name: str = "",
     notes: str = "",
     auto_promote: bool = False,
+    task: Optional[str] = None,
 ) -> Dict:
     """Antrikan job pelatihan. Melempar ValueError bila prasyarat tidak terpenuhi."""
+    from .tasks import resolve as resolve_task
+
     global _active_job_id
     if arch not in models.ARCH_BY_ID:
         raise ValueError(f"Arsitektur tidak dikenal: {arch}")
-    stats = store.dataset_stats()
+    task = resolve_task(task)
+    stats = store.dataset_stats(task)
     if stats["labeled"] < 2 * max(2, stats["n_classes"]):
         raise ValueError(
-            f"Dataset berlabel terlalu sedikit ({stats['labeled']} sampel untuk {stats['n_classes']} kelas). "
-            "Generate dataset sintetis atau tambahkan sampel dulu."
+            f"Dataset berlabel terlalu sedikit ({stats['labeled']} sampel untuk {stats['n_classes']} kelas "
+            f"pada tugas '{task}'). Impor dataset repo, generate sintetis, atau tambahkan sampel dulu."
         )
     if stats["classes_without_data"]:
         missing = ", ".join(stats["classes_without_data"][:6])
         raise ValueError(f"Ada kelas tanpa sampel berlabel: {missing}. Tambahkan data atau nonaktifkan kelas tersebut.")
     with _jobs_lock:
-        if _active_job_id and _jobs.get(_active_job_id, {}).get("status") in ("queued", "running"):
+        running = _jobs.get(_active_job_id or "", {})
+        if running.get("status") in ("queued", "running"):
             raise ValueError("Masih ada job pelatihan yang berjalan. Tunggu selesai atau batalkan dulu.")
         job_id = uuid.uuid4().hex[:10]
         hp = models.coerce_hyperparams(arch, hyperparams)
         job = {
             "id": job_id,
             "status": "queued",
+            "task": task,
             "arch": arch,
             "arch_name": models.ARCH_BY_ID[arch]["name"],
             "hyperparams": hp,
@@ -144,6 +159,7 @@ def start_training(
             "model_id": None,
             "metrics": None,
             "cancel_requested": False,
+            "task": task,
             "dataset": {"labeled": stats["labeled"], "n_classes": stats["n_classes"], "per_split": stats["per_split"]},
         }
         _jobs[job_id] = job
@@ -156,9 +172,9 @@ def start_training(
 
 
 def run_training_sync(arch: str, hyperparams: Optional[Dict] = None, name: str = "", notes: str = "",
-                      auto_promote: bool = False) -> Dict:
+                      auto_promote: bool = False, task: Optional[str] = None) -> Dict:
     """Varian sinkron (dipakai test & skrip): jalankan job di thread ini."""
-    job = start_training(arch, hyperparams, name, notes, auto_promote)
+    job = start_training(arch, hyperparams, name, notes, auto_promote, task)
     # start_training sudah menjalankan thread; tunggu sampai selesai.
     while True:
         j = get_job(job["id"])
@@ -172,13 +188,13 @@ def _run_job(job_id: str) -> None:
     flag = _cancel_flags[job_id]
     job = get_job(job_id)
     assert job is not None
-    arch, hp = job["arch"], job["hyperparams"]
+    arch, hp, task = job["arch"], job["hyperparams"], job.get("task") or "aksara"
     _update(job_id, status="running", started_at=_now(), message="Memuat dataset…")
     try:
-        labels = store.class_labels()
-        X_tr, y_tr, _ = store.load_matrix("train", labels)
-        X_va, y_va, _ = store.load_matrix("val", labels)
-        X_te, y_te, ids_te = store.load_matrix("test", labels)
+        labels = store.class_labels(task)
+        X_tr, y_tr, _ = store.load_matrix("train", labels, task)
+        X_va, y_va, _ = store.load_matrix("val", labels, task)
+        X_te, y_te, ids_te = store.load_matrix("test", labels, task)
         if len(y_tr) == 0:
             raise ValueError("Split train kosong. Jalankan 'acak ulang split' atau tambah data.")
         eval_split = "test"
@@ -220,7 +236,8 @@ def _run_job(job_id: str) -> None:
             return
 
         _update(job_id, message="Mengevaluasi model…", progress=0.96)
-        proba = model.predict_proba(X_te)
+        tta = int(hp.get("eval_tta", 0) or 0)
+        proba = model.predict_proba(X_te, tta=tta) if tta else model.predict_proba(X_te)
         y_pred = proba.argmax(axis=1)
         report = metrics.classification_report(y_te, y_pred, labels, proba)
         report["eval_split"] = eval_split
@@ -228,6 +245,8 @@ def _run_job(job_id: str) -> None:
         report["val_samples"] = int(len(y_va))
         report["test_samples"] = int(len(y_te))
         report["train_seconds"] = round(train_seconds, 3)
+        report["task"] = task
+        report["eval_tta"] = tta
         # akurasi train untuk deteksi overfit
         p_tr = model.predict_proba(X_tr[:2000])
         report["train_accuracy"] = round(float((p_tr.argmax(axis=1) == y_tr[:2000]).mean()), 4)
@@ -240,14 +259,15 @@ def _run_job(job_id: str) -> None:
             for i in wrong
         ]
 
-        model_id = store.new_model_id(arch)
-        folder = store.model_dir(model_id)
+        model_id = store.new_model_id(arch, task)
+        folder = store.model_dir(model_id, task)
         model.save(folder)
         (folder / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
         size_bytes = sum(p.stat().st_size for p in folder.glob("*") if p.is_file())
-        ds_stats = store.dataset_stats()
+        ds_stats = store.dataset_stats(task)
         entry = {
             "id": model_id,
+            "task": task,
             "name": job["name"],
             "notes": job["notes"],
             "arch": arch,
@@ -265,9 +285,9 @@ def _run_job(job_id: str) -> None:
             "metrics": metrics.summarize(report) | {"train_accuracy": report["train_accuracy"]},
             "job_id": job_id,
         }
-        store.register_model(entry)
+        store.register_model(entry, task)
         if job.get("auto_promote"):
-            store.set_production(model_id)
+            store.set_production(model_id, task)
             from . import inference
             inference.invalidate()
         _update(job_id, status="done", finished_at=_now(), progress=1.0, model_id=model_id,

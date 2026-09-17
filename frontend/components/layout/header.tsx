@@ -4,12 +4,13 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useProgressStore } from "@/lib/store"
-import { Flame, Trophy, BookOpen, BookOpenCheck, Languages, LayoutDashboard, Gamepad2, PenSquare, Stamp, ShieldCheck, FlaskConical } from "lucide-react"
+import { Flame, Trophy, BookOpen, BookOpenCheck, Languages, LayoutDashboard, Gamepad2, PenSquare, Stamp, ShieldCheck, FlaskConical, ScanText } from "lucide-react"
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/learn", label: "Belajar", icon: BookOpen },
   { href: "/translate", label: "Translate", icon: Languages },
+  { href: "/lens", label: "Lens", icon: ScanText },
   { href: "/playground", label: "Play", icon: FlaskConical },
   { href: "/quiz", label: "Kuis", icon: Gamepad2 },
   { href: "/twibbon", label: "Twibbon", icon: Stamp },
