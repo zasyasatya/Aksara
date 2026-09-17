@@ -40,6 +40,8 @@ class Glyph:
     parts: List[Part]
     box: Tuple[int, int, int, int]
     pieces: List[List[Part]] = field(default_factory=list)  # alternatif belah horizontal
+    whole: Optional[Part] = None               # tinta gugus utuh (belum dipecah badan/tanda)
+    piece_wholes: List[Part] = field(default_factory=list)  # tinta utuh tiap belahan
     index: int = 0
     gap_before: float = 0.0    # celah horizontal ke gugus sebelumnya / tinggi baris
     word_break: bool = False
@@ -66,10 +68,40 @@ class Line:
     y1: int
     height: float
     glyphs: List[Glyph] = field(default_factory=list)
+    word_gap: float = 0.62         # ambang celah (× tinggi baris) yang dipakai baris ini
 
     @property
     def text(self) -> str:
         return "".join(((" " if g.word_break else "") + (g.char or "")) for g in self.glyphs)
+
+
+def word_gap_threshold(glyphs: List[Glyph], word_gap_ratio: float) -> float:
+    """Ambang celah antar kata untuk SATU baris (dalam satuan tinggi baris).
+
+    Rasio baku (``word_gap_ratio``) dikalibrasi pada teks ber-spasi lebar. Pada
+    font/ukuran tertentu spasi hanya ~0,5× tinggi baris sehingga tidak pernah
+    terdeteksi dan seluruh baris dibaca sebagai satu kata ("heloworlk"). Karena
+    itu, bila pada baris ini ada lompatan jelas antara celah "dalam kata" dan
+    celah "antar kata" (≥ 1,55× dan ≥ 0,34× tinggi baris), ambang diturunkan ke
+    titik tengah lompatan tersebut — pemisah alami milik baris itu sendiri.
+    """
+    thr = float(word_gap_ratio)
+    inner = sorted(g.gap_before for g in glyphs[1:])
+    if len(inner) < 3:
+        return thr
+    # Cari lompatan terbesar pada deret celah terurut: di bawahnya celah "dalam
+    # kata", di atasnya celah "antar kata". Ambang ditaruh di tengah lompatan.
+    best_i, best_ratio = -1, 0.0
+    for i in range(len(inner) - 1):
+        lo, hi = inner[i], inner[i + 1]
+        if hi < 0.30:
+            continue                      # keduanya masih celah dalam kata
+        ratio = hi / max(lo, 0.06)
+        if ratio > best_ratio:
+            best_ratio, best_i = ratio, i
+    if best_i >= 0 and best_ratio >= 1.55 and inner[best_i + 1] >= 0.34:
+        thr = min(thr, max(0.32, 0.5 * (inner[best_i] + inner[best_i + 1])))
+    return thr
 
 
 def find_lines(binary: np.ndarray, min_height: int = 6, merge_ratio: float = 0.55,
@@ -186,6 +218,10 @@ def _split_parts(mask: np.ndarray, y_off: int, x_off: int, body_h: float) -> Lis
                 parts.append(part)
         if parts and not any(pt.role == "body" for pt in parts):
             parts[0].role = "body"
+        # BADAN SELALU DI DEPAN: pipeline memakai ``parts[0]`` sebagai aksara dasar
+        # dan ``parts[1:]`` sebagai pangangge. Tanpa urutan ini, huruf "i"/"j"
+        # (titik di atas badan) menyerahkan TITIK-nya sebagai glyph dasar.
+        parts.sort(key=lambda p: 0 if p.role == "body" else 1)
         return parts
 
     if h < 8 or w < 3:
@@ -361,38 +397,57 @@ def segment(binary: np.ndarray, *, merge_gap_ratio: float = 0.14, word_gap_ratio
         prelim = [b[3] - b[1] for b in boxes]
         ref_h = float(np.percentile(prelim, 25)) if prelim else lh
 
-        # ── gugus kecil yang menyendiri diserap tetangga terdekat ──────────
+        # ── fragmen kecil diserap tetangga terdekat ───────────────────────
         # Pada tulisan tangan, satu aksara sering pecah jadi beberapa komponen
         # (kait, titik, goresan pemisah). Bila tidak diserap, pecahan itu dibaca
         # sebagai aksara tersendiri — sumber kesalahan tersegmentasi berlebih.
+        #
+        # Yang boleh diserap HANYA *fragmen*, yaitu komponen yang jelas bukan
+        # satuan baca utuh: sangat kecil (debu/tinta lepas) atau pendek-sempit
+        # (titik i/j, kait, potongan goresan). Huruf Latin yang sempit tetapi
+        # setinggi baris (i, j, l, f, t, 1) dan aksara ramping TIDAK boleh
+        # diserap: dulu "ll" menyatu jadi "l" dan "ld" jadi "k" sehingga kata
+        # Latin kehilangan huruf. Syarat tambahan: fragmen harus tumpang tindih
+        # horizontal dengan tetangganya (goresan putus dari aksara yang sama)
+        # atau benar-benar menempel/mengambang di atas-bawahnya (titik).
         absorbed = [False] * len(clusters)
         for ci in range(len(clusters)):
             bx0, by0, bx1, by1 = boxes[ci]
             hh, ww = by1 - by0, bx1 - bx0
             area = sum(stats[i]["area"] for i in clusters[ci])
-            big_enough = hh >= 0.46 * ref_h and ww >= 0.30 * ref_h
-            if big_enough and area >= min_area * 2:
-                continue
+            tiny = area < min_area * 2
+            short_and_narrow = hh <= 0.52 * ref_h and ww <= 0.85 * ref_h
+            if not (tiny or short_and_narrow):
+                continue                      # satuan baca utuh → jangan diganggu
             cand = []
             for dj in (ci - 1, ci + 1):
                 if not (0 <= dj < len(clusters)) or absorbed[dj]:
                     continue
                 ox0, oy0, ox1, oy1 = boxes[dj]
+                ow, oh = ox1 - ox0, oy1 - oy0
                 if max(ox1, bx1) - min(ox0, bx0) > max_cluster_w:
                     continue
-                dx = min(abs(ox0 - bx1), abs(bx0 - ox1))
-                dy = abs((oy0 + oy1) / 2.0 - (by0 + by1) / 2.0)
-                ovx = max(0, min(ox1, bx1) - max(ox0, bx0))
-                if ovx < 0.4 * min(ww, ox1 - ox0) and dx > 0.4 * ref_h:
+                # jarak antar kotak (0 bila bersinggungan/tumpang tindih)
+                gx = max(0.0, max(ox0, bx0) - min(ox1, bx1))
+                gy = max(0.0, max(oy0, by0) - min(oy1, by1))
+                ovx = max(0.0, min(ox1, bx1) - max(ox0, bx0))
+                ovy = max(0.0, min(oy1, by1) - max(oy0, by0))
+                ov_ratio = max(ovx / max(1.0, min(ww, ow)), ovy / max(1.0, min(hh, oh)))
+                if ov_ratio < 0.25 and gx > 0.30 * ref_h:
                     continue           # terlalu jauh untuk jadi bagian aksara ini
-                cand.append((dx + 0.6 * dy, dj))
+                if ov_ratio < 0.25 and gy > 0.85 * ref_h:
+                    continue           # beda baris/tinggi → bukan fragmen aksara ini
+                # tumpang tindih horizontal paling meyakinkan (goresan putus);
+                # jarak vertikal TIDAK boleh menghukum titik i/j yang memang
+                # melayang di atas badannya.
+                cand.append((-2.0 * ov_ratio + gx / ref_h + 0.35 * gy / ref_h, dj))
             if cand:
                 cand.sort()
                 dj = cand[0][1]
                 clusters[dj] = clusters[dj] + clusters[ci]
                 boxes[dj] = _box_of(clusters[dj])
                 absorbed[ci] = True
-            elif area < min_area * 2 or max(hh, ww) < 0.24 * ref_h:
+            elif tiny or max(hh, ww) < 0.22 * ref_h:
                 absorbed[ci] = True   # terlalu kecil untuk dipercaya → buang
         if any(absorbed):
             pairs = [(c, b) for c, b, keep in zip(clusters, boxes, absorbed) if not keep]
@@ -412,25 +467,32 @@ def segment(binary: np.ndarray, *, merge_gap_ratio: float = 0.14, word_gap_ratio
             m = np.zeros(int(labels.max()) + 2, dtype=bool)
             m[wanted] = True
             mask = m[crop].astype(np.uint8)
-            parts = (_split_parts(mask, by0 + y0, bx0, med_h) if split_marks
-                     else [Part(mask.astype(np.float32), (bx0, y0 + by0, bx1, y0 + by1), "body")])
+            # tinta UTUH gugus: untuk huruf Latin satu gugus = satu huruf, termasuk
+            # titik i/j dan silang t/f yang oleh pemecah badan/tanda dilepas.
+            whole = Part(mask.astype(np.float32), (bx0, y0 + by0, bx1, y0 + by1), "body")
+            parts = (_split_parts(mask, by0 + y0, bx0, med_h) if split_marks else [whole])
             pieces: List[List[Part]] = []
+            piece_wholes: List[Part] = []
             if split_marks and med_h > 4 and (bx1 - bx0) > split_width_ratio * med_h:
                 cuts = _split_columns(mask, max(3.0, med_h * 0.30), split_width_ratio * med_h)
                 if len(cuts) > 1:
                     for (px0, py0, px1, py1) in cuts:
                         sub = mask[py0:py1, px0:px1]
+                        pw = Part(sub.astype(np.float32),
+                                  (bx0 + px0, y0 + by0 + py0, bx0 + px1, y0 + by0 + py1), "body")
                         if split_marks:
                             pp = _split_parts(sub, y0 + by0 + py0, bx0 + px0, med_h)
                         else:
-                            pp = [Part(sub.astype(np.float32),
-                                       (bx0 + px0, y0 + by0 + py0, bx0 + px1, y0 + by0 + py1), "body")]
+                            pp = [pw]
                         if pp:
                             pieces.append(pp)
+                            piece_wholes.append(pw)
             gap = (bx0 - boxes[gi - 1][2]) / med_h if gi else 1.0
             glyphs.append(Glyph(parts=parts, box=(bx0, y0 + by0, bx1, y0 + by1), pieces=pieces,
-                                index=gi, gap_before=gap))
+                                whole=whole, piece_wholes=piece_wholes, index=gi, gap_before=gap))
+        gap_thr = word_gap_threshold(glyphs, word_gap_ratio)
         for gi, g in enumerate(glyphs):
-            g.word_break = gi == 0 or g.gap_before >= word_gap_ratio
-        lines.append(Line(index=li, y0=y0, y1=y1, height=med_h, glyphs=glyphs))
+            g.word_break = gi == 0 or g.gap_before >= gap_thr
+        lines.append(Line(index=li, y0=y0, y1=y1, height=med_h, glyphs=glyphs,
+                          word_gap=round(gap_thr, 3)))
     return lines

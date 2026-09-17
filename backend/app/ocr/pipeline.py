@@ -33,6 +33,10 @@ from . import imageops, lexicon, segment
 
 MARK_GROUPS = {"pangangge_suara", "pangangge_tengenan", "pangangge_aksara"}
 
+#: kunci tinta utuh satu gugus / satu belahan pada matriks klasifikasi
+WHOLE_KEY = 50
+PIECE_WHOLE_KEY = 150
+
 
 @dataclass
 class ScanOptions:
@@ -233,7 +237,11 @@ def scan_bytes(data: bytes, options: Optional[dict] = None, model_ids: Optional[
             "models": [], "options": vars(opts),
         }
 
-    # (baris, gugus, indeks potongan). 0..9 = gugus utuh; 100+10j+k = belahan ke-j.
+    # (baris, gugus, indeks potongan):
+    #   0..9        = bagian gugus (0 = badan, sisanya pangangge)
+    #   WHOLE       = tinta gugus UTUH (satu huruf Latin: titik i/j & silang t/f ikut)
+    #   100+10j+k   = bagian belahan ke-j
+    #   PIECE_WHOLE = tinta utuh belahan ke-j
     refs: List[Tuple[int, int, int]] = []
     inks: List[np.ndarray] = []
 
@@ -242,11 +250,18 @@ def scan_bytes(data: bytes, options: Optional[dict] = None, model_ids: Optional[
 
     for li, ln in enumerate(lines_seg):
         for gi, g in enumerate(ln.glyphs):
+            if usable(g.whole):
+                refs.append((li, gi, WHOLE_KEY))
+                inks.append(g.whole.ink)
             for pi, part in enumerate(g.parts[:10]):
                 if usable(part):
                     refs.append((li, gi, pi))
                     inks.append(part.ink)
             for j, piece in enumerate(g.pieces):
+                pw = g.piece_wholes[j] if j < len(g.piece_wholes) else None
+                if usable(pw):
+                    refs.append((li, gi, PIECE_WHOLE_KEY + 10 * j))
+                    inks.append(pw.ink)
                 for k, part in enumerate(piece[:10]):
                     if usable(part):
                         refs.append((li, gi, 100 + 10 * j + k))
@@ -292,37 +307,48 @@ def scan_bytes(data: bytes, options: Optional[dict] = None, model_ids: Optional[
     for li, ln in enumerate(lines_seg):
         sc: Dict[str, List[float]] = {t: [] for t in tasks}
         for gi, _g in enumerate(ln.glyphs):
-            r = rows.get((li, gi, 0), {})
             for t in tasks:
-                if t in r:
-                    sc[t].append(float(r[t].max()))
+                # bukti terbaik per gugus: badan saja (cara Aksara dibaca) ATAU
+                # gugus utuh (cara huruf Latin dibaca, titik/silang termasuk).
+                best = max([float(rows[(li, gi, k)][t].max())
+                            for k in (0, WHOLE_KEY)
+                            if t in rows.get((li, gi, k), {})] or [0.0])
+                if best:
+                    sc[t].append(best)
         line_scores.append({t: float(np.mean(v)) if v else 0.0 for t, v in sc.items()})
 
-    results: List[Dict] = []
-    for li, ln in enumerate(lines_seg):
-        if opts.script == "aksara":
-            pick = "aksara"
-        elif opts.script == "latin":
-            pick = "latin"
-        elif len(tasks) == 1:
-            pick = tasks[0]
-        else:
-            sc = line_scores[li]
-            pick = max(tasks, key=lambda t_: sc.get(t_, 0.0))
-            # Bukti khas tulisan Bali: banyak gugus berisi >1 potongan (badan + pangangge).
-            # Huruf Latin hanya sesekali (titik i/j), jadi rasio kecil sudah cukup.
-            multi = sum(1 for g in ln.glyphs if len(g.parts) > 1)
-            bali_evidence = multi >= max(1, int(0.22 * max(1, len(ln.glyphs))))
-            if pick == "latin" and bali_evidence and "aksara" in sc \
-                    and sc["aksara"] >= float(opts.script_margin) * sc["latin"]:
-                pick = "aksara"
-        if pick not in tasks:
-            pick = tasks[0]
+    def decode_line(li: int, ln, pick: str) -> Tuple[Dict, float, Dict]:
+        """Dekode SATU baris sebagai skrip ``pick`` → (hasil, skor bukti, rincian).
+
+        Mode ``auto`` memanggil fungsi ini untuk tiap skrip yang modelnya siap,
+        lalu memilih baris dengan skor bukti tertinggi. Skor menggabungkan tiga
+        hal yang saling menutupi kelemahannya:
+
+        * keyakinan akustik rata-rata (label terpilih),
+        * skor model bahasa per posisi (rangkaian yang tidak mungkin dalam
+          bahasa/Bali ditekan), dan
+        * bukti geometri/leksikon: gugus badan+pangangge (khas Aksara) dan
+          kata yang dikenal kamus (khas Latin).
+        """
         lbls, look = labels[pick], lookup[pick]
 
-        def entry_for(gi: int, parts_list, key_base: int, box, gap, word_break):
-            """Satu keluaran glyph: kandidat aksara dasar + pangangge pada gugus/belahan."""
-            r = rows.get((li, gi, key_base))
+        g_whole_box: List[Optional[object]] = [None]   # tinta utuh glyph aktif (untuk crop)
+
+        def entry_for(gi: int, parts_list, key_base: int, box, gap, word_break,
+                      whole_key: Optional[int] = None):
+            """Satu keluaran glyph: kandidat aksara dasar + pangangge pada gugus/belahan.
+
+            ``key_base`` menunjuk BADAN (untuk Aksara: badan + pangangge di
+            ``key_base+1..``). Bila skrip baris adalah Latin dan tinta utuh
+            tersedia (``whole_key``), huruf dinilai dari gugus UTUH karena titik
+            i/j dan silang t/f adalah bagian huruf, bukan tanda terpisah.
+            """
+            base_key = key_base
+            if pick == "latin" and whole_key is not None:
+                rw = rows.get((li, gi, whole_key))
+                if rw and pick in rw:
+                    base_key = whole_key
+            r = rows.get((li, gi, base_key))
             if not r or pick not in r:
                 return None
             P = r[pick]
@@ -342,7 +368,9 @@ def scan_bytes(data: bytes, options: Optional[dict] = None, model_ids: Optional[
                 "marks": [],
             }
             if opts.with_crops and parts_list:
-                out["crop"] = features.png_data_url(parts_list[0].ink, scale=3)
+                crop_part = (g_whole_box[0] if (base_key == whole_key and g_whole_box[0] is not None)
+                             else parts_list[0])
+                out["crop"] = features.png_data_url(crop_part.ink, scale=3)
             if pick == "aksara":
                 for pi, part in enumerate(parts_list):
                     if pi == 0:
@@ -367,7 +395,9 @@ def scan_bytes(data: bytes, options: Optional[dict] = None, model_ids: Optional[
         gaps: List[float] = []
         glyphs_out: List[Dict] = []
         for gi, g in enumerate(ln.glyphs):
-            r = rows.get((li, gi, 0))
+            g_whole_box[0] = g.whole
+            r = rows.get((li, gi, WHOLE_KEY if pick == "latin" else 0)) \
+                or rows.get((li, gi, 0)) or rows.get((li, gi, WHOLE_KEY))
             if r is None:
                 continue
             whole_conf = max(float(r[t_].max()) for t_ in r)
@@ -377,51 +407,70 @@ def scan_bytes(data: bytes, options: Optional[dict] = None, model_ids: Optional[
                     box = (min(b[0] for b in pxs), min(b[1] for b in pxs),
                            max(b[2] for b in pxs), max(b[3] for b in pxs))
                     res = entry_for(gi, piece, 100 + 10 * j, box,
-                                    g.gap_before if j == 0 else 0.04, g.word_break and j == 0)
+                                    g.gap_before if j == 0 else 0.04, g.word_break and j == 0,
+                                    whole_key=PIECE_WHOLE_KEY + 10 * j)
                     if res:
                         cands.append(res[0])
                         gaps.append(float(g.gap_before if j == 0 else 0.04))
                         glyphs_out.append(res[1])
                 if any(x["index"] == gi for x in glyphs_out):
                     continue
-            res = entry_for(gi, g.parts, 0, g.box, g.gap_before, g.word_break)
+            res = entry_for(gi, g.parts, 0, g.box, g.gap_before, g.word_break, whole_key=WHOLE_KEY)
             if res:
                 cands.append(res[0])
                 gaps.append(float(g.gap_before))
                 glyphs_out.append(res[1])
 
         if not cands:
-            results.append({"index": li, "y": [int(ln.y0), int(ln.y1)], "height": round(ln.height, 1),
-                            "script": pick, "text": "", "glyphs": [], "confidence": 0.0,
-                            "scores": line_scores[li]})
-            continue
+            return ({"index": li, "y": [int(ln.y0), int(ln.y1)], "height": round(ln.height, 1),
+                     "script": pick, "text": "", "glyphs": [], "confidence": 0.0,
+                     "scores": line_scores[li]}, -1e9, {"empty": True})
 
         # ── decoding dengan model bahasa ─────────────────────────────────
         lm = lexicon.get_lm(pick, lbls) if opts.use_language_model else None
         if lm is not None:
+            # Pemisah kata diserahkan ke segmentasi (ambang adaptif per baris),
+            # bukan dihitung ulang dari rasio global yang tidak cocok semua font.
             seq, lm_score = lexicon.beam_decode(cands, lm, width=int(opts.beam_width),
                                                 allow_space=(pick == "latin"),
-                                                word_gap=float(opts.word_gap_ratio), gaps=gaps)
+                                                word_gap=float(ln.word_gap or opts.word_gap_ratio),
+                                                gaps=gaps, breaks=[g["word_break"] for g in glyphs_out])
         else:
             seq, lm_score = [c[0][0] for c in cands], 0.0
 
+        # Rakit teks. PENTING: `seq` dari beam decode berisi TOKEN SPASI tambahan,
+        # jadi indeksnya tidak sejajar dengan `glyphs_out`/`cands`. Dulu posisi
+        # glyph diambil dari indeks seq sehingga setiap kata yang diberi spasi
+        # menggeser label & keyakinan semua glyph sesudahnya ("read the palm leaf"
+        # → "read  th e pa lm leaf", keyakinan 0%). Sekarang penghitung glyph
+        # terpisah dan spasi hanya disisipkan sekali.
         text_chars: List[str] = []
-        for gi, lab in enumerate(seq):
+        pos = 0
+        for lab in seq:
+            if lab == " ":
+                if text_chars and text_chars[-1] != " ":
+                    text_chars.append(" ")
+                continue
+            g = glyphs_out[pos] if pos < len(glyphs_out) else None
+            cand = cands[pos] if pos < len(cands) else []
+            pos += 1
             info = look.get(lab, {})
             if pick == "latin":
-                text_chars.append((" " if (gi < len(glyphs_out) and glyphs_out[gi]["word_break"] and gi) else "")
-                                  + info.get("glyph", lab))
+                if g is not None and g["word_break"] and text_chars and text_chars[-1] != " ":
+                    text_chars.append(" ")   # spasi geometri bila LM melewatkannya
+                text_chars.append(info.get("glyph", lab))
             else:
-                mark_glyphs = [m["glyph"] for m in glyphs_out[gi]["marks"]] if gi < len(glyphs_out) else []
+                if g is not None and g["word_break"] and text_chars and text_chars[-1] != " ":
+                    text_chars.append(" ")   # spasi antar kata Aksara (dari celah geometri)
+                mark_glyphs = [m["glyph"] for m in g["marks"]] if g is not None else []
                 text_chars.append(info.get("glyph", "") + "".join(mark_glyphs))
-            if gi < len(glyphs_out):
-                g = glyphs_out[gi]
+            if g is not None:
                 g["label"] = lab
                 g["glyph"] = info.get("glyph", "")
                 g["name"] = info.get("name", lab)
                 g["latin"] = info.get("latin", "")
-                g["confidence"] = round(float(dict(cands[gi]).get(lab, 0.0)), 4)
-                g["corrected"] = bool(cands[gi] and cands[gi][0][0] != lab)
+                g["confidence"] = round(float(dict(cand).get(lab, 0.0)), 4)
+                g["corrected"] = bool(cand and cand[0][0] != lab)
         text = "".join(text_chars).strip()
         confs = [g["confidence"] for g in glyphs_out if "confidence" in g]
         for g in glyphs_out:
@@ -432,13 +481,48 @@ def scan_bytes(data: bytes, options: Optional[dict] = None, model_ids: Optional[
                 mb = m["box"]
                 m["rect"] = [round(mb[0] / W, 5), round(mb[1] / H, 5), round((mb[2] - mb[0]) / W, 5),
                              round((mb[3] - mb[1]) / H, 5)]
-        results.append({
+        mean_conf = round(float(np.mean(confs)) if confs else 0.0, 4)
+        n_pos = max(1, len(cands))
+        lm_per = lm_score / n_pos
+        score = mean_conf + 0.25 * lm_per
+        detail: Dict[str, float] = {"conf": mean_conf, "lm": round(lm_per, 4)}
+        if pick == "aksara":
+            # Bukti khas tulisan Bali: banyak gugus berisi >1 potongan (badan +
+            # pangangge). Huruf Latin hanya sesekali (titik i/j), jadi rasio kecil
+            # sudah cukup. Ditambah bonus bila rangkaian labelnya kata dikenal.
+            multi = sum(1 for g in ln.glyphs if len(g.parts) > 1)
+            ratio = multi / max(1, len(ln.glyphs))
+            geo = 0.12 * min(1.0, ratio / 0.22)
+            known = 1.0 if (lm is not None and lm.words.get("".join(seq))) else 0.0
+            score += geo + 0.10 * known
+            detail.update({"geo": round(geo, 4), "known": known})
+        else:
+            words = [w for w in text.split() if w]
+            hit = sum(1 for w in words if lm is not None and lm.words.get(w))
+            ratio = hit / max(1, len(words)) if words else 0.0
+            lex = 0.20 * ratio - (0.08 if words and hit == 0 else 0.0)
+            score += lex
+            detail.update({"lex": round(lex, 4), "words": len(words), "hits": hit})
+        out = {
             "index": li, "y": [int(ln.y0), int(ln.y1)], "height": round(ln.height, 1),
             "script": pick, "text": text,
-            "confidence": round(float(np.mean(confs)) if confs else 0.0, 4),
+            "confidence": mean_conf,
             "lm_score": lm_score, "scores": {t: round(v, 4) for t, v in line_scores[li].items()},
+            "script_evidence": detail,
             "glyphs": glyphs_out,
-        })
+        }
+        return out, score, detail
+
+    results: List[Dict] = []
+    for li, ln in enumerate(lines_seg):
+        picks = [opts.script] if (opts.script != "auto" and opts.script in tasks) else list(tasks)
+        best: Optional[Tuple[Dict, float]] = None
+        for p in picks:
+            out, score, _detail = decode_line(li, ln, p)
+            if best is None or score > best[1]:
+                best = (out, score)
+        if best is not None:
+            results.append(best[0])
 
     results = [r for r in results if r.get("text")]
     aksara_text = "\n".join(r["text"] for r in results if r["script"] == "aksara")
