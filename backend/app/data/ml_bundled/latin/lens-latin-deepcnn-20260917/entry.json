@@ -6,15 +6,15 @@
   "arch": "deepcnn",
   "arch_name": "Deep CNN + Augmentasi (rekomendasi OCR Lens)",
   "hyperparams": {
-    "epochs": 48,
+    "epochs": 64,
     "batch_size": 96,
     "learning_rate": 0.007,
     "min_learning_rate": 0.00014000000000000001,
     "augment": 1.0,
     "class_balance": 0.6,
-    "hidden_units": 112,
-    "conv1_filters": 14,
-    "conv2_filters": 28,
+    "hidden_units": 160,
+    "conv1_filters": 20,
+    "conv2_filters": 40,
     "label_smoothing": 0.06,
     "eval_tta": 0
   },
@@ -57,9 +57,9 @@
     "9"
   ],
   "n_classes": 36,
-  "n_params": 170402,
-  "created_at": "2026-09-17T05:36:43+00:00",
-  "train_seconds": 412.2,
+  "n_params": 345056,
+  "created_at": "2026-09-17T13:47:12+00:00",
+  "train_seconds": 935.4,
   "eval_split": "test",
   "dataset_size": {
     "train": 3282,
@@ -67,17 +67,17 @@
     "test": 704
   },
   "metrics": {
-    "accuracy": 0.9886,
-    "macro_precision": 0.9897,
-    "macro_recall": 0.9898,
-    "macro_f1": 0.9893,
-    "weighted_precision": 0.9894,
-    "weighted_recall": 0.9886,
-    "weighted_f1": 0.9885,
-    "top3_accuracy": 0.9957,
-    "log_loss": 0.1384,
+    "accuracy": 0.9858,
+    "macro_precision": 0.9868,
+    "macro_recall": 0.9871,
+    "macro_f1": 0.9862,
+    "weighted_precision": 0.9869,
+    "weighted_recall": 0.9858,
+    "weighted_f1": 0.9856,
+    "top3_accuracy": 0.9972,
+    "log_loss": 0.1425,
     "n_samples": 704,
-    "train_accuracy": 0.986
+    "train_accuracy": 0.9913
   },
   "bundled": true
 }

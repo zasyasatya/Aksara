@@ -28,22 +28,38 @@ eval/evaluate_ocr.py              evaluasi tingkat halaman (render + kata nyata 
 
 `POST /api/ocr/scan` (atau `/scan/file` multipart) →
 
-1. `imageops.decode_gray` (EXIF dihiraukan, sisi terpanjang ≤ `max_side`) → `stretch_contrast`
-   → binerisasi `sauvola|otsu|fixed` dengan `invert=auto` (deteksi polaritas dari border).
+1. `imageops.decode_gray` (EXIF dihiraukan, sisi terpanjang ≤ `max_side`) → binerisasi
+   `sauvola|otsu|fixed` dengan `invert=auto` (deteksi polaritas dari border). Pada citra
+   berderau (σ estimasi ≥ 2,4) binerisasi memakai skema **benih-tumbuh**: benih tinta kuat
+   dicari pada citra blur 0,75 px yang harus ≥ 2,6σ di bawah rerata lokal, lalu tumbuh satu
+   piksel lewat ambang Sauvola pada citra asli — debu kamera tidak lagi jadi tinta, tetapi
+   huruf kecil (<20 px) tidak ikut meleleh seperti saat memakai blur besar.
 2. Opsional: `estimate_skew` + `rotate` (expand=False → sistem koordinat tetap, agar `rect`
-   yang dinormalkan tetap sejajar dengan gambar asli di klien).
+   yang dinormalkan tetap sejajar dengan gambar asli di klien). Sudut < 1° **dilewati** —
+   baji rotasi kecil dulu justru dilukis Sauvola sebagai pita tinta; baji sudut ≥ 1° diisi
+   abu median tepi supaya tidak menghasilkan tinta palsu.
 3. `upscale_small`: bila tinggi baris median < `target_line_height`, citra diperbesar
-   (×≤4) **sebelum** segmentasi. Model dilatih pada glyph ~20 px; teks 1–2 px tanpa ini hancur.
+   (×≤4) **sebelum** segmentasi, dengan σ derau **diwariskan dari skala asli** (interpolasi
+   menurunkan σ terukur dan dulu mematikan jalur anti-derau). Model dilatih pada glyph
+   ~20 px; teks 1–2 px tanpa ini hancur.
 4. `segment.find_lines`: pita proyeksi horizontal; pita berjarak dekat digabung (ascender/
    descender), pita > 2.3× median dibelah pada lembah tertipis; pita berkepadatan tinta <
    `line_min_ink` dibuang (debu/kotoran kamera).
 5. `imageops.components` (scanline 8-konektivitas, O(piksel), 0,07 s untuk 4000 blob pada
-   1400²) → gugus: gabung bila tumpang tindih horizontal ≥ 45% **atau** celah ≤ `merge_gap_ratio`
-   × tinggi baris; wajib `markish` (salah satu kotak ≤ 62% tinggi yang lain) supaya huruf
-   Latin bersebelahan tidak menyatu, dan lebar gabungan ≤ `split_width_ratio` × tinggi baris.
+   1400²) → penyaringan dini: **`_drop_border_frames`** membuang bingkai/bayangan tepi
+   (sliver garis tebing, segitiga vignette), `_drop_lonely_specks` membuang bintik terpencil.
+   `close` (sambung goresan putus tinta tangan) hanya diterapkan bila celah antar komponen
+   sebaris masih ≥ ±2,5 px (`_close_is_safe`) — pada teks Latin rapat closing dinonaktifkan
+   otomatis agar huruf tetangga tidak melebur. Kemudian gugus dibentuk: gabung bila tumpang
+   tindih horizontal ≥ 45% **atau** celah ≤ `merge_gap_ratio` × tinggi baris; wajib `markish`
+   (salah satu kotak ≤ 62% tinggi yang lain) supaya huruf Latin bersebelahan tidak menyatu,
+   dan lebar gabungan ≤ `split_width_ratio` × tinggi baris.
 6. `_split_parts`: bila gugus lebih tinggi dari 1,42× tinggi basis (persentil-25), potong pada
    baris tertipis di zona atas/bawah → `body` + `above`/`below` (pangangge). `_split_columns`
-   menyiapkan opsi belah horizontal untuk gugus yang kelebaran.
+   menyiapkan opsi belah horizontal untuk gugus yang kelebaran memakai lembah kolom
+   `split_valley_ratio` × median; belahan **dipakai** bila keyakinan gugus utuh <
+   `resplit_below` (0,9 untuk Latin — meleburnya buram latin jarang meyakinkan; 0,62 untuk
+   aksara agar ligatur tidak terbelah sembarangan; keduanya diuji lewat selftest + harness).
 7. Klasifikasi batch: semua potongan (termasuk alternatif belahan) sekali jalan per tugas →
    `predict_proba` (dengan `tta`), label dari `entry["classes"]` model, bukan dari kelas aktif
    store — supaya model lama tetap benar walau admin mengubah kelas.
@@ -51,7 +67,9 @@ eval/evaluate_ocr.py              evaluasi tingkat halaman (render + kata nyata 
    bila barisnya punya bukti geometri Bali (banyak gugus >1 potongan).
 9. `lexicon.beam_decode` (lebar `beam_width`): skor = 0,55·log P(akustik) + 0,45·log P(n-gram)
    + bonus kata; aksara memaksa satu kata per baris, Latin boleh ber-spasi dari `word_gap_ratio`.
-10. Rakit Unicode (`glyph` basis + `glyph` pangangge) → `services.transliterator.transliterate`
+10. "Baris sampah bingkai" dibuang pasca-decode: baris ≤ 6 gugus, tinggi ≤ 12 px, keyakinan
+    ≤ 0,75, tanpa kata kamus, **dan** menempel di tepi gambar — semua syarat wajib terpenuhi.
+11. Rakit Unicode (`glyph` basis + `glyph` pangangge) → `services.transliterator.transliterate`
     dua arah → `glossary` dari `dictionary.json`.
 
 ## 2. Model bahasa (lexicon)
@@ -73,16 +91,23 @@ eval/evaluate_ocr.py              evaluasi tingkat halaman (render + kata nyata 
 | `dataset/omniglot-latin-handwriting-v1` | huruf Latin tulisan tangan (Omniglot, MIT) | 520 |
 | `dataset/latin-print-v1` | render 5 font DejaVu a–z 0–9 + degradasi | 2 016 |
 
-* Augmentasi hanya **on-the-fly** saat training (`ml/augment.py`): rotasi, geser, skala, elastis
-  ringan, coretan — dataset tersimpan tidak pernah berubah.
-* `deepcnn` (Conv 14 → Conv 24 → 2 FC 112, BN-free, label smoothing 0,06, cosine LR,
-  class-balance 0,6) di CPU: 398 s (aksara, 3 217 sampel) / 263 s (latin).
-* Hasil 48 epoch (`eval/results/OCR_LENS_MODELS.md`):
+* Augmentasi hanya **on-the-fly** saat training (`ml/augment.py`): rotasi, geser, skala,
+  tebal/tipis pena, blur fokus, derau, pudarnya tinta — dataset tersimpan tidak pernah berubah.
+  Derajatnya **per tugas**: latin kuat (blur s.d. 1,25 px + derau Gaussian + gain 0,62–1,12)
+  karena hurufnya tegas, aksara ringan (blur s.d. 0,9 px, tanpa derau Gaussian, gain 0,78–1,08)
+  karena goresan multi-bagiannya tipis — konfigurasi latin pada aksara menurunkan 94→86%.
+* `deepcnn` (Conv 20 → Conv 40 → 2 FC 160 untuk latin; Conv 14 → Conv 24 → 2 FC 112 untuk
+  aksara; BN-free, label smoothing 0,06, cosine LR, class-balance 0,6) di CPU murni — berkas
+  model ≈ 1,4 MB (latin) / ≈ 300 KB (aksara), aman untuk VPS kecil.
+* Pengaman regresi di `eval/train_ocr_models.py`: model hasil training **tidak menimpa model
+  bawaan** bila akurasinya >3 poin di bawah bawaan (training kolaps/divergen terpantau
+  otomatis, tidak pernah sampai produksi).
+* Hasil (`eval/results/OCR_LENS_MODELS.md`):
 
   | Tugas | test acc | tulisan tangan nyata | F1 makro | top-3 |
   | --- | ---: | ---: | ---: | ---: |
   | aksara | 94,29% | 90,96% (n=387) | 90,82% | 99,7% |
-  | latin | 98,07% | 89,74% (n=78) | 89,12% | 100% |
+  | latin | 98,58% | 91,03% (n=78) | 89,53% | 97,4% |
 
 * Halaman (`eval/results/OCR_LENS_PAGES.md`, bawaan `close_iters=1`, TTA 2): exact-line 30%,
   CER 22% (aksara) / 33–40% (latin) pada render terkontrol; pada 23 citra **kata tulisan tangan
@@ -95,6 +120,22 @@ dan diberi atribusi di `dataset/*/README.md`. Font: Noto Sans Balinese & DejaVu 
 
 ## 4. Batas yang diketahui (jujur di muka)
 
+Diukur pada harness kamera 24 kasus (4 teks × 6 kondisi: render halaman → blur fokus,
+bayangan bertingkat, derau sensor, kompresi JPEG, downscale; deterministik lewat seed CRC32)
+dengan mode Latin:
+
+| Kondisi foto | CER |
+| --- | ---: |
+| Ringan (blur 0,8 px, terang, JPEG 84) | ≈ 0,01 |
+| Sedang (blur 1,1 px, redup 0,6, JPEG 76) | ≈ 0,09 |
+| Gelap (blur 1,3 px, redup 0,45, derau 13, JPEG 70) | ≈ 0,02 |
+| Kecil (teks ±14 px setelah downscale, blur 1,2, derau 10) | ≈ 0,85–0,90 |
+| Jauh / sangat jauh (teks ≤ 10 px efektif) | ≈ 0,88–0,92 |
+
+Maknanya: pada foto normal genggam (huruf ≥ 18–20 px di gambar, subjek fokus) hasil Latin
+sudah layak baca dengan koreksi kamus; gambar terlalu kecil/jauh memang di luar jangkauan
+— lens menampilkan indikator keyakinan + mengarahkan pengguna memperdekat bidikan.
+
 1. **Pasangan/aksara berangkai** (`ᬓ᭄ᬭ`, `ᬦᬿᬢ`): font merangkainya jadi satu ligatura, kelasnya tidak
    ada di dataset → dibaca sebagai bentuk terdekat. Solusi jangka panjang: kelas pasangan atau
    pemecah ligatura berbasis kamus.
@@ -104,6 +145,9 @@ dan diberi atribusi di `dataset/*/README.md`. Font: Noto Sans Balinese & DejaVu 
    terpotong salah; tidak ada model segmentasi semantik.
 4. Bukan OCR umum: kelas = 26 aksara + 36 Latin. Di luar itu (Angka Bali, jangkep lengkap)
    butuh dataset + training tambahan.
+5. Huruf sempit Latin yang melebur total pada sumber (fokus lari + downscale) tidak selalu
+   dapat dipisah kembali; belahan lembah (`split_valley_ratio`) mengatasi sebagian besar kasus
+   sedang, bukan kasus ekstrem.
 
 ## 5. Konfigurasi & operasional
 
@@ -111,11 +155,16 @@ dan diberi atribusi di `dataset/*/README.md`. Font: Noto Sans Balinese & DejaVu 
 
 ```json
 {
-  "default_options": { "script": "auto", "tta": 2, "binarize": "sauvola", "max_glyphs": 480 },
+  "default_options": { "script": "auto", "tta": 2, "binarize": "sauvola", "max_glyphs": 480,
+                       "split_valley_ratio": 0.8, "resplit_below": 0.62 },
   "limits": { "scan_per_minute": 30, "feedback_per_minute": 8, "max_image_bytes": 8000000, "max_side": 2400 },
   "feedback": { "enabled": true, "require_review": true }
 }
 ```
+
+Mode Latin menimpa dua bawaan itu saat klien tidak menetapkan eksplisit: `close_iters=0`
+(huruf Latin tanpa goresan putus; closing isotropik melebur tetangga) dan `resplit_below=0,9`
+(belahan dipakai lebih agresif). Semua nilai bisa dioverride per-request lewat `options`.
 
 * Rate limit = token bucket per IP (`X-Forwarded-For` dihormati); admin dibebaskan.
 * Setiap opsi request dijepit ke rentang aman (`ScanOptions._RANGE`) → klien tidak bisa

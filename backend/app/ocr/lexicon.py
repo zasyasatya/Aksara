@@ -15,7 +15,6 @@ Ruang simbol:
 from __future__ import annotations
 
 import json
-import json
 import math
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
@@ -137,7 +136,8 @@ _LM_CACHE: Dict[str, NgramLM] = {}
 
 def _latin_corpus() -> List[str]:
     texts: List[str] = []
-    for name in ("dictionary.json", "aksara_master.json", "lessons.json", "quiz.json", "docs.json", "engagement.json"):
+    for name in ("dictionary.json", "aksara_master.json", "lessons.json", "quiz.json", "docs.json",
+                 "engagement.json", "lexicon_extra.json"):
         data = _load_json(DATA_DIR / name)
         for s in _iter_strings(data):
             clean = "".join(ch for ch in s.lower() if ch.isalpha() or ch.isspace())
@@ -219,7 +219,11 @@ def _corpus_stamp() -> float:
 
 def build_aksara_lm(labels: Sequence[str]) -> NgramLM:
     """LM atas urutan label kelas (bukan codepoint) — ruang simbol model klasifikasi."""
-    from app.ml import store  # lokal: hindari import melingkar saat pemuatan modul
+    # Relatif terhadap paket (bukan `app.ml` absolut) agar jalan baik saat proses
+    # dijalankan sebagai `uvicorn app.main:app` (cwd=backend) MAUPUN
+    # `uvicorn backend.app.main:app` (cwd=root repo). Import lokal supaya tidak
+    # ada siklus saat pemuatan modul.
+    from ..ml import store
 
     lookup = store.class_lookup("aksara")
     code_to_label = {ord(c["glyph"][0]): c["label"] for c in lookup.values() if c.get("glyph")}

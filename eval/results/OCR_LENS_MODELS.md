@@ -7,7 +7,7 @@ berfungsi tanpa training ulang; Panel Admin tetap dapat melatih ulang.
 | Tugas | Arsitektur | Kelas | Sampel latih | Akurasi test | **Akurasi tulisan tangan nyata** | F1 makro | Top-3 | CER | Waktu |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | aksara | Deep CNN + Augmentasi (rekomendasi OCR Lens) | 26 | 3217 | 94.29% | 90.96% (n=387) | 90.82% | 99.7% | 9.04% | 397.9 s |
-| latin | Deep CNN + Augmentasi (rekomendasi OCR Lens) | 36 | 3282 | 98.86% | 92.31% (n=78) | 90.85% | 96.2% | 7.69% | 412.2 s |
+| latin | Deep CNN + Augmentasi (rekomendasi OCR Lens) | 36 | 3282 | 98.58% | 91.03% (n=78) | 89.53% | 97.4% | 8.97% | 935.4 s |
 
 ## Konfigurasi
 
@@ -80,10 +80,10 @@ berfungsi tanpa training ulang; Panel Admin tetap dapat melatih ulang.
 | `f` | 100.0 | 100.0 | 100.0 | 3 |
 | `g` | 100.0 | 33.3 | 50.0 | 3 |
 | `h` | 100.0 | 100.0 | 100.0 | 3 |
-| `i` | 100.0 | 100.0 | 100.0 | 3 |
+| `i` | 100.0 | 66.7 | 80.0 | 3 |
 | `j` | 100.0 | 100.0 | 100.0 | 3 |
 | `k` | 100.0 | 100.0 | 100.0 | 3 |
-| `l` | 100.0 | 100.0 | 100.0 | 3 |
+| `l` | 75.0 | 100.0 | 85.7 | 3 |
 | `m` | 100.0 | 100.0 | 100.0 | 3 |
 | `n` | 100.0 | 100.0 | 100.0 | 3 |
 | `o` | 75.0 | 100.0 | 85.7 | 3 |
