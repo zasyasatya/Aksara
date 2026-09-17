@@ -365,8 +365,22 @@ def segment(binary: np.ndarray, *, merge_gap_ratio: float = 0.14, word_gap_ratio
                 # titik i, gantungan), bukan huruf sebelah. Huruf Latin yang bersebelahan
                 # punya tinggi serupa dan harus tetap terpisah.
                 markish = short <= 0.62 * tall
-                touching = (x0 - cur_end) <= merge or ov_x >= 0.45 * narrow
-                aligned = ov_x >= 0.45 * narrow or ov_y >= 0.5
+                # Hubungan vertikal menentukan cara tanda menempel:
+                # (a) MELAYANG di atas/bawah badan (ada celah vertikal) — titik i/j,
+                #     ulu, surang, cecek: pusat horizontal tanda harus berada dalam
+                #     rentang badan, sehingga titik "i" tidak jatuh ke huruf sebelah
+                #     (dulu "li" terbaca "r" + "i tanpa titik" setelah deskew).
+                # (b) BERDAMPINGAN (tumpang tindih vertikal) — goresan putus dari
+                #     glyph yang sama: harus benar-benar tumpang tindih horizontal
+                #     atau hampir bersinggungan; sekadar "dekat" tidak cukup.
+                v_gap = max(0.0, max(t0, cur_top) - min(t1, cur_bot))
+                cx = 0.5 * (x0 + x1)
+                if v_gap > 0:
+                    touching = (x0 - cur_end) <= merge or ov_x >= 0.45 * narrow
+                    aligned = (cur_x0 - 1.0) <= cx <= (cur_end + 1.0)
+                else:
+                    touching = ov_x >= max(1.0, 0.3 * narrow) or (x0 - cur_end) <= 0.5 * merge
+                    aligned = ov_x >= 0.45 * narrow or ov_y >= 0.5
                 if markish and touching and aligned and union_w <= max_cluster_w and union_h <= lh * 2.2:
                     join = True
             if join:
@@ -437,10 +451,17 @@ def segment(binary: np.ndarray, *, merge_gap_ratio: float = 0.14, word_gap_ratio
                     continue           # terlalu jauh untuk jadi bagian aksara ini
                 if ov_ratio < 0.25 and gy > 0.85 * ref_h:
                     continue           # beda baris/tinggi → bukan fragmen aksara ini
-                # tumpang tindih horizontal paling meyakinkan (goresan putus);
-                # jarak vertikal TIDAK boleh menghukum titik i/j yang memang
-                # melayang di atas badannya.
-                cand.append((-2.0 * ov_ratio + gx / ref_h + 0.35 * gy / ref_h, dj))
+                # Sejajaran horizontal (covx) adalah bukti terkuat bahwa fragmen
+                # milik tetangga ini: titik i/j melayang TEPAT di atas badannya
+                # (covx≈1), sedangkan badan tinggi di sebelahnya hanya "menyentuh"
+                # fragmen secara vertikal (covx≈0) — tanpa pembeda ini titik "i"
+                # bisa jatuh ke huruf di kirinya ("li" terbaca "r"+"i tanpa titik").
+                # Jarak vertikal TIDAK menghukum titik yang memang melayang.
+                covx = ovx / max(1.0, min(ww, ow))
+                score = -2.0 * covx + gx / ref_h + 0.35 * gy / ref_h
+                if covx >= 0.6 and gy <= 0.6 * ref_h:
+                    score -= 1.0   # fragmen melayang tepat di atas/bawah badannya
+                cand.append((score, dj))
             if cand:
                 cand.sort()
                 dj = cand[0][1]
