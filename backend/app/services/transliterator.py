@@ -179,9 +179,9 @@ VOWEL_TO_PANGANGGE = {
     "ě": "ᭂ",  # pepet (e pepet)
     "ê": "ᭂ",  # pepet (e pepet)
     "ai": "ᬿ",
-    "o": "ᭀ",  # will be handled as taleng+tedong combination
-    "au": "ᭁ",
-    "ā": "ᭀ",  # tedong
+    "o": "ᭀ",  # taling tedung
+    "au": "ᭁ",  # taling detya tedung
+    "ā": "ᬵ",  # tedung (a panjang) — BUKAN taling tedung (o)
 }
 
 # Pangangge Tengenan (final consonants)
@@ -561,53 +561,113 @@ def transliterate_word_wrapper(word: str):
 #    aksara dasar DIKUTI tanda) ────────────────────────────────────────────
 BALI_VOWEL_MARKS = {
     "ᬶ": "i",        # ulu
-    "ᬷ": "ī",        # ulu melik
+    "ᬷ": "ī",        # ulu sari (ulu melik)
     "ᬸ": "u",        # suku
     "ᬹ": "ū",        # suku ilut
     "ᬾ": "e",      # taleng
-    "ᬿ": "ai",    # taling detya
+    "ᬿ": "ai",    # taling repa (detya)
     "ᬵ": "ā",       # tedung
-    "ᭀ": "o",   # taling tedung (e+o precomposed)
-    "ᭁ": "au",  # taling detya tedung (ai+o precomposed)
+    "ᭀ": "o",   # taling tedung
+    "ᭁ": "au",  # taling repa tedung
     "ᭂ": "ě",       # pepet
-    "ᬺ": "rě",     # guwung macelek
+    "ᭃ": "ě",       # pepet tedung
+    "ᬺ": "rě",     # ra repa (guwung macelek)
+    "ᬻ": "rě",     # ra repa tedung
+    "ᬼ": "lě",     # la lenga
+    "ᬽ": "lě",     # la lenga mudra
 }
 
 # Aksara suara yang bisa diikuti tanda length -> vokal panjang/diftong
 _SUARA_LENGTH = {
     "ᬅ": "ā",   # akara + tedung
-    "ᬇ": "ī",   # ikara + ulu melik
+    "ᬇ": "ī",   # ikara + ulu sari
     "ᬉ": "ū",   # ukara + suku ilut
     "ᬐ": "au",  # aikara + tedung
 }
 
-_HA_CHAR = "ᬳ"  # ha — berfungsi ganda: konsonan "h" & vokal tunggal "a"
+# Vokal panjang yang sudah tersedia sebagai SATU huruf (bentuk precomposed).
+# Bentuk urai (akara + tedung, dst.) tetap dikenali lewat _SUARA_LENGTH.
+_SUARA_PRECOMPOSED = {
+    "ᬆ": "ā",   # akara tedung
+    "ᬈ": "ī",   # ikara tedung
+    "ᬊ": "ū",   # ukara tedung
+    "ᬌ": "ṝ",   # ra repa tedung
+    "ᬎ": "ḹ",   # la lenga tedung
+    "ᬒ": "au",  # okara tedung
+}
 
-_PUNCT_KEEP = set("  ,,.;:!?()")
+# Tanda nasal (anusvara) — mis. "ᬑᬁ" (Om / Ongkara).
+_NASAL_SIGNS = {"ଁ": "m", "ᬁ": "m"}   # ulu ricem, ulu candra
+
+_HA_CHAR = "ᬳ"  # ha — konsonan /h/ + vokal inheren /a/
+
+_BALI_RE = re.compile(r"([^\u1B00-\u1B7F ]+)")
+
+_REV_CACHE: Dict[str, object] = {"stamp": None, "map": {}}
 
 
-@lru_cache(maxsize=2000)
-def transliterate_bali_to_latin(text: str) -> Tuple[str, List[Dict], List[str]]:
-    """Bali to Latin — parser urutan Unicode standar.
+def _dictionary_stamp() -> float:
+    try:
+        return (DATA_DIR / "dictionary.json").stat().st_mtime
+    except OSError:  # pragma: no cover - berkas hilang
+        return 0.0
+
+
+def reverse_dictionary() -> Dict[str, str]:
+    """Kamus balik: bentuk Aksara (NFC) -> kata Latin, dari ``dictionary.json``.
+
+    Kata khusus dieja mengikuti tradisi, bukan huruf-per-huruf: "ᬤᬃᬫ" adalah
+    *dharma* (bukan "darma"), "ᬩᬼᬕᬜ᭄ᬚᬸᬃ" adalah *bleganjur* (bukan
+    "baleganyjur"), "ᬑᬁ ᬲ᭄ᬯᬲ᭄ᬢ᭄ᬬᬲ᭄ᬢᬸ" adalah *om swastyastu*.
+    Cache di-invalidate lewat mtime sehingga suntingan kamus di Panel Guru
+    langsung berlaku tanpa restart.
+    """
+    stamp = _dictionary_stamp()
+    cached = _REV_CACHE["map"]
+    if _REV_CACHE["stamp"] == stamp and isinstance(cached, dict) and cached:
+        return cached  # type: ignore[return-value]
+    items: Dict[str, object] = dict(DICTIONARY)
+    try:
+        from .data_store import get_dictionary
+
+        live = get_dictionary()
+        if isinstance(live, dict):
+            items.update(live)
+    except Exception:  # pragma: no cover - store opsional
+        pass
+    out: Dict[str, str] = {}
+    for latin, entry in items.items():
+        bali = entry.get("bali") if isinstance(entry, dict) else None
+        if not isinstance(bali, str) or not bali.strip():
+            continue
+        key = unicodedata.normalize("NFC", bali).strip()
+        out.setdefault(key, str(latin).strip())
+    _REV_CACHE["stamp"] = stamp
+    _REV_CACHE["map"] = out
+    return out
+
+
+@lru_cache(maxsize=4096)
+def _parse_bali_word(text: str) -> Tuple[str, List[Dict], List[str]]:
+    """Parser SATU kata Aksara Bali (tanpa spasi/tanda baca) -> Latin.
 
     Aturan (mengikuti Pedoman Aksara Bali & romanisasi LOC):
-    * Aksara dasar dibaca dengan vokal inheren "a", diubah tanda
-      pangangge suara di belakangnya (ulu=i, suku=u, taleng=e,
-      taling tedung=o, taling detya=ai, taling detya tedung=au,
-      tedung=ā, pepet=ě, ulu melik=ī, suku ilut=ū, guwung macelek=rě).
-      Bentuk terpisah taleng+tedung (=o) dan taling detya+tedung (=au)
-      tetap dikenali.
-    * Adeg-adeg mematikan vokal -> konsonan menjadi cluster (gantungan);
-      vokal penutup cluster datang dari aksara berikutnya.
-    * Tengenan (bisah=h, surang=r, cecek=ng) menambah koda pada suku kata.
-    * Aksara suara independen (akara/ikara/ukara/ekara/aikara/okara)
-      dibaca a/i/u/e/ai/o; + tanda length di belakang = vokal panjang.
+    * Aksara dasar dibaca dengan vokal inheren "a", diubah tanda pangangge suara
+      di belakangnya (ulu=i, suku=u, taleng=e, taling tedung=o, taling repa=ai,
+      taling repa tedung=au, tedung=ā, pepet=ě, ulu sari=ī, suku ilut=ū,
+      ra repa=rě, la lenga=lě). Bentuk terpisah taleng+tedung (=o) dan
+      taling repa+tedung (=au) tetap dikenali.
+    * Adeg-adeg mematikan vokal -> konsonan menjadi cluster (gantungan); vokal
+      penutup cluster datang dari aksara berikutnya.
+    * Tengenan (bisah=h, surang=r, cecek=ng) menambah koda pada suku kata —
+      juga setelah aksara suara ("ᬅᬂ" = ang, "ᬐᬃ" = air, "ᬑᬁ" = om).
+    * ᬳ (ha) dibaca "ha"; bila dimatikan adeg-adeg ia menjadi konsonan "h"
+      ("ᬳ᭄ᬕ" = hga). Data proyek memakai bacaan ini (hanacaraka, hujan).
     """
-    text = unicodedata.normalize("NFC", text)
     warnings: List[str] = []
     breakdown: List[Dict] = []
     result_parts: List[str] = []
-    cluster: List[str] = []  # konsonan cluster menunggu vokal penutup
+    cluster: List[str] = []       # konsonan cluster menunggu vokal penutup
     cluster_bali: List[str] = []
     i = 0
     n = len(text)
@@ -631,20 +691,12 @@ def transliterate_bali_to_latin(text: str) -> Tuple[str, List[Dict], List[str]]:
     while i < n:
         ch = text[i]
 
-        # Spasi & tanda baca: batasi cluster, simpan apa adanya.
-        if ch in _PUNCT_KEEP:
+        # 1) Aksara suara independen (pendek, panjang, dan precomposed).
+        if ch in SUARA_BALI_TO_LATIN or ch in _SUARA_PRECOMPOSED:
             flush_cluster()
-            result_parts.append(" " if ch == " " else ch)
-            i += 1
-            continue
-
-        # 1) Aksara suara independen.
-        if ch in SUARA_BALI_TO_LATIN:
-            flush_cluster()
-            reading = SUARA_BALI_TO_LATIN[ch]
+            reading = _SUARA_PRECOMPOSED.get(ch) or SUARA_BALI_TO_LATIN[ch]
+            src = ch
             j = i + 1
-            # vokal panjang/diftong: akara+tedung, ikara+ulu melik,
-            # ukara+suku ilut, aikara+tedung (=au)
             length_mark = None
             if ch == "ᬅ" and j < n and text[j] == "ᬵ":
                 length_mark = "ᬵ"
@@ -656,24 +708,26 @@ def transliterate_bali_to_latin(text: str) -> Tuple[str, List[Dict], List[str]]:
                 length_mark = "ᬵ"
             if length_mark is not None:
                 reading = _SUARA_LENGTH[ch]
-                result_parts.append(reading)
-                breakdown.append({
-                    "bali": ch + length_mark, "latin": reading,
-                    "type": "suara", "description": "Aksara Suara %s (panjang)" % reading,
-                })
-                i = j + 1
-                continue
+                src += length_mark
+                j += 1
+            desc = "Aksara Suara %s" % reading
+            # tanda nasal (ulu candra/ricem) & tengenan yang menempel pada aksara
+            # suara — dulu hilang sehingga "ᬅᬂ" terbaca "a" dan "ᬑᬁ" jadi "oᬁ".
+            while j < n and (text[j] in _NASAL_SIGNS or text[j] in BALI_TENGENAN_TO_LATIN):
+                mk = text[j]
+                add = _NASAL_SIGNS.get(mk) or BALI_TENGENAN_TO_LATIN[mk]
+                reading += add
+                src += mk
+                j += 1
+                desc = "Aksara Suara %s + %s" % (reading, add)
             # adeg setelah aksara suara -> vokal jadi koda cluster (mis. okara+adeg = "om")
             if j < n and text[j] == "᭄":
                 cluster.append(reading)
-                cluster_bali.append(ch + "᭄")
+                cluster_bali.append(src + "᭄")
                 i = j + 1
                 continue
             result_parts.append(reading)
-            breakdown.append({
-                "bali": ch, "latin": reading,
-                "type": "suara", "description": "Aksara Suara %s" % reading,
-            })
+            breakdown.append({"bali": src, "latin": reading, "type": "suara", "description": desc})
             i = j
             continue
 
@@ -684,7 +738,7 @@ def transliterate_bali_to_latin(text: str) -> Tuple[str, List[Dict], List[str]]:
             j = i + 1
             vowel = "a"
             marks = ""
-            # Kumpulkan tanda vokal (maks. 2: taleng+tedung / taling detya+tedung).
+            # Kumpulkan tanda vokal (maks. 2: taleng+tedung / taling repa+tedung).
             while j < n and text[j] in BALI_VOWEL_MARKS:
                 mk = text[j]
                 if mk == "ᬾ" and j + 1 < n and text[j + 1] == "ᭀ":
@@ -718,21 +772,15 @@ def transliterate_bali_to_latin(text: str) -> Tuple[str, List[Dict], List[str]]:
                 cluster_bali.append(ch + marks)
             else:
                 bali_syl = "".join(cluster_bali) + ch + marks + teng_marks
-                if ch == _HA_CHAR:
-                    # ha (ᬳ) dibaca sebagai vokal tunggal "a" (standar LOC &
-                    # romanisasi umum); bila diikuti tanda vokal, tanda itu
-                    # dibaca langsung (h-nya tidak diucapkan).
-                    syl = "".join(cluster) + vowel + teng
-                    desc_bits = ["ha sebagai vokal %s" % vowel]
-                else:
-                    syl = "".join(cluster) + cons + vowel + teng
-                    desc_bits = [("%s (a inheren)" % cons) if not marks else ("%s + %s" % (cons, marks))]
+                syl = "".join(cluster) + cons + vowel + teng
+                desc_bits = [("%s (a inheren)" % cons) if not marks else ("%s + %s" % (cons, marks))]
                 if teng:
                     desc_bits.append("+ %s" % teng)
                 breakdown.append({
                     "bali": bali_syl,
                     "latin": syl,
-                    "type": "wresastra+gantungan" if cluster_bali else ("wresastra+pangangge" if (marks or teng_marks) else "wresastra"),
+                    "type": "wresastra+gantungan" if cluster_bali else (
+                        "wresastra+pangangge" if (marks or teng_marks) else "wresastra"),
                     "description": " ".join(desc_bits) + " = %s" % syl,
                 })
                 result_parts.append(syl)
@@ -748,7 +796,7 @@ def transliterate_bali_to_latin(text: str) -> Tuple[str, List[Dict], List[str]]:
             continue
 
         # 4) Tanda vokal mengambang (tanpa dasar).
-        if ch in BALI_VOWEL_MARKS:
+        if ch in BALI_VOWEL_MARKS or ch in _NASAL_SIGNS:
             warnings.append("Tanda pangangge tanpa aksara dasar (posisi %d)" % i)
             i += 1
             continue
@@ -759,6 +807,60 @@ def transliterate_bali_to_latin(text: str) -> Tuple[str, List[Dict], List[str]]:
 
     flush_cluster()
     return "".join(result_parts), breakdown, warnings
+
+
+def transliterate_bali_to_latin(text: str) -> Tuple[str, List[Dict], List[str]]:
+    """Bali -> Latin: kamus balik per frasa/kata, lalu parser aturan per kata.
+
+    Teks dipecah menjadi frasa Aksara (blok karakter Bali + spasi) dan tanda
+    pemisah lain (tanda baca, baris baru, angka) dilewatkan apa adanya. Tiap
+    frasa/kata dicocokkan dulu ke kamus balik ``dictionary.json`` sehingga kata
+    khusus terbaca seperti dieja guru, bukan hasil aturan huruf-per-huruf.
+    """
+    text = unicodedata.normalize("NFC", text or "")
+    rev = reverse_dictionary()
+    out: List[str] = []
+    breakdown: List[Dict] = []
+    warnings: List[str] = []
+
+    def emit_phrase(phrase: str) -> None:
+        key = phrase.strip()
+        if not key:
+            return
+        hit = rev.get(key)
+        if hit:
+            out.append(hit)
+            breakdown.append({"bali": key, "latin": hit, "type": "dictionary",
+                              "description": "Kata khusus (kamus)"})
+            return
+        for wi, word in enumerate(key.split(" ")):
+            if not word:
+                continue
+            if wi:
+                out.append(" ")
+            wkey = unicodedata.normalize("NFC", word)
+            wht = rev.get(wkey)
+            if wht:
+                out.append(wht)
+                breakdown.append({"bali": wkey, "latin": wht, "type": "dictionary",
+                                  "description": "Kata khusus (kamus)"})
+                continue
+            lat, bd, wn = _parse_bali_word(wkey)
+            out.append(lat)
+            breakdown.extend(bd)
+            warnings.extend(wn)
+
+    for part in _BALI_RE.split(text):
+        if not part:
+            continue
+        if 0x1B00 <= ord(part[0]) <= 0x1B7F or part[0] == " ":
+            if part.strip():
+                emit_phrase(part if (0x1B00 <= ord(part[0]) <= 0x1B7F) else part.strip())
+            elif part:
+                out.append(part)      # spasi antar frasa dipertahankan
+        else:
+            out.append(part)          # tanda baca / angka / teks lain apa adanya
+    return "".join(out), breakdown, warnings
 
 
 def transliterate(text: str, direction: str = "latin-to-bali", use_dictionary: bool = True):
