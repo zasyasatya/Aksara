@@ -58,6 +58,7 @@ class ScanOptions:
     split_marks: bool = True
     top_k: int = 5
     split_width_ratio: float = 1.25   # gugus selebar ini × tinggi baris dicoba dibelah
+    split_valley_ratio: float = 0.8   # kedalaman lembah kolom (× median) untuk membelah
     resplit_below: float = 0.62       # keyakinan gugus utuh di bawah ini → pakai belahan
     with_crops: bool = False          # sertakan PNG kecil tiap aksara (inspector)
     upscale_small: bool = True        # teks kecil diperbesar dulu (ketebalan goresan)
@@ -71,7 +72,8 @@ class ScanOptions:
         "tta": (0, 12), "beam_width": (1, 64), "sauvola_window": (8, 200), "sauvola_k": (0.0, 1.0),
         "min_area": (0, 500), "min_height": (2, 60), "close_iters": (0, 4), "merge_gap_ratio": (0.0, 1.0),
         "word_gap_ratio": (0.1, 2.0), "max_glyphs": (4, 2000), "top_k": (1, 10),
-        "split_width_ratio": (0.8, 4.0), "resplit_below": (0.0, 1.0), "target_line_height": (12, 200),
+        "split_width_ratio": (0.8, 4.0), "split_valley_ratio": (0.05, 0.6),
+        "resplit_below": (0.0, 1.0), "target_line_height": (12, 200),
         "script_margin": (0.0, 2.0), "line_min_ink": (0.0, 0.2), "max_side": (200, 4000),
     }
     _CHOICES = {"script": ("auto", "aksara", "latin"), "binarize": ("sauvola", "otsu", "fixed"),
@@ -131,16 +133,30 @@ def mark_labels(task: str = "aksara") -> set:
 def preprocess(data: bytes, opts: ScanOptions) -> Tuple[np.ndarray, np.ndarray, Dict]:
     """bytes → (biner 1=tinta, grayscale, info diagnostik)."""
     gray = imageops.decode_gray(data, max_side=int(opts.max_side))
+    # σ derau diukur SEKALI pada skala asli: rotasi & terutama pembesaran
+    # (``upscale_small``) menghaluskan derau sehingga estimasi ulang secara keliru
+    # mematikan peredam derau dan latar kembali penuh tinta palsu.
+    sigma = imageops.estimate_noise(imageops.stretch_contrast(gray))
+    if sigma >= 2.4:
+        info_noise: Dict[str, float] = {"noise_sigma": round(float(sigma), 2)}
+    else:
+        info_noise = {}
     binary = imageops.binarize(gray, opts.binarize, window=int(opts.sauvola_window),
-                              k=float(opts.sauvola_k), invert=opts.invert)
-    info = {"size": [int(gray.shape[1]), int(gray.shape[0])], "ink_ratio": round(float(binary.mean()), 4)}
+                              k=float(opts.sauvola_k), invert=opts.invert, sigma=sigma)
+    info = {"size": [int(gray.shape[1]), int(gray.shape[0])], "ink_ratio": round(float(binary.mean()), 4),
+            **info_noise}
     if opts.deskew and binary.shape[0] > 24:
         angle = imageops.estimate_skew(binary, max_angle=7.0, step=0.5)
         info["deskew_angle"] = round(float(angle), 2)
-        if abs(angle) >= 0.5:
-            gray = imageops.rotate(gray, angle, fill=255.0)
+        # Kecil dari 1° tidak berarti bagi OCR, tetapi rotasinya meninggalkan wedge
+        # lancip di sudut — batas tajam itu dilukis Sauvola sebagai pita tinta padat
+        # (→ baris "teks" sampah). Wedge diisi abu latar median, bukan putih, supaya
+        # tidak ada tepi kontras sama sekali.
+        if abs(angle) >= 1.0:
+            border = np.concatenate([gray[0, :], gray[-1, :], gray[:, 0], gray[:, -1]])
+            gray = imageops.rotate(gray, angle, fill=float(np.median(border)))
             binary = imageops.binarize(gray, opts.binarize, window=int(opts.sauvola_window),
-                                      k=float(opts.sauvola_k), invert=opts.invert)
+                                      k=float(opts.sauvola_k), invert=opts.invert, sigma=sigma)
             info["ink_ratio_after"] = round(float(binary.mean()), 4)
     # Tulisan kecil → goresan 1-2 px, model (yang dilatih pada glyph ~20 px) kehilangan
     # detail. Bila tinggi baris median di bawah target, perbesar dulu seluruh kanvas.
@@ -154,7 +170,7 @@ def preprocess(data: bytes, opts: ScanOptions) -> Tuple[np.ndarray, np.ndarray, 
             info["upscale"] = round(factor, 2)
             gray = imageops.scale(gray, factor)
             binary = imageops.binarize(gray, opts.binarize, window=max(9, int(opts.sauvola_window * factor)),
-                                      k=float(opts.sauvola_k), invert=opts.invert)
+                                      k=float(opts.sauvola_k), invert=opts.invert, sigma=sigma)
             info["ink_ratio_up"] = round(float(binary.mean()), 4)
     return binary, gray, info
 
@@ -214,9 +230,23 @@ def gloss_latin(text: str) -> List[Dict]:
 
 # ── utama ─────────────────────────────────────────────────────────────────
 
-def scan_bytes(data: bytes, options: Optional[dict] = None, model_ids: Optional[Dict[str, str]] = None) -> Dict:
+def scan_bytes(data: bytes, options: Optional[dict] = None, model_ids: Optional[Dict[str, str]] = None,
+               raw_options: Optional[dict] = None) -> Dict:
     t0 = time.time()
     opts = ScanOptions.from_dict(options)
+    # Huruf Latin (cetak maupun tulis) tidak punya goresan putus seperti aksara
+    # tarikan tangan; morfologi penutup justru melebur huruf yang bersebelahan rapat
+    # ("om" → satu gugus) pada teks kamera berukuran kecil. Matikan bawaannya untuk
+    # mode latin — override eksplisit dari klien tetap dihormati. Begitu pula ambang
+    # pakai-belahan: gugus Latin yang melebur buram jarang meyakinkan, jadi belahan
+    # dipakai lebih agresif (0,9); untuk Aksara 0,62 tetap terbaik (belahan sembarang
+    # memecah aksara berangkai dan justru menaikkan CER — diuji lewat selftest).
+    raw = raw_options if raw_options is not None else (options or {})
+    if opts.script == "latin":
+        if "close_iters" not in (raw or {}):
+            opts.close_iters = 0
+        if "resplit_below" not in (raw or {}):
+            opts.resplit_below = 0.9
     model_ids = dict(model_ids or {})
     warnings: List[str] = []
 
@@ -226,7 +256,7 @@ def scan_bytes(data: bytes, options: Optional[dict] = None, model_ids: Optional[
         binary, merge_gap_ratio=float(opts.merge_gap_ratio), word_gap_ratio=float(opts.word_gap_ratio),
         min_height=int(opts.min_height), min_area=int(opts.min_area), close_iters=int(opts.close_iters),
         split_marks=bool(opts.split_marks), split_width_ratio=float(opts.split_width_ratio),
-        min_ink=float(opts.line_min_ink),
+        min_ink=float(opts.line_min_ink), split_valley_ratio=float(opts.split_valley_ratio),
     )
     if not lines_seg:
         return {
@@ -525,6 +555,22 @@ def scan_bytes(data: bytes, options: Optional[dict] = None, model_ids: Optional[
             results.append(best[0])
 
     results = [r for r in results if r.get("text")]
+
+    # Singkirkan "baris sampah bingkai" — sisa bayangan/bingkai foto di tepi gambar
+    # yang lolos ke hasil sebagai 1–6 gugus mungil tanpa kata bermakna. SEMUA syarat
+    # harus terpenuhi sekaligus (tepi bingkai + sangat pendek + rendah + tanpa kata
+    # kamus + keyakinan rendah) supaya baris teks asli tidak pernah tersapu.
+    def _garis_sampah_bingkai(r: Dict) -> bool:
+        y0, y1 = r["y"]
+        boxes = [g["box"] for g in r["glyphs"]] if r.get("glyphs") else []
+        tepi = y0 <= 4 or (binary is not None and y1 >= binary.shape[0] - 4) or \
+            any((b[0] <= 3 or (binary is not None and b[2] >= binary.shape[1] - 3)) for b in boxes)
+        pendek = r["height"] <= 12 and len(r["glyphs"]) <= 6
+        rendah = r["confidence"] <= 0.75
+        hits = r.get("script_evidence", {}).get("hits", 0)
+        return bool(tepi and pendek and rendah and hits == 0)
+
+    results = [r for r in results if not _garis_sampah_bingkai(r)]
     aksara_text = "\n".join(r["text"] for r in results if r["script"] == "aksara")
     latin_text = "\n".join(r["text"] for r in results if r["script"] == "latin")
     detected = "aksara" if (aksara_text and len(aksara_text) >= len(latin_text)) else (

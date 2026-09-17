@@ -16,7 +16,7 @@ import io
 from typing import List, Optional, Tuple
 
 import numpy as np
-from PIL import Image, ImageOps
+from PIL import Image, ImageFilter, ImageOps
 
 MAX_SIDE = 1400
 
@@ -90,12 +90,9 @@ def _integral(arr: np.ndarray) -> np.ndarray:
     return out
 
 
-def sauvola(gray: np.ndarray, window: int = 25, k: float = 0.12, R: float = 128.0) -> np.ndarray:
-    """Binerisasi adaptif Sauvola — O(N) lewat integral image, tahan cahaya miring.
-
-    Ambang lokal ``t = mean · (1 + k · (std/R − 1))``: di daerah bertekstur (std besar)
-    ambang turun sehingga goresan tipis pada daun lontar tetap terjaga.
-    """
+def sauvola_threshold(gray: np.ndarray, window: int = 25, k: float = 0.12,
+                      R: float = 128.0) -> Tuple[np.ndarray, np.ndarray]:
+    """Ambang Sauvola per piksel + rerata lokal (dipakai juga jalur noise-aware)."""
     h, w = gray.shape
     half = max(3, int(window) // 2)
     pad = np.pad(gray, half, mode="reflect")
@@ -111,15 +108,62 @@ def sauvola(gray: np.ndarray, window: int = 25, k: float = 0.12, R: float = 128.
     mean = box(ii) / size
     var = np.maximum(box(jj) / size - mean * mean, 0.0)
     thr = mean * (1.0 + k * (np.sqrt(var) / R - 1.0))
+    return thr, mean
+
+
+def sauvola(gray: np.ndarray, window: int = 25, k: float = 0.12, R: float = 128.0) -> np.ndarray:
+    """Binerisasi adaptif Sauvola — O(N) lewat integral image, tahan cahaya miring.
+
+    Ambang lokal ``t = mean · (1 + k · (std/R − 1))``: di daerah bertekstur (std besar)
+    ambang turun sehingga goresan tipis pada daun lontar tetap terjaga.
+    """
+    thr, _mean = sauvola_threshold(gray, window=window, k=k, R=R)
     return (gray < thr).astype(np.uint8)
 
 
+def smooth(gray: np.ndarray, sigma: float = 0.8) -> np.ndarray:
+    """Gaussian ringan (PIL) — menekan derau sensor/JPEG tanpa menghapus goresan."""
+    im = Image.fromarray(np.clip(gray, 0, 255).astype(np.uint8))
+    return np.asarray(im.filter(ImageFilter.GaussianBlur(float(sigma))), dtype=np.float32)
+
+
+def estimate_noise(gray: np.ndarray) -> float:
+    """Estimasi σ derau kamera — median residual terhadap blur 3×3 (robust).
+
+    Area latar (mayoritas piksel) menentukan estimasi, sehingga tepi goresan yang
+    kontras tinggi tidak ikut menaikkan angkanya.
+    """
+    if gray.size < 64:
+        return 0.0
+    res = np.abs(gray - smooth(gray, 0.8))
+    return float(np.median(res)) / 0.693
+
+
+def _dilate1(mask: np.ndarray) -> np.ndarray:
+    """Dilatasi 8-tetangga satu iterasi (NumPy murni)."""
+    p = np.pad(mask.astype(bool), 1)
+    return (p[:-2, 1:-1] | p[2:, 1:-1] | p[1:-1, :-2] | p[1:-1, 2:]
+            | p[:-2, :-2] | p[:-2, 2:] | p[2:, :-2] | p[2:, 2:])
+
+
 def binarize(gray: np.ndarray, mode: str = "sauvola", window: int = 25, k: float = 0.12,
-             invert: str = "auto") -> np.ndarray:
+             invert: str = "auto", denoise: str = "auto", sigma: Optional[float] = None) -> np.ndarray:
     """Citra biner ``uint8`` dengan 1 = tinta.
 
     ``invert``: ``auto`` (deteksi dari pinggir), ``dark-ink`` (tinta gelap di latar
     terang), ``light-ink`` (kebalikannya — mis. aksara putih pada batu gelap).
+
+    ``denoise``: ``auto`` menambahkan peredam derau adaptif pada mode Sauvola bila
+    σ derau estimasi ≥ 2,4 (foto kamera gelap/noisy). Caranya: citra dilembutkan
+    ringan, lalu tinta *kuat* dibatasi pada piksel yang berada ``margin ≈ 2,6σ`` di
+    bawah rerata lokal — bintik derau di latar rata tidak lagi ikut menjadi tinta —
+    sementara piksel tepi goresan yang lolos ambang Sauvola dan menempel pada tinta
+    kuat tetap dipulihkan. Citra bersih (render/tangkapan layar) tidak berubah
+    perilakunya sama sekali.
+
+    ``sigma``: σ derau yang sudah diestimasi pemanggil (dalam skala abu pasca-stretch).
+    Penting saat citra diperbesar: interpolasi menurunkan σ terukur sehingga estimasi
+    ulang bisa salah mematikan peredam derau; pemanggil meneruskan σ dari skala asli.
     """
     g = stretch_contrast(gray)
     if mode == "otsu":
@@ -127,7 +171,24 @@ def binarize(gray: np.ndarray, mode: str = "sauvola", window: int = 25, k: float
     elif mode == "fixed":
         binary = (g < 128).astype(np.uint8)
     else:
-        binary = sauvola(g, window=window, k=k)
+        if denoise == "off":
+            sigma = 0.0
+        elif sigma is None:
+            sigma = estimate_noise(g)
+        if sigma >= 2.4:
+            # Benih tinta kuat dinilai pada citra yang dilembutkan ringan (0,75px — cukup
+            # menekan derau, TIDAK melebur huruf yang berjarak sempit seperti blur besar);
+            # pertumbuhan memakai ambang Sauvola pada citra ASLI sehingga tepi goresan
+            # tetap tajam dan huruf tetangga tidak menyatu. (Blur adaptif-σ sudah dicoba:
+            # justru melelehkan huruf kecil → CER naik; 0,75 tetap terukur paling baik.)
+            soft = smooth(g, sigma=0.75)
+            _thr_soft, mean_soft = sauvola_threshold(soft, window=window, k=k)
+            margin = float(np.clip(2.6 * sigma, 3.0, 30.0))
+            strong = soft < (mean_soft - margin)
+            thr_grow, _mean_grow = sauvola_threshold(g, window=window, k=k)
+            binary = (strong | ((g < thr_grow) & _dilate1(strong))).astype(np.uint8)
+        else:
+            binary = sauvola(g, window=window, k=k)
     if invert == "auto":
         border = np.concatenate([binary[0, :], binary[-1, :], binary[:, 0], binary[:, -1]])
         if border.mean() > 0.5:

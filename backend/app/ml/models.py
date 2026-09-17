@@ -186,6 +186,8 @@ def coerce_hyperparams(arch: str, given: Optional[Dict]) -> Dict:
         raise ValueError(f"Arsitektur tidak dikenal: {arch}")
     out = default_hyperparams(arch)
     given = given or {}
+    if given.get("task"):  # string non-numerik; menata derajat augmentasi per jenis aksara
+        out["task"] = str(given["task"])
     for h in spec["hyperparams"]:
         if h["key"] not in given or given[h["key"]] is None:
             continue
@@ -918,6 +920,7 @@ class DeepCNNModel(BaseModel):
         opt = Adam([self.params[k] for k in keys], lr=lr0, weight_decay=float(self.hp["weight_decay"]))
         epochs, bs = int(self.hp["epochs"]), int(self.hp["batch_size"])
         strength = float(self.hp["augment"])
+        aug_task = str(self.hp.get("task", "latin"))
         eps = float(self.hp["label_smoothing"])
         clip = float(self.hp["grad_clip"])
         balance = float(self.hp.get("class_balance", 0.5))
@@ -931,7 +934,7 @@ class DeepCNNModel(BaseModel):
                 idx = order[pos]
                 xb_raw, yb_idx = X[idx], y[idx]
                 if strength > 0:
-                    xb_raw = augment_mod.augment_batch(xb_raw, yb_idx, rng, strength)[0]
+                    xb_raw = augment_mod.augment_batch(xb_raw, yb_idx, rng, strength, task=aug_task)[0]
                 Y = one_hot(yb_idx, self.n_classes)
                 if eps > 0:
                     Y = Y * (1.0 - eps) + eps / self.n_classes
@@ -972,7 +975,8 @@ class DeepCNNModel(BaseModel):
             g = rng or np.random.default_rng(7)
             acc = p.copy()
             for _ in range(int(tta)):
-                xp = augment_mod.augment_batch(X, np.zeros(len(X), dtype=np.int64), g, 0.6)[0]
+                xp = augment_mod.augment_batch(X, np.zeros(len(X), dtype=np.int64), g, 0.6,
+                                               task=str(self.hp.get("task", "latin")))[0]
                 xs = self._scale(xp)
                 parts = [self._forward(xs[s:s + 256], False)[0] for s in range(0, len(xs), 256)]
                 acc = acc + np.concatenate(parts, axis=0)

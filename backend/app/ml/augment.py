@@ -29,11 +29,18 @@ def _to_mask(img: Image.Image) -> np.ndarray:
 
 
 def augment_one(ink01: np.ndarray, rng: np.random.Generator, strength: float = 1.0,
-                max_side: int = FEATURE_SIZE) -> np.ndarray:
+                max_side: int = FEATURE_SIZE, task: str = "latin") -> np.ndarray:
     """Satu maska (H×W, 1=tinta) → maska teraugmentasi ukuran sama.
 
     ``strength`` 0 = identitas, 1 = penuh (dipakai saat training), >1 = agresif.
+
+    ``task`` menata derajat distorsi: aksara Bali berstruktur multi-bagian tipis
+    (gantungan/aksara suara) yang rusak oleh blur & derau kuat — diuji empiris model
+    aksara jeblok 94→86% bila dipaksa konfigurasi latin — sehingga aksara memakai
+    versi lebih ringan, sedangkan latin (huruf tegas beruji pada kamera buram nyata)
+    memakai versi kuat.
     """
+    heavy = task != "aksara"
     strength = float(max(0.0, min(2.0, strength)))
     if strength <= 0:
         return ink01.astype(np.float32, copy=True)
@@ -65,7 +72,14 @@ def augment_one(ink01: np.ndarray, rng: np.random.Generator, strength: float = 1
         img = img.filter(ImageFilter.MinFilter(3))        # pena tebal (dilasi tinta)
     elif r < 0.45 * strength:
         img = img.filter(ImageFilter.MaxFilter(3))        # pena tipis (erosi tinta)
-    if rng.random() < 0.55:
+    # Blur fokus kamera. Untuk latin, rentang atas diperlebar (≈1,5px pada kanvas
+    # 28×28) karena bidikan Lens nyata sering setara blur page 1,1–1,5px pada huruf
+    # 25–40px; tanpa contoh seburam itu model mengacaukan pasangan mirip (e→k, u→m,
+    # i→l). Aksara dipertahankan ringan — goresan tipisnya mudah musnah.
+    if heavy:
+        if rng.random() < 0.60:
+            img = img.filter(ImageFilter.GaussianBlur(radius=float(rng.uniform(0.1, 1.25)) * strength))
+    elif rng.random() < 0.40 * strength:
         img = img.filter(ImageFilter.GaussianBlur(radius=float(rng.uniform(0.1, 0.9)) * strength))
 
     out = _to_mask(img)
@@ -73,14 +87,19 @@ def augment_one(ink01: np.ndarray, rng: np.random.Generator, strength: float = 1
         h, w = out.shape
         y = int(rng.integers(0, h))
         out[max(0, y - 1):y + 2, :] *= 0.2
-    if rng.random() < 0.30 * strength:                     # noise sensor kamera
+    if rng.random() < 0.30 * strength:                     # bintik noise kamera
         noise = rng.random(out.shape).astype(np.float32)
         out = np.where(noise > 0.994, 1.0, out)
+    if heavy and rng.random() < 0.45 * strength:           # derau Gaussian (sensor gelap)
+        sigma_g = float(rng.uniform(0.02, 0.10)) * strength
+        out = out + rng.normal(0.0, sigma_g, out.shape).astype(np.float32)
+    if rng.random() < (0.50 if heavy else 0.35) * strength:  # tinta pudar / kontras rendah
+        out = out * float(rng.uniform(0.62, 1.12) if heavy else rng.uniform(0.78, 1.08))
     return np.clip(out, 0.0, 1.0).astype(np.float32)
 
 
 def augment_batch(X: np.ndarray, y: np.ndarray, rng: np.random.Generator,
-                  strength: float = 1.0) -> tuple[np.ndarray, np.ndarray]:
+                  strength: float = 1.0, task: str = "latin") -> tuple[np.ndarray, np.ndarray]:
     """Augmentasi sekumpulan vektor fitur ``N×784`` (baris = 28×28)."""
     if strength <= 0:
         return X, y
@@ -89,7 +108,7 @@ def augment_batch(X: np.ndarray, y: np.ndarray, rng: np.random.Generator,
     out = np.empty_like(X)
     for i in range(n):
         m = X[i].reshape(side, side)
-        out[i] = augment_one(m, rng, strength, max_side=side).reshape(-1)
+        out[i] = augment_one(m, rng, strength, max_side=side, task=task).reshape(-1)
     return out, y
 
 

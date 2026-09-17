@@ -46,6 +46,7 @@ DEFAULT_OPTIONS: Dict = {
     "top_k": 5,
     "max_glyphs": 480,
     "split_width_ratio": 1.25,
+    "split_valley_ratio": 0.8,
     "resplit_below": 0.62,
     "upscale_small": True,
     "target_line_height": 30,

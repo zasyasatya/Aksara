@@ -107,7 +107,7 @@ def _scan(body_image: str = "", data: Optional[bytes] = None, options: Optional[
     opts = ocr_config.merged_options(options)
     opts.setdefault("max_side", int(limits.get("max_side", 2400)))
     try:
-        out = pipeline.scan_bytes(data, options=opts)
+        out = pipeline.scan_bytes(data, options=opts, raw_options=options)
     except LookupError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
     except Exception as exc:  # pragma: no cover - citra rusak

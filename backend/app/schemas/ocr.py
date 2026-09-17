@@ -34,6 +34,7 @@ class ScanOptionsIn(BaseModel):
     split_marks: Optional[bool] = Field(None, description="pisahkan pangangge dari badan aksara")
     top_k: Optional[int] = Field(None, ge=1, le=10)
     split_width_ratio: Optional[float] = Field(None, ge=0.8, le=4.0)
+    split_valley_ratio: Optional[float] = Field(None, ge=0.05, le=0.6, description="kedalaman lembah kolom untuk membelah gugus")
     resplit_below: Optional[float] = Field(None, ge=0.0, le=1.0)
     with_crops: Optional[bool] = Field(None, description="sertakan PNG kecil tiap aksara (inspector)")
     upscale_small: Optional[bool] = None

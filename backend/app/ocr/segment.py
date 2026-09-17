@@ -279,7 +279,7 @@ def _split_parts(mask: np.ndarray, y_off: int, x_off: int, body_h: float) -> Lis
 
 
 def _split_columns(mask: np.ndarray, min_piece: float, max_width: float,
-                   max_extra: int = 3) -> List[Tuple[int, int, int, int]]:
+                   max_extra: int = 3, valley_ratio: float = 0.16) -> List[Tuple[int, int, int, int]]:
     """Belah gugus lebar pada lembah kolom tertipis → kandidat per aksara.
 
     Dipakai bila dua aksara/huruf menempel (atau digabung oleh ``close``). Lembah
@@ -292,7 +292,9 @@ def _split_columns(mask: np.ndarray, min_piece: float, max_width: float,
     def finish(x0: int, x1: int) -> None:
         bb = imageops.bbox_of(mask[:, x0:x1])
         if bb is not None and bb[2] - bb[0] >= 2 and bb[3] - bb[1] >= 2:
-            out.append(bb)
+            # bbox_of relatif terhadap potongan [:, x0:x1] — kembalikan ke koordinat
+            # mask (tanpa ini belahan ke-2 dst bergeser ke kiri & saling tumpang).
+            out.append((x0 + bb[0], bb[1], x0 + bb[2], bb[3]))
 
     def rec(x0: int, x1: int, depth: int) -> None:
         ww = x1 - x0
@@ -308,7 +310,7 @@ def _split_columns(mask: np.ndarray, min_piece: float, max_width: float,
                 best_v, best_i = v, i
         ink = cols[cols > 0]
         ref = float(np.median(ink)) if ink.size else 1.0
-        if (best_i < 0 or best_v > max(1.0, ref * 0.16)
+        if (best_i < 0 or best_v > max(1.0, ref * valley_ratio)
                 or (best_i + 1 - x0) < min_piece or (x1 - best_i - 1) < min_piece):
             finish(x0, x1)
             return
@@ -319,14 +321,149 @@ def _split_columns(mask: np.ndarray, min_piece: float, max_width: float,
     return out
 
 
+def _drop_lonely_specks(cleaned: np.ndarray, min_area: int) -> np.ndarray:
+    """Buang titik "kesepian" — kecil, kompak, dan tidak menempel pada huruf.
+
+    Pada foto penuh derau (terutama setelah pembesaran teks kecil) ratusan titik 2–4px
+    lolos ambang dan MENJEMBATANI baris teks (profil horizontal tak pernah nol → dua
+    baris menyatu) atau menyusup ke celah kata. Titik semacam itu kompak (padat) dan
+    jauh dari goresan besar; sebaliknya tanda baca aksara dan titik i/j — yang juga
+    kecil — selalu berhimpit dengan hurufnya, sehingga tidak ikut terbuang.
+    """
+    labels, stats = imageops.components(cleaned)
+    if not stats:
+        return cleaned
+    heights = np.array([s["h"] for s in stats], dtype=np.float32)
+    big = heights >= 8
+    if not big.any():
+        return cleaned
+    # tinggi huruf acuan: median komponen yang cukup tinggi (tahan terhadap lautan titik)
+    h_ref = float(np.median(heights[big]))
+    lim = max(4.0, 0.45 * h_ref)
+    kill = np.zeros(len(stats), dtype=bool)
+    for i, s in enumerate(stats):
+        if big[i]:
+            continue
+        hh, ww = float(s["h"]), float(s["w"])
+        if hh > lim or ww > lim:
+            continue                    # pipih/fragmen goresan — bukan titik
+        if s["area"] < 0.40 * hh * ww:  # keropos/bintang — biarkan min_area yang menilai
+            continue
+        x0, y0, x1, y1 = s["x"], s["y"], s["x"] + s["w"], s["y"] + s["h"]
+        lonely = True
+        for j, t in enumerate(stats):
+            if i == j or not big[j]:
+                continue
+            # bertetangga dengan goresan besar bila rentang-x bersinggungan (±toleransi)
+            # dan jarak vertikal dekat — titik i/j & pangangge lolos uji ini.
+            tol = 0.25 * h_ref
+            ox = min(x1, t["x"] + t["w"]) - max(x0, t["x"]) + tol
+            gy = max(0.0, max(y0, t["y"]) - min(y1, t["y"] + t["h"]))
+            if ox > 0 and gy <= 1.4 * h_ref:
+                lonely = False
+                break
+        if lonely:
+            kill[i] = True
+    if not kill.any():
+        return cleaned
+    drop = {int(stats[i]["label"]) + 1 for i in np.where(kill)[0]}
+    lut = np.zeros(int(labels.max()) + 1, dtype=bool)
+    for d in drop:
+        if d < len(lut):
+            lut[d] = True
+    out = cleaned.copy()
+    out[lut[labels]] = 0
+    return out
+
+
+def _close_is_safe(cleaned: np.ndarray, min_gap: float = 2.5) -> bool:
+    """Apakah closing 1–2 iterasi aman (tidak melebur satuan baca bersebelahan)?
+
+    Mengukur celah horizontal tipikal antar komponen yang sebaris. Bila median-nya
+    di bawah ``min_gap`` huruf-huruf sudah sempit — dilatasi 1px akan mengelembungkan
+    mereka jadi satu komponen — sehingga closing dilewati.
+    """
+    _labels, stats = imageops.components(cleaned)
+    if len(stats) < 6:
+        return True
+    gaps: List[int] = []
+    by_y = sorted(stats, key=lambda s: (s["y"], s["x"]))
+    # kelompok kasar per baris (y bertumpang tindih), lalu celah x antar komponen
+    line: List[dict] = []
+    line_bot = -1
+    for s in by_y:
+        if s["y"] > line_bot and line:
+            _collect_gaps(line, gaps)
+            line = []
+        if not line or min(s["y"] + s["h"], line_bot) - s["y"] > 0:
+            line.append(s)
+            line_bot = max(line_bot, s["y"] + s["h"])
+    if line:
+        _collect_gaps(line, gaps)
+    if len(gaps) < 3:
+        return True
+    return float(np.median(gaps)) >= min_gap
+
+
+def _collect_gaps(line: List[dict], gaps: List[int]) -> None:
+    line.sort(key=lambda s: s["x"])
+    for a, b in zip(line, line[1:]):
+        # pasangan yang bertumpang tindih vertikal (calon huruf sebaris)
+        ov = min(a["y"] + a["h"], b["y"] + b["h"]) - max(a["y"], b["y"])
+        if ov >= 0.4 * min(a["h"], b["h"]):
+            g = b["x"] - (a["x"] + a["w"])
+            if 1 <= g <= 30:
+                gaps.append(g)
+
+
+def _drop_border_frames(cleaned: np.ndarray) -> np.ndarray:
+    """Buang komponen "bingkai foto": garis/tepi bingkai & bayangan sudut yang
+    menyentuh sisi gambar dan mustahil berupa huruf.
+
+    Kandidat dibuang bila menyentuh tepi gambar DAN (a) garis tipis memanjang
+    (sliver bingkai: memanjang ≥ 25% sisi namun tebal ≤ 3–5% sisi lainnya),
+    atau (b) gumpalan besar (bayangan/vignette: luas bbox ≥ 8% gambar). Huruf asli
+    yang kebetulan tergores tepi tidak kena karena ukurannya jauh di bawah ambang.
+    """
+    labels, stats = imageops.components(cleaned)
+    if not stats:
+        return cleaned
+    H, W = cleaned.shape
+    kill = set()
+    for i, s in enumerate(stats, start=1):
+        touch = s["x"] == 0 or s["y"] == 0 or s["x"] + s["w"] >= W or s["y"] + s["h"] >= H
+        if not touch:
+            continue
+        thin_h = s["h"] >= 0.25 * H and s["w"] <= max(8, 0.03 * W)
+        thin_w = s["w"] >= 0.25 * W and s["h"] <= max(10, 0.05 * H)
+        big = (s["w"] * s["h"]) >= 0.08 * W * H
+        # Gumpalan bayangan/vignette besar: tinta ≥ ~0,7% gambar dengan sisi panjang
+        # ≥ ~12% sisi maksimum — tidak mungkin satu huruf; baris teks asli tampak
+        # sebagai BANYAK komponen kecil yang masing-masing lolos filter ini.
+        shade = s["area"] >= max(160, 0.007 * W * H) and max(s["w"], s["h"]) >= 0.12 * max(W, H)
+        if thin_h or thin_w or big or shade:
+            kill.add(i)
+    if not kill:
+        return cleaned
+    out = cleaned.copy()
+    np.place(out, np.isin(labels, list(kill)), 0)
+    return out
+
+
 def segment(binary: np.ndarray, *, merge_gap_ratio: float = 0.14, word_gap_ratio: float = 0.62,
             min_height: int = 6, min_area: int = 6, close_iters: int = 0,
             split_marks: bool = True, split_width_ratio: float = 1.25,
-            min_ink: float = 0.012) -> List[Line]:
+            min_ink: float = 0.012, split_valley_ratio: float = 0.16) -> List[Line]:
     """Citra biner → daftar :class:`Line` berisi :class:`Glyph` siap diklasifikasi."""
     h, w = binary.shape
     cleaned = imageops.remove_small(binary, min_area=min_area)
-    if close_iters:
+    cleaned = _drop_border_frames(cleaned)
+    cleaned = _drop_lonely_specks(cleaned, min_area=min_area)
+    if close_iters and _close_is_safe(cleaned):
+        # Closing isotropik menyambung goresan putus tinta tangan, TETAPI hanya bila
+        # celah antar goresan pada citra ini cukup lebar (≥ ~3px): pada teks rapat
+        # (huruf Latin kecil berjarak 1–2px) closing justru melebur huruf
+        # bersebelahan ("semeng" → "emeng") sehingga dinonaktifkan otomatis.
         cleaned = imageops.close(cleaned, close_iters)
     labels_all, stats_all = imageops.components(cleaned)
     bands = find_lines(cleaned, min_height=min_height, min_ink=min_ink)
@@ -495,7 +632,8 @@ def segment(binary: np.ndarray, *, merge_gap_ratio: float = 0.14, word_gap_ratio
             pieces: List[List[Part]] = []
             piece_wholes: List[Part] = []
             if split_marks and med_h > 4 and (bx1 - bx0) > split_width_ratio * med_h:
-                cuts = _split_columns(mask, max(3.0, med_h * 0.30), split_width_ratio * med_h)
+                cuts = _split_columns(mask, max(3.0, med_h * 0.30), split_width_ratio * med_h,
+                                      valley_ratio=split_valley_ratio)
                 if len(cuts) > 1:
                     for (px0, py0, px1, py1) in cuts:
                         sub = mask[py0:py1, px0:px1]

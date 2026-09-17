@@ -137,6 +137,7 @@ def start_training(
             raise ValueError("Masih ada job pelatihan yang berjalan. Tunggu selesai atau batalkan dulu.")
         job_id = uuid.uuid4().hex[:10]
         hp = models.coerce_hyperparams(arch, hyperparams)
+        hp["task"] = task  # augmentasi menyesuaikan jenis aksara (latin kuat, aksara ringan)
         job = {
             "id": job_id,
             "status": "queued",

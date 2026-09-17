@@ -85,6 +85,7 @@ def train_task(task: str, args) -> dict:
     print(f"\n=== tugas '{task}' === dataset {stats['labeled']} berlabel · {len(labels)} kelas · {added}")
 
     hp = {
+        "task": task,
         "epochs": args.epochs,
         "batch_size": args.batch_size,
         "learning_rate": args.lr,
@@ -149,9 +150,16 @@ def train_task(task: str, args) -> dict:
 
     model_id = f"lens-{task}-{args.arch}-{datetime.now(timezone.utc).strftime('%Y%m%d')}"
     folder = BUNDLED_DIR / task / model_id
-    folder.mkdir(parents=True, exist_ok=True)
-    model.save(folder)
-    (folder / "report.json").write_text(json.dumps(rep_all, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    # Pengaman regresi: jangan pernah menimpa model bawaan dengan model yang jauh
+    # lebih jelek (mis. training kolaps tak belajar, divergen, atau data buruk) —
+    # tersimpan hanya ke folder samping untuk dianalisis.
+    prev_acc = 0.0
+    for old in sorted(BUNDLED_DIR.glob(f"{task}/lens-*"), key=lambda p: p.stat().st_mtime, reverse=True):
+        try:
+            prev_acc = max(prev_acc, float(json.loads((old / "report.json").read_text(encoding="utf-8")).get("accuracy") or 0.0))
+        except Exception:
+            continue
     entry = {
         "id": model_id,
         "task": task,
@@ -171,13 +179,22 @@ def train_task(task: str, args) -> dict:
         "metrics": ml_metrics.summarize(rep_all) | {"train_accuracy": rep_all["train_accuracy"]},
         "bundled": True,
     }
-    (folder / "entry.json").write_text(json.dumps(entry, ensure_ascii=False, indent=2), encoding="utf-8")
-    size = sum(p.stat().st_size for p in folder.glob("*") if p.is_file())
     print(f"  akurasi test   : {rep_all['accuracy'] * 100:.2f}%  (F1 makro {rep_all['macro_f1'] * 100:.2f}%, "
           f"top-3 {rep_all['top3_accuracy'] * 100:.1f}%)")
     if rep_real:
         print(f"  AKTUAL (tangan): {rep_real['accuracy'] * 100:.2f}%  n={rep_real['n']}  "
               f"CER {rep_real['char_error_rate'] * 100:.2f}%  top-3 {rep_real['top3_accuracy'] * 100:.1f}%")
+    regressed = prev_acc > 0 and rep_all["accuracy"] + 0.03 < prev_acc
+    if regressed:
+        print(f"  !! REGRESI: akurasi baru {rep_all['accuracy'] * 100:.2f}% < bawaan {prev_acc * 100:.2f}% "
+              f"(toleransi 3 poin) — model bawaan TIDAK ditimpa dan tidak ada berkas yang ditulis.")
+        return {"model_id": model_id, "entry": entry, "report": rep_all, "real": rep_real,
+                "folder": None, "regressed": True}
+    folder.mkdir(parents=True, exist_ok=True)
+    model.save(folder)
+    (folder / "report.json").write_text(json.dumps(rep_all, ensure_ascii=False, indent=2), encoding="utf-8")
+    (folder / "entry.json").write_text(json.dumps(entry, ensure_ascii=False, indent=2), encoding="utf-8")
+    size = sum(p.stat().st_size for p in folder.glob("*") if p.is_file())
     print(f"  → {folder.relative_to(ROOT)}  ({size / 1024:.0f} KB)")
     return {"model_id": model_id, "entry": entry, "report": rep_all, "real": rep_real, "folder": folder}
 
@@ -306,6 +323,9 @@ def main() -> int:
     results = []
     for task in (["aksara", "latin"] if args.task == "both" else [args.task]):
         results.append(train_task(task, args))
+    if any(r.get("regressed") for r in results):
+        # Gunakan kondisi model bawaan aktual dalam ringkasan (bukan model regresi).
+        results = bundled_results()
     write_summary(results, args)
     if not args.keep_store:
         shutil.rmtree(work.parent, ignore_errors=True)
