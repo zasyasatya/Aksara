@@ -2,7 +2,7 @@
   "id": "lens-latin-deepcnn-20260917",
   "task": "latin",
   "name": "Model OCR Lens — latin (dilatih pada dataset aktual)",
-  "notes": "Dilatih oleh eval/train_ocr_models.py pada 2536 sampel (omniglot-latin-handwriting-v1, latin-print-v1); augmentasi on-the-fly, cosine LR, label smoothing.",
+  "notes": "Dilatih oleh eval/train_ocr_models.py pada 4272 sampel (omniglot-latin-handwriting-v1, latin-print-v1); augmentasi on-the-fly, cosine LR, label smoothing.",
   "arch": "deepcnn",
   "arch_name": "Deep CNN + Augmentasi (rekomendasi OCR Lens)",
   "hyperparams": {
@@ -58,26 +58,26 @@
   ],
   "n_classes": 36,
   "n_params": 170402,
-  "created_at": "2026-09-17T00:48:30+00:00",
-  "train_seconds": 263.4,
+  "created_at": "2026-09-17T05:36:43+00:00",
+  "train_seconds": 412.2,
   "eval_split": "test",
   "dataset_size": {
-    "train": 1932,
-    "val": 190,
-    "test": 414
+    "train": 3282,
+    "val": 286,
+    "test": 704
   },
   "metrics": {
-    "accuracy": 0.9807,
-    "macro_precision": 0.983,
-    "macro_recall": 0.9824,
-    "macro_f1": 0.9815,
-    "weighted_precision": 0.9828,
-    "weighted_recall": 0.9807,
-    "weighted_f1": 0.9805,
-    "top3_accuracy": 1.0,
-    "log_loss": 0.1554,
-    "n_samples": 414,
-    "train_accuracy": 0.98
+    "accuracy": 0.9886,
+    "macro_precision": 0.9897,
+    "macro_recall": 0.9898,
+    "macro_f1": 0.9893,
+    "weighted_precision": 0.9894,
+    "weighted_recall": 0.9886,
+    "weighted_f1": 0.9885,
+    "top3_accuracy": 0.9957,
+    "log_loss": 0.1384,
+    "n_samples": 704,
+    "train_accuracy": 0.986
   },
   "bundled": true
 }
