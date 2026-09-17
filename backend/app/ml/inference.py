@@ -27,11 +27,11 @@ def invalidate(model_id: Optional[str] = None) -> None:
             _cache.pop(model_id, None)
 
 
-def load_model(model_id: str) -> models.BaseModel:
+def load_model(model_id: str, task: Optional[str] = None) -> models.BaseModel:
     with _cache_lock:
         if model_id in _cache:
             return _cache[model_id]
-    folder = store.model_dir(model_id)
+    folder = store.model_dir(model_id, task)
     if not (folder / "model.json").is_file():
         raise FileNotFoundError(model_id)
     model = models.BaseModel.load(folder)
@@ -42,25 +42,38 @@ def load_model(model_id: str) -> models.BaseModel:
     return model
 
 
-def resolve_model_id(model_id: Optional[str]) -> str:
+def resolve_model_id(model_id: Optional[str], task: Optional[str] = None) -> str:
     if model_id:
         return model_id
-    prod = store.production_model_id()
+    prod = store.production_model_id(task)
     if not prod:
         raise LookupError("Belum ada model produksi. Latih model lalu tetapkan sebagai produksi di Panel Admin.")
     return prod
 
 
-def predict_ink(ink: np.ndarray, model_id: Optional[str] = None, top_k: int = 5) -> Dict:
-    mid = resolve_model_id(model_id)
-    entry = store.get_model_entry(mid)
+def predict_ink(ink: np.ndarray, model_id: Optional[str] = None, top_k: int = 5,
+                task: Optional[str] = None, tta: int = 0) -> Dict:
+    """Klasifikasi satu maska tinta.
+
+    ``tta`` > 0 menjalankan test-time augmentation pada model yang mendukungnya
+    (rata-rata probabilitas beberapa versi teraugmentasi) — dipakai OCR Lens untuk
+    menaikkan akurasi pada foto kamera yang kurang tajam.
+    """
+    mid = resolve_model_id(model_id, task)
+    entry = store.get_model_entry(mid, task)
+    if entry is None:
+        entry = store.get_model_entry(mid, None)
     if entry is None:
         raise FileNotFoundError(mid)
-    model = load_model(mid)
+    entry_task = entry.get("task") or task or "aksara"
+    model = load_model(mid, entry_task)
     labels: List[str] = entry["classes"]
-    lookup = {c.label: c.__dict__ for c in store.all_available_classes()}
+    lookup = {c.label: c.__dict__ for c in store.all_available_classes(entry_task)}
     x = features.features_from_ink(ink)[None, :]
-    proba = model.predict_proba(x)[0]
+    try:
+        proba = (model.predict_proba(x, tta=int(tta)) if tta else model.predict_proba(x))[0]
+    except TypeError:  # model lama tanpa dukung TTA
+        proba = model.predict_proba(x)[0]
     order = np.argsort(-proba)[:max(1, min(top_k, len(labels)))]
     top = []
     for i in order:
@@ -76,6 +89,7 @@ def predict_ink(ink: np.ndarray, model_id: Optional[str] = None, top_k: int = 5)
     best = top[0]
     margin = best["probability"] - (top[1]["probability"] if len(top) > 1 else 0.0)
     return {
+        "task": entry_task or task or "aksara",
         "model_id": mid,
         "model_name": entry.get("name"),
         "arch": entry.get("arch"),

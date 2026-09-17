@@ -133,6 +133,40 @@ ARCHITECTURES: List[Dict] = [
             {"key": "dropout", "label": "Dropout", "type": "float", "default": 0.25, "min": 0, "max": 0.9},
         ],
     },
+    {
+        "id": "deepcnn",
+        "name": "Deep CNN + Augmentasi (rekomendasi OCR Lens)",
+        "family": "Jaringan saraf konvolusi dalam",
+        "trainable": True,
+        "description": (
+            "Enam lapisan: conv3×3×f1 → conv3×3×f1 → maxpool → conv3×3×f2 → conv3×3×f2 → maxpool → "
+            "FC → softmax. Augmentasi on-the-fly (rotasi, shear, tebal goresan, blur, noise kamera), "
+            "label smoothing, cosine learning-rate schedule, clipping gradien, dan sampling kelas "
+            "tertimbang — dirancang untuk dataset kecil-but-nyata seperti Caraka & Omniglot."
+        ),
+        "pros": [
+            "Akurasi tertinggi pada data sedikit",
+            "Augmentasi mengurangi overfit tanpa mengubah dataset",
+            "Tahan variasi gaya tulis & kualitas kamera",
+        ],
+        "cons": ["Training paling lama (CPU)", "Perlu epoch lebih banyak"],
+        "hyperparams": [
+            {"key": "epochs", "label": "Epoch", "type": "int", "default": 30, "min": 1, "max": 400},
+            {"key": "learning_rate", "label": "Learning rate awal", "type": "float", "default": 0.006, "min": 0.00001, "max": 1},
+            {"key": "min_learning_rate", "label": "Learning rate akhir (cosine)", "type": "float", "default": 0.00012, "min": 0.000001, "max": 1},
+            {"key": "batch_size", "label": "Batch size", "type": "int", "default": 64, "min": 8, "max": 256},
+            {"key": "conv1_filters", "label": "Filter conv 1–2", "type": "int", "default": 12, "min": 2, "max": 48},
+            {"key": "conv2_filters", "label": "Filter conv 3–4", "type": "int", "default": 24, "min": 2, "max": 64},
+            {"key": "hidden_units", "label": "Neuron FC", "type": "int", "default": 96, "min": 8, "max": 512},
+            {"key": "dropout", "label": "Dropout", "type": "float", "default": 0.25, "min": 0, "max": 0.9},
+            {"key": "weight_decay", "label": "Weight decay (L2)", "type": "float", "default": 0.0001, "min": 0, "max": 0.1},
+            {"key": "label_smoothing", "label": "Label smoothing", "type": "float", "default": 0.05, "min": 0, "max": 0.4},
+            {"key": "augment", "label": "Kekuatan augmentasi", "type": "float", "default": 1.0, "min": 0, "max": 2},
+            {"key": "grad_clip", "label": "Clipping gradien", "type": "float", "default": 5.0, "min": 0, "max": 100},
+            {"key": "class_balance", "label": "Penyeimbang kelas (0=netral · 1=penuh)", "type": "float", "default": 0.5, "min": 0, "max": 1},
+            {"key": "eval_tta", "label": "TTA saat evaluasi (0=mati)", "type": "int", "default": 0, "min": 0, "max": 12},
+        ],
+    },
 ]
 
 ARCH_BY_ID = {a["id"]: a for a in ARCHITECTURES}
@@ -735,8 +769,229 @@ class CNNModel(BaseModel):
         self.params = {k: arrays[k] for k in ["W1", "b1", "W2", "b2", "W3", "b3", "W4", "b4"]}
 
 
+
+
+# ── Deep CNN (augmentasi + label smoothing + cosine LR) ────────────────────
+
+class DeepCNNModel(BaseModel):
+    """conv(f1)→conv(f1)→pool→conv(f2)→conv(f2)→pool→FC→softmax.
+
+    Perbedaan utama dibanding ``cnn``: dua kali lebih dalam, augmentasi dilakukan
+    *saat* training (sehingga satu dataset dapat menghasilkan banyak tampilan),
+    label smoothing + cosine learning-rate + clipping gradien menstabilkan
+    pelatihan pada dataset kecil, dan sampling kelas terimbang memperbaiki kelas
+    langka (mis. ``surang`` / ``cecek``).
+    """
+
+    arch = "deepcnn"
+
+    def __init__(self, n_classes: int, hyperparams: Optional[Dict] = None):
+        super().__init__(n_classes, hyperparams)
+        self.params: Dict[str, np.ndarray] = {}
+        self.init_stats: Dict[str, float] = {}
+        self.augment_rng = np.random.default_rng(12345)
+
+    def _init(self, rng: np.random.Generator) -> None:
+        f1 = int(self.hp["conv1_filters"])
+        f2 = int(self.hp["conv2_filters"])
+        hdim = int(self.hp["hidden_units"])
+        s = FEATURE_SIZE // 4
+        P = {
+            "W1": rng.standard_normal((f1, 9)) * math.sqrt(1.0 / 9),
+            "b1": np.zeros(f1),
+            "W2": rng.standard_normal((f1, f1 * 9)) * math.sqrt(1.0 / (f1 * 9)),
+            "b2": np.zeros(f1),
+            "W3": rng.standard_normal((f2, f1 * 9)) * math.sqrt(1.0 / (f1 * 9)),
+            "b3": np.zeros(f2),
+            "W4": rng.standard_normal((f2, f2 * 9)) * math.sqrt(1.0 / (f2 * 9)),
+            "b4": np.zeros(f2),
+            "W5": rng.standard_normal((f2 * s * s, hdim)) * math.sqrt(1.0 / (f2 * s * s)),
+            "b5": np.zeros(hdim),
+            "W6": rng.standard_normal((hdim, self.n_classes)) * math.sqrt(1.0 / hdim),
+            "b6": np.zeros(self.n_classes),
+        }
+        self.params = {k: v.astype(np.float32) for k, v in P.items()}
+
+    def _rescale_layers(self, Xs: np.ndarray) -> Dict[str, float]:
+        """Inisialisasi bergantung-data (data-dependent init).
+
+        Untuk jaringan konvolusi tanpa BatchNorm, besar aktivasi bisa meledak dari
+        lapisan ke lapisan → loss awal ekstrem → Adam mendorong bobot ke titik di
+        mana semua ReLU mati dan keluaran membeku pada distribusi seragam
+        (loss = ln(C) selamanya). Di sini setiap lapisan diskalakan sehingga RMS
+        pra-aktivasinya ≈ 1 pada batch pertama, sehingga epoch pertama sudah stabil.
+        """
+        P = self.params
+        stats: Dict[str, float] = {}
+        steps = (
+            ("W1", "b1"), ("W2", "b2"), ("W3", "b3"), ("W4", "b4"), ("W5", "b5"), ("W6", "b6"),
+        )
+        for depth, (wk, bk) in enumerate(steps):
+            out, cache = self._forward(Xs, False)
+            x0, a1, _c1, z2, _c2, _m1, a3, _c3, z4, _c4, _m2, flat, z5, _h5, _d, p1, p2 = cache
+            pre = {0: None, 1: None}
+            tensors = {0: self._pre_activations(cache, depth), }
+            z = tensors[0]
+            rms = float(np.sqrt(np.mean(z.astype(np.float64) ** 2))) or 1.0
+            rms = max(rms, 1e-6)
+            P[wk] = (P[wk] / rms).astype(np.float32)
+            P[bk] = (P[bk] / rms).astype(np.float32)
+            stats[wk] = round(rms, 4)
+        return stats
+
+    @staticmethod
+    def _pre_activations(cache, depth: int) -> np.ndarray:
+        (x0, a1, cols1, z2, cols2, m1, a3, cols3, z4, cols4, m2, flat, z5, h5, drop, p1, p2) = cache
+        return {0: a1, 1: z2, 2: a3, 3: z4, 4: z5, 5: h5}[depth]
+
+    # -- maju / mundur ------------------------------------------------------
+    def _forward(self, Xs: np.ndarray, train: bool, rng: Optional[np.random.Generator] = None):
+        P = self.params
+        n = Xs.shape[0]
+        x0 = Xs.reshape(n, 1, FEATURE_SIZE, FEATURE_SIZE)
+        z1, cols1 = _conv3(x0, P["W1"], P["b1"])
+        a1 = np.maximum(z1, 0.0)
+        z2, cols2 = _conv3(a1, P["W2"], P["b2"])
+        a2 = np.maximum(z2, 0.0)
+        p1, m1 = _maxpool2(a2)
+        z3, cols3 = _conv3(p1, P["W3"], P["b3"])
+        a3 = np.maximum(z3, 0.0)
+        z4, cols4 = _conv3(a3, P["W4"], P["b4"])
+        a4 = np.maximum(z4, 0.0)
+        p2, m2 = _maxpool2(a4)
+        flat = p2.reshape(n, -1)
+        z5 = flat @ P["W5"] + P["b5"]
+        h5 = np.maximum(z5, 0.0)
+        drop = None
+        pd = float(self.hp["dropout"])
+        if train and pd > 0 and rng is not None:
+            drop = (rng.random(h5.shape, dtype=np.float32) >= pd).astype(np.float32) / (1.0 - pd)
+            h5 = h5 * drop
+        out = softmax(h5 @ P["W6"] + P["b6"])
+        cache = (x0, a1, cols1, z2, cols2, m1, a3, cols3, z4, cols4, m2, flat, z5, h5, drop, p1, p2)
+        return out, cache
+
+    def _backward(self, out: np.ndarray, Y: np.ndarray, cache) -> List[np.ndarray]:
+        P = self.params
+        x0, a1, cols1, z2, cols2, m1, a3, cols3, z4, cols4, m2, flat, z5, h5, drop, p1, p2 = cache
+        n = out.shape[0]
+        g = (out - Y) / n                                   # dL/d(logit-6)
+        dW6, db6 = h5.T @ g, g.sum(axis=0)
+        dh5 = g @ P["W6"].T
+        if drop is not None:
+            dh5 = dh5 * drop
+        dz5 = dh5 * (z5 > 0)
+        dW5, db5 = flat.T @ dz5, dz5.sum(axis=0)
+        dp2 = (dz5 @ P["W5"].T).reshape(p2.shape)
+        da4 = _maxpool2_back(dp2, m2)
+        dz4 = da4 * (z4 > 0)
+        f2 = dz4.shape[1]
+        dz4_flat = dz4.transpose(0, 2, 3, 1).reshape(-1, f2)
+        dW4, db4 = dz4_flat.T @ cols4, dz4_flat.sum(axis=0)
+        da3 = _col2im3(dz4_flat @ P["W4"], n, a3.shape[1], a3.shape[2], a3.shape[3])
+        dz3 = da3 * (a3 > 0)
+        dz3_flat = dz3.transpose(0, 2, 3, 1).reshape(-1, f2)
+        dW3, db3 = dz3_flat.T @ cols3, dz3_flat.sum(axis=0)
+        dp1 = _col2im3(dz3_flat @ P["W3"], n, p1.shape[1], p1.shape[2], p1.shape[3])
+        da2 = _maxpool2_back(dp1, m1)
+        dz2 = da2 * (z2 > 0)
+        dz2_flat = dz2.transpose(0, 2, 3, 1).reshape(-1, a1.shape[1])
+        dW2, db2 = dz2_flat.T @ cols2, dz2_flat.sum(axis=0)
+        da1 = _col2im3(dz2_flat @ P["W2"], n, a1.shape[1], a1.shape[2], a1.shape[3])
+        dz1 = da1 * (a1 > 0)
+        dz1_flat = dz1.transpose(0, 2, 3, 1).reshape(-1, a1.shape[1])
+        dW1, db1 = dz1_flat.T @ cols1, dz1_flat.sum(axis=0)
+        return [dW1, db1, dW2, db2, dW3, db3, dW4, db4, dW5, db5, dW6, db6]
+
+    # -- training -----------------------------------------------------------
+    def fit(self, X, y, X_val=None, y_val=None, progress=None, should_stop=None) -> None:
+        from . import augment as augment_mod
+
+        rng = np.random.default_rng(0)
+        self._fit_scaler(X)
+        self._init(rng)
+        keys = ["W1", "b1", "W2", "b2", "W3", "b3", "W4", "b4", "W5", "b5", "W6", "b6"]
+        probe = X[: min(len(X), 256)]
+        self.init_stats = self._rescale_layers(self._scale(probe))
+        lr0 = float(self.hp["learning_rate"])
+        lr_min = min(float(self.hp["min_learning_rate"]), lr0)
+        opt = Adam([self.params[k] for k in keys], lr=lr0, weight_decay=float(self.hp["weight_decay"]))
+        epochs, bs = int(self.hp["epochs"]), int(self.hp["batch_size"])
+        strength = float(self.hp["augment"])
+        eps = float(self.hp["label_smoothing"])
+        clip = float(self.hp["grad_clip"])
+        balance = float(self.hp.get("class_balance", 0.5))
+        base = float(bs)
+        for ep in range(1, epochs + 1):
+            t0 = time.time()
+            opt.lr = lr_min + 0.5 * (lr0 - lr_min) * (1.0 + math.cos(math.pi * (ep - 1) / max(1, epochs)))
+            order = augment_mod.balanced_indices(y, rng, balance)
+            losses, accs = [], []
+            for pos in _iterate_minibatches(len(order), bs, rng):
+                idx = order[pos]
+                xb_raw, yb_idx = X[idx], y[idx]
+                if strength > 0:
+                    xb_raw = augment_mod.augment_batch(xb_raw, yb_idx, rng, strength)[0]
+                Y = one_hot(yb_idx, self.n_classes)
+                if eps > 0:
+                    Y = Y * (1.0 - eps) + eps / self.n_classes
+                Xs = self._scale(xb_raw)
+                out, cache = self._forward(Xs, True, rng)
+                losses.append(float(-(Y * np.log(out + 1e-9)).sum(axis=1).mean()))
+                grads = self._backward(out, Y, cache)
+                if clip > 0:
+                    norm = float(np.sqrt(sum(float((g * g).sum()) for g in grads)))
+                    if norm > clip and norm > 0:
+                        grads = [g * (clip / norm) for g in grads]
+                opt.step([g.astype(np.float32) for g in grads])
+            sub = slice(0, min(len(X), 1500))
+            rec = {
+                "epoch": ep,
+                "loss": round(float(np.mean(losses)), 5),
+                "lr": round(float(opt.lr), 6),
+                "train_acc": _accuracy(self, X[sub], y[sub]),
+                "val_acc": _accuracy(self, X_val if X_val is None or len(X_val) <= 2500 else X_val[:2500],
+                                     y_val if y_val is None or len(y_val) <= 2500 else y_val[:2500]),
+                "seconds": round(time.time() - t0, 3),
+            }
+            self.history.append(rec)
+            if progress:
+                progress(rec)
+            if should_stop and should_stop():
+                break
+
+    def predict_proba(self, X: np.ndarray, tta: int = 0, rng: Optional[np.random.Generator] = None) -> np.ndarray:
+        """``tta`` > 0: rata-rata probabilitas pada ``tta`` versi teraugmentasi (test-time augmentation)."""
+        Xs = self._scale(X)
+        outs = []
+        for s in range(0, len(Xs), 256):
+            outs.append(self._forward(Xs[s:s + 256], False)[0])
+        p = np.concatenate(outs, axis=0) if outs else np.zeros((0, self.n_classes), dtype=np.float32)
+        if tta and len(p):
+            from . import augment as augment_mod
+            g = rng or np.random.default_rng(7)
+            acc = p.copy()
+            for _ in range(int(tta)):
+                xp = augment_mod.augment_batch(X, np.zeros(len(X), dtype=np.int64), g, 0.6)[0]
+                xs = self._scale(xp)
+                parts = [self._forward(xs[s:s + 256], False)[0] for s in range(0, len(xs), 256)]
+                acc = acc + np.concatenate(parts, axis=0)
+            p = acc / (1.0 + int(tta))
+        return p
+
+    def n_params(self) -> int:
+        return int(sum(v.size for v in self.params.values()))
+
+    def _arrays(self):
+        return dict(self.params)
+
+    def _load_arrays(self, arrays):
+        self.params = {k: arrays[k] for k in ["W1", "b1", "W2", "b2", "W3", "b3", "W4", "b4", "W5", "b5", "W6", "b6"]}
+
+
 MODEL_CLASSES = {
     "template": TemplateModel,
+    "deepcnn": DeepCNNModel,
     "centroid": CentroidModel,
     "knn": KNNModel,
     "logreg": LogRegModel,

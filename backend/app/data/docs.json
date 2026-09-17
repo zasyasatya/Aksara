@@ -59,6 +59,16 @@
       "is_public": true,
       "order": 6,
       "updated_at": "2026-09-04"
+    },
+    {
+      "slug": "lens-ocr",
+      "title": "Lens — OCR Kamera Aksara Bali & Latin",
+      "subtitle": "Cara kerja pipeline kamera (praproses → segmentasi → CNN → decoding kamus → terjemahan), asal dataset, akurasi terukur, alur koreksi ke retraining, API, dan pemecahan masalah",
+      "role": "metodologi",
+      "icon": "ScanText",
+      "is_public": true,
+      "order": 7,
+      "updated_at": "2026-09-17"
     }
   ]
 }

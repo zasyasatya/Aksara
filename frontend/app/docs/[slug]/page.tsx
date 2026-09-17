@@ -11,6 +11,7 @@ export function generateStaticParams() {
     "metode-scientific",
     "dataset-dan-model",
     "panduan-retraining",
+    "lens-ocr",
   ].map((slug) => ({ slug }))
 }
 

@@ -52,11 +52,20 @@ def _read_manifest(folder: Path) -> Optional[Dict]:
     return data
 
 
-def list_bundled() -> List[Dict]:
-    """Ringkasan setiap paket dataset yang tersedia (tanpa daftar sampel penuh)."""
+def list_bundled(task: Optional[str] = None) -> List[Dict]:
+    """Ringkasan setiap paket dataset yang tersedia (tanpa daftar sampel penuh).
+
+    ``task`` memfilter paket berdasarkan manifest ``task`` (``aksara`` / ``latin``).
+    Paket tanpa field ``task`` dianggap tugas aksara (kompatibel paket lama).
+    """
     root = datasets_root()
     if root is None:
         return []
+    wanted = None
+    if task:
+        from .tasks import resolve as resolve_task
+
+        wanted = resolve_task(task)
     out = []
     for folder in sorted(p for p in root.iterdir() if p.is_dir()):
         m = _read_manifest(folder)
@@ -68,7 +77,13 @@ def list_bundled() -> List[Dict]:
             sp = s.get("split")
             if sp in per_split:
                 per_split[sp] += 1
+        pack_task = m.get("task") or "aksara"
+        if wanted and pack_task != wanted:
+            continue
         out.append({
+            "task": pack_task,
+            "real": bool(m.get("source")),
+            "source": m.get("source"),
             "name": m.get("name") or folder.name,
             "folder": folder.name,
             "description": m.get("description", ""),
@@ -101,6 +116,7 @@ def import_bundled(
     activate_classes: bool = True,
     replace_existing: bool = True,
     keep_split: bool = True,
+    task: Optional[str] = None,
 ) -> Dict:
     """Salin paket dataset ke store ML.
 
@@ -112,22 +128,28 @@ def import_bundled(
     m = get_bundled(name)
     if m is None:
         raise LookupError(f"Dataset '{name}' tidak ditemukan di repo.")
+    pack_task = m.get("task") or "aksara"
+    target_task = task or pack_task
+    if task and pack_task != target_task:
+        raise ValueError(
+            f"Paket '{name}' berisi sampel tugas '{pack_task}', tidak dapat diimpor ke '{target_task}'."
+        )
     folder: Path = m["_folder"]
     labels_in_pack = [c["label"] for c in m.get("classes", []) if c.get("label")] or sorted(
         {s["label"] for s in m["samples"] if s.get("label")}
     )
     if activate_classes:
-        store.set_classes(labels_in_pack)
-    active = set(store.class_labels())
+        store.set_classes(labels_in_pack, target_task)
+    active = set(store.class_labels(target_task))
 
     removed = 0
     if replace_existing:
         with store._lock:
             ids = [
-                s["id"] for s in store.list_samples()
+                s["id"] for s in store.list_samples(target_task)
                 if s.get("source") == "import" and (s.get("meta") or {}).get("dataset") == name
             ]
-        removed = store.delete_samples(ids) if ids else 0
+        removed = store.delete_samples(ids, target_task) if ids else 0
 
     items, skipped = [], 0
     for s in m["samples"]:
@@ -146,16 +168,17 @@ def import_bundled(
             skipped += 1
             continue
         split = s.get("split") if keep_split and s.get("split") in store.SPLITS else None
-        meta = {"dataset": name, "file": rel, **(s.get("meta") or {})}
+        meta = {**(s.get("meta") or {}), "dataset": name, "file": rel, "task": target_task}
         items.append((ink, label, "import", split, f"impor {name}", meta))
-    entries = store.add_samples_bulk(items)
+    entries = store.add_samples_bulk(items, target_task)
     if not keep_split:
-        store.rebalance_splits()
+        store.rebalance_splits(task=target_task)
     return {
         "name": name,
+        "task": target_task,
         "added": len(entries),
         "removed": removed,
         "skipped": skipped + (len(items) - len(entries)),
         "classes": labels_in_pack,
-        "stats": store.dataset_stats(),
+        "stats": store.dataset_stats(target_task),
     }

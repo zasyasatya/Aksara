@@ -3,12 +3,13 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, BookOpen, BookOpenCheck, Languages, Gamepad2, Stamp, User } from "lucide-react"
+import { LayoutDashboard, BookOpen, BookOpenCheck, Languages, Gamepad2, ScanText, Stamp, User } from "lucide-react"
 
 const navItems = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/learn", label: "Belajar", icon: BookOpen },
   { href: "/translate", label: "Translate", icon: Languages },
+  { href: "/lens", label: "Lens", icon: ScanText },
   { href: "/quiz", label: "Kuis", icon: Gamepad2 },
   { href: "/twibbon", label: "Twibbon", icon: Stamp },
   { href: "/playground", label: "Play", icon: User },
@@ -29,12 +30,12 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
           className={cn(
-            "flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium transition-all",
+            "flex flex-col items-center gap-1 rounded-2xl px-1.5 py-2 text-xs font-medium transition-all",
             isActive ? "bg-deep-brown text-cream shadow-soft" : "text-deep-brown/60"
           )}
             >
               <Icon className="h-5 w-5" />
-              <span className="text-[10px]">{item.label}</span>
+              <span className="text-[9px] leading-none">{item.label}</span>
             </Link>
           )
         })}

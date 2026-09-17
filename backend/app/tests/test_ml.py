@@ -25,13 +25,9 @@ client = TestClient(app)
 def isolated_ml_dir(tmp_path, monkeypatch):
     """Arahkan semua path store ke direktori sementara + bersihkan cache inferensi."""
     ml = tmp_path / "ml"
+    # store.compute paths() dari ML_DIR tiap panggilan (multi-tugas: ml/<task>/…)
     monkeypatch.setattr(store, "ML_DIR", ml)
-    monkeypatch.setattr(store, "DATASET_DIR", ml / "dataset")
-    monkeypatch.setattr(store, "IMAGES_DIR", ml / "dataset" / "images")
-    monkeypatch.setattr(store, "INDEX_PATH", ml / "dataset" / "index.json")
-    monkeypatch.setattr(store, "MODELS_DIR", ml / "models")
-    monkeypatch.setattr(store, "REGISTRY_PATH", ml / "models" / "registry.json")
-    monkeypatch.setattr(store, "CLASSES_PATH", ml / "classes.json")
+    store._migrated.clear()
     from app.ml import inference
     inference.invalidate()
     yield
@@ -147,7 +143,8 @@ def test_hyperparams_are_clamped_and_unknown_arch_rejected():
 
 def test_classes_default_and_update():
     r = client.get("/api/ml/classes").json()
-    assert len(r["active"]) == 18 and len(r["available"]) >= 40
+    # baku tugas aksara = 26 kelas Caraka (18 Wresastra + pangangge + adeg-adeg)
+    assert len(r["active"]) == 26 and len(r["available"]) >= 40
     r = client.put("/api/ml/classes", json={"labels": ["ha", "na", "ca"]})
     assert r.status_code == 200 and [c["label"] for c in r.json()["active"]] == ["ha", "na", "ca"]
     r = client.put("/api/ml/classes", json={"labels": ["ha", "zzz"]})

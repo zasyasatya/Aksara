@@ -122,3 +122,10 @@
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
+
+/* Lens Aksara: garis pemindaian pada bingkai bidik */
+@keyframes scan {
+  0% { transform: translateY(-100%); }
+  50% { transform: translateY(180%); }
+  100% { transform: translateY(-100%); }
+}

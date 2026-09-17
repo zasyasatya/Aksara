@@ -39,10 +39,14 @@ class GlyphClass:
     group: str        # wresastra | swalalita | suara | angka
 
 
+CLASS_GROUPS = ("wresastra", "swalalita", "suara", "angka", "pangangge_suara", "pangangge_tengenan")
+
+
 def build_classes(master: dict, groups: Sequence[str] = ("wresastra",)) -> List[GlyphClass]:
     """Bangun daftar kelas dari aksara_master.json untuk kelompok terpilih."""
     out: List[GlyphClass] = []
-    seen = set()
+    seen: set[str] = set()
+    seen_glyphs: set[str] = set()
     for group in groups:
         if group == "wresastra":
             items = master.get("wresastra", [])
@@ -52,6 +56,8 @@ def build_classes(master: dict, groups: Sequence[str] = ("wresastra",)) -> List[
             items = master.get("suara", [])
         elif group == "angka":
             items = master.get("angka", [])
+        elif group in ("pangangge_suara", "pangangge_tengenan"):
+            items = master.get(group, [])
         else:
             continue
         for it in items:
@@ -59,14 +65,17 @@ def build_classes(master: dict, groups: Sequence[str] = ("wresastra",)) -> List[
             if not glyph:
                 continue
             label = it.get("id") or f"angka_{it.get('latin')}"
-            if label in seen:
+            if label in seen or glyph in seen_glyphs:
+                # aksara_master memiliki id berbeda dengan glif yang sama (mis. tedong vs
+                # taleng_tedong) — satu glif = satu kelas agar label tidak ambigu.
                 continue
             seen.add(label)
+            seen_glyphs.add(glyph)
             out.append(GlyphClass(
                 label=label,
                 glyph=glyph,
                 name=it.get("name") or label,
-                latin=str(it.get("latin") or ""),
+                latin=str(it.get("latin") or it.get("latin_effect") or ""),
                 group=group,
             ))
     return out

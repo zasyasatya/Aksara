@@ -1,4 +1,5 @@
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -7,9 +8,18 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from .core.config import settings
-from .routers import health, translate, classify, lessons, quiz, docs, manage, engagement, auth, ml, settings as settings_router
+from .routers import health, translate, classify, lessons, quiz, docs, manage, engagement, auth, ml, ocr, settings as settings_router
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    """Persiapan awal: pasang model OCR Lens bawaan (lihat `_prepare_ocr_models`)."""
+    await _prepare_ocr_models()
+    yield
+
 
 app = FastAPI(
+    lifespan=lifespan,
     title=settings.app_name,
     version=settings.version,
     description=settings.description + "\n\nAdvanced transliteration handling gantungan, gempelan, pangangge, tumpuk telu rules.",
@@ -39,9 +49,24 @@ app.include_router(docs.router, prefix=settings.api_prefix)
 app.include_router(manage.router, prefix=settings.api_prefix)
 app.include_router(engagement.router, prefix=settings.api_prefix)
 app.include_router(ml.router, prefix=settings.api_prefix)
+app.include_router(ocr.router, prefix=settings.api_prefix)
 app.include_router(settings_router.router, prefix=settings.api_prefix)
 app.include_router(auth.router)
 app.include_router(auth.router, prefix=settings.api_prefix)
+
+async def _prepare_ocr_models():
+    """Pasang model OCR Lens bawaan (hasil training dataset aktual) bila belum ada.
+
+    Salinan file kecil (±300 KB) dan idempoten; gagal pun tidak apa — halaman Lens
+    akan meminta admin melatih/mengimpor model lewat Panel Admin.
+    """
+    try:
+        from .ml import pretrain
+
+        pretrain.ensure_installed()
+    except Exception as exc:  # pragma: no cover - jangan gagalkan booting aplikasi
+        print(f"[aksara] model OCR bawaan belum terpasang: {exc}", flush=True)
+
 
 @app.get("/api")
 async def api_root():
@@ -67,6 +92,10 @@ async def api_root():
             "/api/ml/models",
             "/api/ml/dataset/samples",
             "/api/ml/train",
+            "/api/ocr/status",
+            "/api/ocr/scan",
+            "/api/ocr/scan/file",
+            "/api/ocr/feedback",
             "/api/settings/theme",
         ]
     }
